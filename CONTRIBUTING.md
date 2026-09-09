@@ -117,6 +117,39 @@ first; changesets rewrites those to real version ranges at publish time.
 
 There is deliberately no `NPM_TOKEN`. Publishing authenticates over OIDC.
 
+### Setting up the docs deployment, once
+
+1. Create a Cloudflare API token from the **Edit Cloudflare Workers** template,
+   scoped to the account that owns `arshadshah.com`.
+2. Add it as the repository secret `CLOUDFLARE_API_TOKEN`, and the account id
+   as `CLOUDFLARE_ACCOUNT_ID`.
+3. The first `wrangler deploy` creates the `detent-docs` Worker and claims
+   `detent.arshadshah.com` as a custom domain. That requires the zone for
+   `arshadshah.com` to be on the same Cloudflare account.
+
+Until the secrets exist the deploy step fails and everything before it — the
+build and the type check — passes. Pull requests never deploy.
+
+## The documentation site
+
+`apps/docs` is a private Astro Starlight site.
+
+```bash
+pnpm docs          # dev server
+pnpm docs:build    # production build
+```
+
+**Demos are real.** Each lives in `apps/docs/src/demos/<id>.ts`, imports the
+library through the workspace, and exports
+`default function mount(stage: HTMLElement): () => void`. A change to the
+library's public API breaks the docs build rather than leaving a code block
+quietly wrong. Add one by dropping a module in that directory and referencing
+it as `<Demo id="<id>">`.
+
+The docs app pins **TypeScript 6** while the packages use 7: `astro check`
+needs TypeScript's programmatic API, which the native 7.x compiler does not
+expose yet. Nothing published is affected.
+
 ## Design documents
 
 `docs/superpowers/` holds the specs and implementation plans this repository

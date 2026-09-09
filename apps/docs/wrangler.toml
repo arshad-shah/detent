@@ -1,0 +1,12 @@
+name = "detent-docs"
+compatibility_date = "2026-09-01"
+
+[assets]
+directory = "./dist"
+# Astro emits <page>/index.html, so a request for /api/draggable/ has to fall
+# back to the directory's index rather than 404.
+not_found_handling = "404-page"
+
+[[routes]]
+pattern = "detent.arshadshah.com"
+custom_domain = true
