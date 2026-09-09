@@ -1,5 +1,15 @@
 # detent
 
+## 0.2.0
+
+### Minor Changes
+
+- [#9](https://github.com/arshad-shah/detent/pull/9) [`cc1e16d`](https://github.com/arshad-shah/detent/commit/cc1e16d98d525d58fc315015a6ff12917114f14f) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Export the `HandleName` and `HandleSpec` types.
+  
+  `resizable`'s `handles` option could not be typed by a consumer without them —
+  writing a helper that returns a handle list meant redeclaring the eight names
+  by hand.
+
 ## 0.1.0
 
 ### Minor Changes

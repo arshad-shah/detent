@@ -1,6 +1,6 @@
 {
   "name": "detent-svelte",
-  "version": "0.0.0",
+  "version": "0.2.0",
   "description": "Svelte actions for detent — drag, reorder and resize.",
   "type": "module",
   "sideEffects": false,
