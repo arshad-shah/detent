@@ -21,6 +21,10 @@ Grab any edge or corner of the panel below.
   <div class="demo-panel"></div>
 </Demo>
 
+Pulling the top or left edge moves the element as well as sizing it — the edge
+you grabbed follows the pointer, so the opposite edge stays put. The offset is
+derived from the final clamped size, so hitting a minimum never causes drift.
+
 ## Holding a ratio
 
 `aspectRatio` keeps width and height in proportion. `true` holds the element's

@@ -1,9 +1,13 @@
 ---
 title: detent
-description: Tiny zero-dependency drag, reorder and resize for the web.
+description: Drag, reorder and resize for the web. 6.7 KB gzipped, no dependencies.
 template: splash
 hero:
-  tagline: Drag, reorder and resize for the web. No dependencies, no framework, one input path for mouse, touch and pen.
+  title: Drag, reorder, resize
+  tagline: 6.7 KB gzipped, no dependencies, and one input path for mouse, touch and pen.
+  image:
+    light: ../../assets/mark.svg
+    dark: ../../assets/mark-inverse.svg
   actions:
     - text: Getting started
       link: /guides/getting-started/
@@ -29,15 +33,15 @@ import Demo from '../../components/Demo.astro';
 </Demo>
 
 <CardGrid>
-  <Card title="draggable" icon="seti:plan">
+  <Card title="draggable">
     Move an element with the pointer. Axis locking, bounds, grid snapping.
     [Read more](/api/draggable/)
   </Card>
-  <Card title="sortable" icon="list-format">
-    Reorder a list, or pass items between several. Keyboard support included.
-    [Read more](/api/sortable/)
+  <Card title="sortable">
+    Reorder a list, or pass items between several. Keyboard reordering with
+    screen-reader announcements. [Read more](/api/sortable/)
   </Card>
-  <Card title="resizable" icon="seti:image">
+  <Card title="resizable">
     Eight handles or your own elements. Aspect ratio, grid, bounds.
     [Read more](/api/resizable/)
   </Card>
@@ -68,7 +72,7 @@ import Demo from '../../components/Demo.astro';
   </TabItem>
 </Tabs>
 
-## Why it is small
+## What it costs
 
 | Bundle | Gzipped |
 | --- | --- |
@@ -81,6 +85,9 @@ Every rectangle is read once at the start of a drag and cached, so nothing
 reads layout during a move. DOM writes are batched to one per frame. Reorders
 use FLIP, so the browser lays the list out a single time no matter how many
 items shuffle.
+
+Per-swap cost grows with the number of items, not their size: fine at 20,
+noticeable around 200. Set `animation: 0` or virtualise above that.
 
 A detent is the catch that holds a moving part at a set position — the click
 you feel when a dial lands on a setting.

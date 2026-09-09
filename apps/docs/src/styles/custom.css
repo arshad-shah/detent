@@ -1,38 +1,206 @@
+/*
+ * The site wears the brand in brand/tokens.css — Ink, Paper, Panel, Signal.
+ * Nothing here invents a colour.
+ *
+ * Theming has three states, not two. An explicit choice stamps
+ * data-theme="light" or "dark"; the default "auto" stamps nothing, and only
+ * prefers-color-scheme separates them. Overriding just :root and
+ * [data-theme='light'] left an auto visitor on a light system with
+ * Starlight's own light background and this file's dark text.
+ *
+ * So the palette is chosen once into role tokens, across all three states, and
+ * the Starlight variables are mapped from those roles exactly once.
+ *
+ * Signal marks the thing that just moved. It is an accent and a state, never
+ * body text.
+ */
+
 :root {
-  --demo-surface: var(--sl-color-gray-6);
-  --demo-line: var(--sl-color-gray-5);
-  --demo-item: var(--sl-color-gray-7);
-  --demo-accent: var(--sl-color-accent);
+  /* Brand, verbatim from brand/tokens.css. */
+  --detent-ink: #2b2d24;
+  --detent-paper: #e7e5dc;
+  --detent-panel: #faf9f5;
+  --detent-signal: #a82a57;
+  --detent-signal-soft: #f4dee6;
+  --detent-muted: #6e7264;
+  --detent-line: #c9c6b8;
+
+  /*
+   * The brand names Ink as a dark surface, not a dark scale. A real theme
+   * needs separation between page, raised surface and item, so these step
+   * down from and up past Ink on its own hue rather than crowding it.
+   */
+  --detent-ink-deep: #0b0c07;
+  --detent-ink-raised: #191b14;
+  --detent-ink-panel: #2b2d24;
+  --detent-ink-line: #3a3d31;
+  --detent-signal-light: #e39bb4; /* 6.3:1 on Ink */
+  --detent-signal-deep: #4a2333;
+
+  --sl-font: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  --sl-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
+/* Roles: dark, matching Starlight's own base. */
+:root {
+  --role-bg: var(--detent-ink-deep);
+  --role-surface: var(--detent-ink-raised);
+  /* Ink itself is the item surface — the brand's dark surface, sitting on
+     something blacker rather than being the black. */
+  --role-raised: var(--detent-ink-panel);
+  --role-line: var(--detent-ink-line);
+  --role-text: var(--detent-paper);
+  --role-text-strong: var(--detent-panel);
+  --role-text-soft: #cfcdc2;
+  --role-text-muted: #b0b3a5;
+  --role-text-faint: #85897a;
+  --role-accent: var(--detent-signal-light);
+  --role-accent-low: var(--detent-signal-deep);
+  --role-accent-high: #f2cdd9;
+  --role-inverse: var(--detent-ink);
+}
+
+/* Auto, on a light system. Mirrors Starlight's own media-query selector, which
+   is why the roles repeat here rather than the whole mapping. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) {
+    --role-bg: var(--detent-paper);
+    --role-surface: var(--detent-panel);
+    --role-raised: var(--detent-panel);
+    --role-line: var(--detent-line);
+    --role-text: #3a3d31;
+    --role-text-strong: var(--detent-ink);
+    --role-text-soft: #4d5142;
+    --role-text-muted: var(--detent-muted);
+    --role-text-faint: #8b8e80;
+    --role-accent: var(--detent-signal);
+    --role-accent-low: var(--detent-signal-soft);
+    --role-accent-high: #7a1e3f;
+    --role-inverse: var(--detent-paper);
+  }
+}
+
+/* An explicit light choice wins in both directions. */
+:root[data-theme='light'] {
+  --role-bg: var(--detent-paper);
+  --role-surface: var(--detent-panel);
+  --role-raised: var(--detent-panel);
+  --role-line: var(--detent-line);
+  --role-text: #3a3d31;
+  --role-text-strong: var(--detent-ink);
+  --role-text-soft: #4d5142;
+  --role-text-muted: var(--detent-muted);
+  --role-text-faint: #8b8e80;
+  --role-accent: var(--detent-signal);
+  --role-accent-low: var(--detent-signal-soft);
+  --role-accent-high: #7a1e3f;
+  --role-inverse: var(--detent-paper);
+}
+
+/* Starlight, mapped from the roles once. */
+:root {
+  --sl-color-accent-low: var(--role-accent-low);
+  --sl-color-accent: var(--role-accent);
+  --sl-color-accent-high: var(--role-accent-high);
+
+  --sl-color-white: var(--role-text-strong);
+  --sl-color-gray-1: var(--role-text);
+  --sl-color-gray-2: var(--role-text-soft);
+  --sl-color-gray-3: var(--role-text-muted);
+  --sl-color-gray-4: var(--role-text-faint);
+  --sl-color-gray-5: var(--role-line);
+  --sl-color-gray-6: var(--role-surface);
+  --sl-color-gray-7: var(--role-raised);
+  --sl-color-black: var(--role-inverse);
+
+  --sl-color-text: var(--role-text);
+  --sl-color-text-accent: var(--role-accent);
+  --sl-color-bg: var(--role-bg);
+  --sl-color-bg-nav: var(--role-bg);
+  --sl-color-bg-sidebar: var(--role-bg);
+  --sl-color-bg-inline-code: var(--role-surface);
+  --sl-color-bg-accent: var(--role-accent);
+  --sl-color-hairline: var(--role-line);
+  --sl-color-hairline-light: var(--role-line);
+  --sl-color-hairline-shade: var(--role-line);
+
+  --demo-surface: var(--role-surface);
+  --demo-stage-bg: var(--role-bg);
+  --demo-line: var(--role-line);
+  --demo-item: var(--role-raised);
+  --demo-item-text: var(--role-text);
+  --demo-signal: var(--role-accent);
+  --demo-signal-fill: var(--role-accent-low);
+}
+
+/* --- Type ---------------------------------------------------------------- */
+
+/*
+ * Bricolage is a variable face with an optical size axis; letting it track the
+ * rendered size is the whole reason to use it rather than a static weight.
+ */
+.site-title,
+h1,
+h2,
+h3 {
+  font-variation-settings: 'opsz' 24;
+  letter-spacing: -0.015em;
+}
+
+h1 {
+  font-weight: 700;
+  font-variation-settings: 'opsz' 48;
+  letter-spacing: -0.025em;
+}
+
+.site-title {
+  font-weight: 600;
+}
+
+/* Mono is for content that is genuinely data, per the brand. Starlight
+   already uses it for code; this stops it leaking into UI chrome. */
+.sl-markdown-content table td:first-child code {
+  font-weight: 600;
+}
+
+/* --- The demo stage ------------------------------------------------------ */
+
+/*
+ * The signature element. A part at rest in its seat, and Signal on whatever is
+ * currently moving — which is also the class contract the styling guide
+ * documents, shown rather than described.
+ */
+
 .demo {
-  margin: 1.5rem 0;
+  margin: 1.75rem 0;
   border: 1px solid var(--demo-line);
-  border-radius: 0.5rem;
+  border-radius: 4px;
   overflow: hidden;
   background: var(--demo-surface);
 }
 
 .demo-title {
-  padding: 0.5rem 0.75rem;
-  font-size: var(--sl-text-sm);
-  color: var(--sl-color-gray-2);
+  padding: 0.5rem 0.875rem;
+  font-size: var(--sl-text-xs);
+  font-weight: 500;
+  color: var(--sl-color-gray-3);
   border-bottom: 1px solid var(--demo-line);
 }
 
 .demo-stage {
   position: relative;
-  padding: 1rem;
+  padding: 1.25rem;
   overflow: hidden;
+  background: var(--demo-stage-bg);
 }
 
 .demo-reset {
   display: block;
   width: 100%;
-  padding: 0.4rem;
+  padding: 0.45rem;
   font: inherit;
   font-size: var(--sl-text-xs);
-  color: var(--sl-color-gray-2);
+  color: var(--sl-color-gray-3);
   background: none;
   border: 0;
   border-top: 1px solid var(--demo-line);
@@ -44,15 +212,23 @@
   background: var(--demo-line);
 }
 
-/* Shared furniture for the demo contents themselves. */
+.demo-reset:focus-visible {
+  outline: 2px solid var(--demo-signal);
+  outline-offset: -2px;
+}
+
+/* The moving parts. */
+
 .demo-box {
   display: grid;
   place-items: center;
   width: 96px;
   height: 96px;
-  background: var(--demo-accent);
-  color: var(--sl-color-black);
-  border-radius: 0.375rem;
+  font-size: var(--sl-text-xs);
+  color: var(--demo-item-text);
+  background: var(--demo-item);
+  border: 1px solid var(--demo-line);
+  border-radius: 4px;
   cursor: grab;
   user-select: none;
 }
@@ -68,15 +244,17 @@
 
 .demo-list li {
   padding: 0.6rem 0.75rem;
+  font-size: var(--sl-text-sm);
+  color: var(--demo-item-text);
   background: var(--demo-item);
   border: 1px solid var(--demo-line);
-  border-radius: 0.375rem;
+  border-radius: 4px;
   cursor: grab;
   user-select: none;
 }
 
 .demo-list li:focus-visible {
-  outline: 2px solid var(--demo-accent);
+  outline: 2px solid var(--demo-signal);
   outline-offset: 2px;
 }
 
@@ -86,5 +264,116 @@
   height: 120px;
   background: var(--demo-item);
   border: 1px solid var(--demo-line);
-  border-radius: 0.375rem;
+  border-radius: 4px;
+}
+
+/*
+ * Signal marks the thing that just moved. These are the library's own classes,
+ * so this is the class contract demonstrating itself.
+ */
+.demo .detent-dragging,
+.demo .detent-sorting,
+.demo .detent-resizing {
+  color: var(--demo-signal);
+  background: var(--demo-signal-fill);
+  border-color: var(--demo-signal);
+  cursor: grabbing;
+}
+
+/*
+ * Handles stay quiet until you approach them. Painting all eight in Signal put
+ * a crimson frame around the panel, which reads as broken rather than as an
+ * affordance — and Signal is for the thing that moved, not everything that
+ * could.
+ */
+.demo .detent-handle-ne::after,
+.demo .detent-handle-nw::after,
+.demo .detent-handle-se::after,
+.demo .detent-handle-sw::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  background: var(--demo-line);
+  border-radius: 1px;
+  transition: background 120ms ease;
+}
+
+.demo-panel:hover .detent-handle-ne::after,
+.demo-panel:hover .detent-handle-nw::after,
+.demo-panel:hover .detent-handle-se::after,
+.demo-panel:hover .detent-handle-sw::after,
+.demo .detent-resizing .detent-handle-ne::after,
+.demo .detent-resizing .detent-handle-nw::after,
+.demo .detent-resizing .detent-handle-se::after,
+.demo .detent-resizing .detent-handle-sw::after {
+  background: var(--demo-signal);
+}
+
+/* --- Landing page -------------------------------------------------------- */
+
+.hero h1 {
+  font-variation-settings: 'opsz' 64;
+}
+
+/* The size table is measurements, so it takes the mono face. */
+.sl-markdown-content table td:last-child {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .demo * {
+    transition: none !important;
+  }
+}
+
+/* --- Starlight chrome ---------------------------------------------------- */
+
+/*
+ * The default active-page treatment is a solid accent fill, which at Signal's
+ * saturation shouts louder than the page content. A rule and a colour say the
+ * same thing quietly.
+ */
+.sidebar-content a[aria-current='page'],
+.sidebar-content a[aria-current='page']:hover {
+  color: var(--sl-color-text-accent);
+  background: transparent;
+  border-inline-start: 2px solid var(--sl-color-text-accent);
+  margin-inline-start: -2px;
+  font-weight: 600;
+}
+
+/* The splash hero reserved a full viewport for very little, pushing the demo
+   below the fold on a laptop. */
+.hero {
+  padding-block: 2rem 1rem;
+}
+
+.hero > img,
+.hero .hero-html {
+  max-width: 15rem;
+  justify-self: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .demo .detent-handle-ne::after,
+  .demo .detent-handle-nw::after,
+  .demo .detent-handle-se::after,
+  .demo .detent-handle-sw::after {
+    transition: none;
+  }
+}
+
+/* Cards sit on Panel like the demo stages, so the page has two surfaces
+   rather than four. */
+.card {
+  background: var(--demo-surface);
+  border-color: var(--demo-line);
+  border-radius: 4px;
+}
+
+.card .title {
+  color: var(--sl-color-white);
+  font-weight: 600;
 }
