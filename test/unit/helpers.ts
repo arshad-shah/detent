@@ -1,5 +1,5 @@
-import { flush } from '../src/core/scheduler';
-import type { Box } from '../src/core/types';
+import { flush } from '../../src/core/scheduler';
+import type { Box } from '../../src/core/types';
 
 /**
  * happy-dom has no layout engine, so every element in a test is told where it

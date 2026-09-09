@@ -6,8 +6,8 @@ import {
   detectAxis,
   resolveInsertIndex,
   snap,
-} from '../src/core/geometry';
-import type { Box } from '../src/core/types';
+} from '../../src/core/geometry';
+import type { Box } from '../../src/core/types';
 
 const box = (left: number, top: number, width = 100, height = 40): Box => ({
   left,

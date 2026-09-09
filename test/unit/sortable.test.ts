@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { sortable } from '../src/sortable';
+import { sortable } from '../../src/sortable';
 import { idsOf, layout, makeList, offsetOf, press, stack } from './helpers';
-import type { Box } from '../src/core/types';
+import type { Box } from '../../src/core/types';
 
 beforeEach(() => {
   document.body.innerHTML = '';
