@@ -1,4 +1,6 @@
 import { paint, paintNow, resolveBounds, stateOf } from './core/box';
+import { CLASS } from './core/constants';
+import { normaliseGrid } from './core/options';
 import { boxOf, clampOffset, snap } from './core/geometry';
 import { bindPointer, type DragSession } from './core/pointer';
 import type { Activation, Axis, Bounds, Box, Handle, Point } from './core/types';
@@ -44,14 +46,8 @@ export interface DraggableHandle extends Handle {
   setDisabled(disabled: boolean): void;
 }
 
-const DRAGGING_CLASS = 'dk-dragging';
-
 export function draggable(el: HTMLElement, options: DraggableOptions = {}): DraggableHandle {
-  const grid: [number, number] | null = options.grid
-    ? typeof options.grid === 'number'
-      ? [options.grid, options.grid]
-      : options.grid
-    : null;
+  const grid = normaliseGrid(options.grid);
 
   let disabled = options.disabled ?? false;
 
@@ -114,7 +110,7 @@ export function draggable(el: HTMLElement, options: DraggableOptions = {}): Drag
       limit = resolveBounds(el, options.bounds ?? null);
       gridOrigin = grid ? resolveGridOrigin(limit) : { x: 0, y: 0 };
 
-      el.classList.add(DRAGGING_CLASS);
+      el.classList.add(CLASS.dragging);
       return options.onStart?.(payload(session));
     },
 
@@ -144,7 +140,7 @@ export function draggable(el: HTMLElement, options: DraggableOptions = {}): Drag
         state.y = startOffset.y;
         paint(el);
       }
-      el.classList.remove(DRAGGING_CLASS);
+      el.classList.remove(CLASS.dragging);
       options.onEnd?.(payload(session), cancelled);
     },
   });
@@ -167,7 +163,7 @@ export function draggable(el: HTMLElement, options: DraggableOptions = {}): Drag
     },
     destroy() {
       pointer.destroy();
-      el.classList.remove(DRAGGING_CLASS);
+      el.classList.remove(CLASS.dragging);
     },
   };
 }

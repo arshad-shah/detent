@@ -1,3 +1,4 @@
+import { DEFAULTS } from './constants';
 import { boxOf } from './geometry';
 import type { Point } from './types';
 
@@ -21,8 +22,8 @@ export interface AutoScrollOptions {
  * on abruptly, which makes long drags controllable.
  */
 export function createAutoScroll(target: Element | null, options: AutoScrollOptions = {}) {
-  const threshold = options.threshold ?? 60;
-  const speed = options.speed ?? 14;
+  const threshold = options.threshold ?? DEFAULTS.scrollThreshold;
+  const speed = options.speed ?? DEFAULTS.scrollSpeed;
 
   let pointer: Point | null = null;
   let frame = 0;

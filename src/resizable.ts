@@ -1,4 +1,6 @@
 import { paint, resolveBounds, stateOf } from './core/box';
+import { ATTR, CLASS, DEFAULTS, handleClass } from './core/constants';
+import { normaliseGrid } from './core/options';
 import { boxOf } from './core/geometry';
 import { bindPointer } from './core/pointer';
 import {
@@ -53,23 +55,17 @@ export interface ResizableHandle extends Handle {
   setDisabled(disabled: boolean): void;
 }
 
-const RESIZING_CLASS = 'dk-resizing';
-
 export function resizable(el: HTMLElement, options: ResizableOptions = {}): ResizableHandle {
   const supplied = Array.isArray(options.handles) || !options.handles ? null : options.handles;
   const names = (supplied ? Object.keys(supplied) : (options.handles as HandleName[] | undefined) ?? ALL_HANDLES) as HandleName[];
-  const grid: [number, number] | null = options.grid
-    ? typeof options.grid === 'number'
-      ? [options.grid, options.grid]
-      : options.grid
-    : null;
+  const grid = normaliseGrid(options.grid);
 
   let disabled = options.disabled ?? false;
 
   const restorePosition = el.style.position;
   // Only needed for handles the library positions itself.
   if (!supplied && getComputedStyle(el).position === 'static') el.style.position = 'relative';
-  el.classList.add('dk-resizable');
+  el.classList.add(CLASS.resizable);
 
   const bindings: Handle[] = [];
   const created: HTMLElement[] = [];
@@ -83,11 +79,11 @@ export function resizable(el: HTMLElement, options: ResizableOptions = {}): Resi
       const target = supplied[name];
       node = typeof target === 'string' ? el.querySelector<HTMLElement>(target) : (target ?? null);
       if (!node) continue;
-      node.setAttribute('data-dk-handle', name);
+      node.setAttribute(ATTR.handle, name);
     } else {
       node = document.createElement('span');
-      node.className = `dk-handle dk-handle-${name}`;
-      node.setAttribute('data-dk-handle', name);
+      node.className = `${CLASS.handle} ${handleClass(name)}`;
+      node.setAttribute(ATTR.handle, name);
       node.setAttribute('aria-hidden', 'true');
       el.appendChild(node);
       created.push(node);
@@ -153,8 +149,8 @@ export function resizable(el: HTMLElement, options: ResizableOptions = {}): Resi
               : null;
 
         limits = {
-          minWidth: options.minWidth ?? 16,
-          minHeight: options.minHeight ?? 16,
+          minWidth: options.minWidth ?? DEFAULTS.minSize,
+          minHeight: options.minHeight ?? DEFAULTS.minSize,
           maxWidth: options.maxWidth ?? Infinity,
           maxHeight: options.maxHeight ?? Infinity,
         };
@@ -171,7 +167,7 @@ export function resizable(el: HTMLElement, options: ResizableOptions = {}): Resi
           if (dirY < 0) limits.maxHeight = Math.min(limits.maxHeight, top + startHeight - area.top);
         }
 
-        el.classList.add(RESIZING_CLASS);
+        el.classList.add(CLASS.resizing);
         return options.onStart?.(payload(session.event, session.cancel));
       },
 
@@ -205,7 +201,7 @@ export function resizable(el: HTMLElement, options: ResizableOptions = {}): Resi
           state.y = startY;
           paint(el);
         }
-        el.classList.remove(RESIZING_CLASS);
+        el.classList.remove(CLASS.resizing);
         options.onEnd?.(payload(session.event, session.cancel), cancelled);
       },
     });
@@ -220,10 +216,10 @@ export function resizable(el: HTMLElement, options: ResizableOptions = {}): Resi
       // Only remove handles the library made. Elements you supplied are yours.
       for (const node of created) node.remove();
       if (supplied) {
-        for (const name of names) el.querySelector(`[data-dk-handle="${name}"]`)?.removeAttribute('data-dk-handle');
+        for (const name of names) el.querySelector(`[${ATTR.handle}="${name}"]`)?.removeAttribute(ATTR.handle);
       }
       el.style.position = restorePosition;
-      el.classList.remove('dk-resizable', RESIZING_CLASS);
+      el.classList.remove(CLASS.resizable, CLASS.resizing);
     },
   };
 }

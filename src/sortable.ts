@@ -1,4 +1,5 @@
 import { paintNow, stateOf } from './core/box';
+import { ATTR, CLASS, DEFAULTS } from './core/constants';
 import { createAutoScroll, type AutoScrollOptions } from './core/autoscroll';
 import * as flip from './core/flip';
 import {
@@ -62,7 +63,6 @@ interface Instance {
 }
 
 const registry = new Set<Instance>();
-const SORTING_CLASS = 'dk-sorting';
 
 function childrenOf(instance: Instance): HTMLElement[] {
   const { container, options } = instance;
@@ -71,7 +71,7 @@ function childrenOf(instance: Instance): HTMLElement[] {
     : container.children;
   const out: HTMLElement[] = [];
   for (const node of Array.from(nodes)) {
-    if (node instanceof HTMLElement && !node.hasAttribute('data-dk-ignore')) out.push(node);
+    if (node instanceof HTMLElement && !node.hasAttribute(ATTR.ignore)) out.push(node);
   }
   return out;
 }
@@ -100,13 +100,13 @@ function placeAt(container: HTMLElement, item: HTMLElement, siblings: HTMLElemen
 }
 
 export function sortable(container: HTMLElement, options: SortableOptions = {}): Handle {
-  const animation = options.animation ?? 180;
+  const animation = options.animation ?? DEFAULTS.animation;
   const useKeyboard = options.keyboard !== false;
   let disabled = options.disabled ?? false;
 
   const instance: Instance = { container, options, items: () => childrenOf(instance) };
   registry.add(instance);
-  container.classList.add('dk-sortable');
+  container.classList.add(CLASS.sortable);
 
   // --- Live drag state -----------------------------------------------------
   let item: HTMLElement | null = null;
@@ -268,9 +268,9 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
       restorePosition = item.style.position;
       restoreZIndex = item.style.zIndex;
       if (getComputedStyle(item).position === 'static') item.style.position = 'relative';
-      item.style.zIndex = String(options.zIndex ?? 20);
+      item.style.zIndex = String(options.zIndex ?? DEFAULTS.zIndex);
 
-      item.classList.add(SORTING_CLASS);
+      item.classList.add(CLASS.sorting);
       refreshCache(instance);
 
       if (options.autoScroll !== false) {
@@ -314,7 +314,7 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
 
       dragged.style.position = restorePosition;
       dragged.style.zIndex = restoreZIndex;
-      dragged.classList.remove(SORTING_CLASS);
+      dragged.classList.remove(CLASS.sorting);
 
       const toContainer = dragged.parentElement as HTMLElement;
       const toIndex = childrenOf({ ...instance, container: toContainer }).indexOf(dragged);
@@ -354,7 +354,7 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
       event.preventDefault();
       if (lifted) {
         const to = list.indexOf(lifted);
-        lifted.classList.remove(SORTING_CLASS);
+        lifted.classList.remove(CLASS.sorting);
         announce(`Dropped at position ${to + 1} of ${list.length}.`);
         if (to !== liftedFrom) {
           options.onSort?.({
@@ -367,7 +367,7 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
       } else {
         lifted = current;
         liftedFrom = index;
-        current.classList.add(SORTING_CLASS);
+        current.classList.add(CLASS.sorting);
         announce(`Lifted from position ${index + 1} of ${list.length}. Use the arrow keys to move.`);
       }
       return;
@@ -379,7 +379,7 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
       const snapshot = flip.record(list);
       placeAt(container, lifted, siblings, liftedFrom);
       flip.play(snapshot, animation);
-      lifted.classList.remove(SORTING_CLASS);
+      lifted.classList.remove(CLASS.sorting);
       announce('Move cancelled.');
       lifted = null;
       return;
@@ -412,7 +412,7 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
     destroy() {
       pointer.destroy();
       container.removeEventListener('keydown', onKeyDown);
-      container.classList.remove('dk-sortable');
+      container.classList.remove(CLASS.sortable);
       registry.delete(instance);
     },
   };

@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { draggable } from '../../src/draggable';
+import { CLASS } from '../../src/core/constants';
 import { resetState } from '../../src/core/box';
 import { layout, offsetOf, press } from './helpers';
 
@@ -80,9 +81,9 @@ describe('draggable', () => {
     draggable(el, { distance: 0 });
     const gesture = press(el, 0, 0);
     gesture.move(10, 10);
-    expect(el.classList.contains('dk-dragging')).toBe(true);
+    expect(el.classList.contains(CLASS.dragging)).toBe(true);
     gesture.up();
-    expect(el.classList.contains('dk-dragging')).toBe(false);
+    expect(el.classList.contains(CLASS.dragging)).toBe(false);
   });
 
   it('puts the element back when the drag is cancelled', () => {

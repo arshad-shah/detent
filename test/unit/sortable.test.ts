@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { sortable } from '../../src/sortable';
+import { CLASS } from '../../src/core/constants';
 import { idsOf, layout, makeList, offsetOf, press, stack } from './helpers';
 import type { Box } from '../../src/core/types';
 
@@ -87,9 +88,9 @@ describe('sortable within one list', () => {
     sortable(list, { distance: 0, animation: 0 });
     const gesture = press(items[0], 10, 25);
     gesture.move(10, 60);
-    expect(items[0].classList.contains('dk-sorting')).toBe(true);
+    expect(items[0].classList.contains(CLASS.sorting)).toBe(true);
     gesture.up();
-    expect(items[0].classList.contains('dk-sorting')).toBe(false);
+    expect(items[0].classList.contains(CLASS.sorting)).toBe(false);
   });
 
   it('ignores a press that lands on the list but not on an item', () => {
