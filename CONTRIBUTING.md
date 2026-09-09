@@ -117,6 +117,10 @@ first; changesets rewrites those to real version ranges at publish time.
 
 There is deliberately no `NPM_TOKEN`. Publishing authenticates over OIDC.
 
+> The full one-time setup — npm publishing, Trusted Publishing, Cloudflare
+> tokens and branch protection, with the exact values to enter — is in
+> [docs/SETUP.md](docs/SETUP.md).
+
 ### Setting up the docs deployment, once
 
 1. Create a Cloudflare API token from the **Edit Cloudflare Workers** template,
@@ -155,3 +159,16 @@ expose yet. Nothing published is affected.
 `docs/superpowers/` holds the specs and implementation plans this repository
 was built from, plus notes on behaviour that is documented rather than fixed —
 see [stacking contexts](docs/superpowers/notes/stacking-contexts.md).
+
+## Security
+
+GitHub Actions are pinned to commit SHAs rather than tags, because a tag can be
+moved and a SHA cannot. Dependabot proposes updates weekly; do not replace a
+SHA with a tag when resolving a conflict.
+
+`main` is protected: pull requests only, required checks, no force pushes,
+enforced for admins. The settings live in
+[`.github/branch-protection.json`](.github/branch-protection.json) so they are
+reviewable in a diff rather than buried in a dashboard.
+
+Reporting a vulnerability: [SECURITY.md](SECURITY.md).

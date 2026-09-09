@@ -20,7 +20,8 @@
     "version-packages": "changeset version && pnpm install --lockfile-only",
     "release": "pnpm -r build && changeset publish",
     "docs": "pnpm -F docs dev",
-    "docs:build": "pnpm -F docs build"
+    "docs:build": "pnpm -F docs build",
+    "protect-main": "gh api -X PUT repos/arshad-shah/detent/branches/main/protection --input .github/branch-protection.json"
   },
   "devDependencies": {
     "@changesets/changelog-github": "^0.6.0",
