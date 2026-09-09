@@ -30,10 +30,10 @@
    * needs separation between page, raised surface and item, so these step
    * down from and up past Ink on its own hue rather than crowding it.
    */
-  --detent-ink-deep: #141610;
-  --detent-ink-raised: #34362c;
-  --detent-ink-panel: #414437;
-  --detent-ink-line: #4a4d3f;
+  --detent-ink-deep: #0b0c07;
+  --detent-ink-raised: #191b14;
+  --detent-ink-panel: #2b2d24;
+  --detent-ink-line: #3a3d31;
   --detent-signal-light: #e39bb4; /* 6.3:1 on Ink */
   --detent-signal-deep: #4a2333;
 
@@ -44,9 +44,11 @@
 /* Roles: dark, matching Starlight's own base. */
 :root {
   --role-bg: var(--detent-ink-deep);
-  --role-surface: var(--detent-ink);
+  --role-surface: var(--detent-ink-raised);
+  /* Ink itself is the item surface — the brand's dark surface, sitting on
+     something blacker rather than being the black. */
   --role-raised: var(--detent-ink-panel);
-  --role-line: #4a4d3f;
+  --role-line: var(--detent-ink-line);
   --role-text: var(--detent-paper);
   --role-text-strong: var(--detent-panel);
   --role-text-soft: #cfcdc2;
