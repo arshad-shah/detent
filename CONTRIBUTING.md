@@ -96,7 +96,12 @@ Until that is done, the release job is expected to fail at the publish step
 with an authentication error. Everything before it — the version PR, the
 changelog, the tags — works from the start.
 
-Repeat both steps for each new package.
+There are four packages — `detent`, `detent-react`, `detent-svelte` and
+`detent-elements` — and each needs its own first manual publish and its own
+Trusted Publishing registration, all pointing at the same `main.yml`.
+
+The wrappers depend on `detent` through `workspace:^`, so publish `detent`
+first; changesets rewrites those to real version ranges at publish time.
 
 ## Repository secrets
 

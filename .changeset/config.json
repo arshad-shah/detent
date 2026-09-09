@@ -1,9 +1,21 @@
 {
   "$schema": "https://unpkg.com/@changesets/config@3.0.0/schema.json",
-  "changelog": ["@changesets/changelog-github", { "repo": "arshad-shah/detent" }],
+  "changelog": [
+    "@changesets/changelog-github",
+    {
+      "repo": "arshad-shah/detent"
+    }
+  ],
   "commit": false,
   "fixed": [],
-  "linked": [],
+  "linked": [
+    [
+      "detent",
+      "detent-react",
+      "detent-svelte",
+      "detent-elements"
+    ]
+  ],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",

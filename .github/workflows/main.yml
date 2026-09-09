@@ -23,8 +23,9 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # Once at the root: every package's browser tests share the install.
       - name: Install browsers
-        run: pnpm -F detent exec playwright install --with-deps chromium firefox webkit
+        run: pnpm exec playwright install --with-deps chromium firefox webkit
       - run: pnpm typecheck
       - run: pnpm test:unit
       - run: pnpm test:browser
