@@ -53,8 +53,13 @@ export function createAutoScroll(target: Element | null, options: AutoScrollOpti
     if (dx || dy) {
       const beforeTop = scroller.scrollTop;
       const beforeLeft = scroller.scrollLeft;
-      scroller.scrollTop += dy;
-      scroller.scrollLeft += dx;
+
+      // `behavior: 'instant'` overrides a host page's `scroll-behavior: smooth`.
+      // Without it the browser animates every step, so each frame reads a
+      // position still in flight from the previous one and auto-scroll stalls
+      // outright rather than merely stuttering.
+      scroller.scrollBy({ top: dy, left: dx, behavior: 'instant' });
+
       if (scroller.scrollTop !== beforeTop || scroller.scrollLeft !== beforeLeft) {
         options.onScroll?.();
       }
