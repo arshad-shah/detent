@@ -1,0 +1,86 @@
+---
+title: detent
+description: Tiny zero-dependency drag, reorder and resize for the web.
+template: splash
+hero:
+  tagline: Drag, reorder and resize for the web. No dependencies, no framework, one input path for mouse, touch and pen.
+  actions:
+    - text: Getting started
+      link: /guides/getting-started/
+      icon: right-arrow
+    - text: GitHub
+      link: https://github.com/arshad-shah/detent
+      icon: external
+      variant: minimal
+---
+
+import { CardGrid, Card, Tabs, TabItem } from '@astrojs/starlight/components';
+import Demo from '../../components/Demo.astro';
+
+<Demo id="hero" title="Reorder the list, resize the panel" height={260}>
+  <div style="display:flex;gap:1.5rem;align-items:flex-start">
+    <ul class="demo-list" style="flex:1">
+      <li>first</li>
+      <li>second</li>
+      <li>third</li>
+    </ul>
+    <div class="demo-panel"></div>
+  </div>
+</Demo>
+
+<CardGrid>
+  <Card title="draggable" icon="seti:plan">
+    Move an element with the pointer. Axis locking, bounds, grid snapping.
+    [Read more](/api/draggable/)
+  </Card>
+  <Card title="sortable" icon="list-format">
+    Reorder a list, or pass items between several. Keyboard support included.
+    [Read more](/api/sortable/)
+  </Card>
+  <Card title="resizable" icon="seti:image">
+    Eight handles or your own elements. Aspect ratio, grid, bounds.
+    [Read more](/api/resizable/)
+  </Card>
+</CardGrid>
+
+## Install
+
+<Tabs syncKey="framework">
+  <TabItem label="Vanilla">
+    ```bash
+    npm install detent
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```bash
+    npm install detent detent-react
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```bash
+    npm install detent detent-svelte
+    ```
+  </TabItem>
+  <TabItem label="Web Components">
+    ```bash
+    npm install detent detent-elements
+    ```
+  </TabItem>
+</Tabs>
+
+## Why it is small
+
+| Bundle | Gzipped |
+| --- | --- |
+| `draggable` only | 2.4 KB |
+| `resizable` only | 3.1 KB |
+| `sortable` only | 4.6 KB |
+| all three | 6.7 KB |
+
+Every rectangle is read once at the start of a drag and cached, so nothing
+reads layout during a move. DOM writes are batched to one per frame. Reorders
+use FLIP, so the browser lays the list out a single time no matter how many
+items shuffle.
+
+A detent is the catch that holds a moving part at a set position — the click
+you feel when a dial lands on a setting.

@@ -121,191 +121,35 @@ there.
   where they were with a transform. The browser lays out a single time no
   matter how many items shuffle.
 
-## Living alongside your own styling
+## Documentation
 
-The library writes as little as it can get away with, but it does write.
+Full documentation, with demos you can drag, lives at
+**[detent.arshadshah.com](https://detent.arshadshah.com)**.
 
-| What it touches | Where | Notes |
-| --- | --- | --- |
-| `transform` | inline, on the dragged element | Clobbers a transform you set yourself. Use a wrapper if the element animates. |
-| `touch-action` | inline, on the bound element | Set `touchAction` to change it. |
-| `position`, `z-index` | inline, only while sorting | `position` is only set if the item was static, and both are restored on drop. |
-| `user-select` | on `<body>`, only during a drag | Restored on drop. |
-| `.detent-dragging`, `.detent-sorting`, `.detent-resizing` | classes | Style them however you like. |
-
-Reorder animations use `composite: 'add'`, so they stack on top of any
-transform an item already has rather than replacing it.
-
-**Resize handles append children.** By default `resizable` puts eight `<span>`
-elements inside the target. They are absolutely positioned, so flex and grid
-layouts are unaffected — but they will break `:last-child` and `:nth-child`
-rules, code that walks `element.children`, and framework rendering that owns
-the child list. Give it your own handles instead:
-
-```js
-resizable(card, {
-  handles: { se: '.card-corner', e: '.card-edge' },
-});
-```
-
-Supplied handles are never created, never removed, and the target's `position`
-is left alone — position them yourself. One more thing to watch: the default
-handles sit 6px outside the element's edge, so `overflow: hidden` on the
-component will clip them.
-
-## Reordering large components
-
-It works, and the mechanics do not care how big an item is. What matters is the
-total amount of DOM in the list. Measured on a mid-range laptop, dragging one
-row through a list:
-
-| List | Median frame | Worst frame | Verdict |
-| --- | --- | --- | --- |
-| 30 rows × 220 elements | 16.7ms | 66ms | smooth |
-| 150 rows × 60 elements | 16.7ms | 33ms | smooth |
-| 80 rows × 400 elements | 16.7ms | 183ms | visibly janky |
-
-The cliff is around 10,000 elements in one sortable list. Past that, drop
-`animation` to `0` first — it roughly halves the worst frame — and virtualise
-if that is not enough.
-
-**What a reorder costs the item itself.** Sorting moves the real element in the
-DOM, and the browser resets some things when a node is re-parented. Measured,
-not guessed:
-
-| | Survives a reorder |
+| | |
 | --- | --- |
-| Input values, checkbox state | yes |
-| Keyboard focus inside the item | **no** |
-| Scroll position of a scrollable child | **no** |
-| `<iframe>` content | **no** — the frame reloads |
-| `<video>` / `<audio>` playback | no |
-| Canvas pixels | yes |
+| [Getting started](https://detent.arshadshah.com/guides/getting-started/) | Install, the stylesheet, the three entry points |
+| [draggable](https://detent.arshadshah.com/api/draggable/) · [sortable](https://detent.arshadshah.com/api/sortable/) · [resizable](https://detent.arshadshah.com/api/resizable/) | Every option, with live demos |
+| [Styling](https://detent.arshadshah.com/guides/styling/) | The class contract, the cascade layer, what the library writes |
+| [Limitations](https://detent.arshadshah.com/guides/limitations/) | Stacking contexts, scroll anchoring, large lists |
 
-If an item contains an iframe or an embedded player, reordering it will restart
-that content. Nothing in the library can prevent this; it is what the browser
-does when a node moves. Reorder a lightweight placeholder instead, or use
-`onSort` to reorder your data and let your framework re-render.
+## Framework wrappers
 
-**Anything `position: fixed` inside a dragged item stops being fixed.** A
-transform makes its element the reference point for fixed descendants, so a
-dropdown, tooltip or modal rendered inside the item will follow the item
-instead of staying put. Render those into a portal at the document root.
+| Package | What it gives you |
+| --- | --- |
+| [`detent-react`](https://www.npmjs.com/package/detent-react) | Hooks returning a callback ref. Re-rendering never re-binds. |
+| [`detent-svelte`](https://www.npmjs.com/package/detent-svelte) | `use:` actions with reactive options. |
+| [`detent-elements`](https://www.npmjs.com/package/detent-elements) | Custom elements. No peers — Angular, Vue, Astro, plain HTML. |
 
-## Touch
+## Styling in one paragraph
 
-A finger gets a press delay (200ms by default) before a drag starts, so swiping
-still scrolls the page. A mouse gets a small distance threshold instead, so
-clicks still register. Both are tunable with `delay`, `distance` and
-`tolerance`.
-
-A sortable list that scrolls itself keeps its swipe gesture automatically —
-press and hold to lift instead. Override with `touchAction` if you need to.
-
-## Styling
-
-Every class the library writes is prefixed `detent-`:
-
-| Class | On | When |
-| --- | --- | --- |
-| `detent-dragging` | a draggable element | during a drag |
-| `detent-sorting` | a sortable item | while it moves, by pointer or keyboard |
-| `detent-sortable` | a sortable container | for its lifetime |
-| `detent-resizable` | a resizable element | for its lifetime |
-| `detent-resizing` | a resizable element | during a resize |
-| `detent-handle`, `detent-handle-{n,e,s,w,ne,nw,se,sw}` | a created handle | for its lifetime |
-
-There is also `[data-detent-dragging]` on `<body>` for the duration of any
-drag, which is handy for cursor and pointer-events rules.
-
-**Overriding is meant to be easy.** `detent/styles.css` ships inside
-`@layer detent`. Unlayered CSS beats layered CSS at any specificity, so your
-own rule wins without `!important` and without a specificity war:
-
-```css
-/* This wins. No !important needed. */
-.detent-handle {
-  background: var(--brand);
-  border-radius: 2px;
-}
-```
-
-Handle size comes from a custom property:
-
-```css
-.detent-handle { --detent-handle-size: 20px; }
-```
-
-**What the stylesheet is not responsible for.** Three declarations are written
-inline instead — a handle's `position` and `touch-action`, and a static
-target's `position` — because a host reset such as `* { position: static }`
-would otherwise detach every handle. That means dragging, sorting and keyboard
-reordering all work with no stylesheet loaded at all.
-
-The exception is resize handles: their size and placement are cosmetic, so
-without `detent/styles.css` a library-created handle has no dimensions and
-nothing to grab. Either load the stylesheet, or pass your own `handles` and
-size them yourself.
-
-## Known limitations
-
-**A dragged item cannot escape an ancestor's stacking context.** If a card
-renders behind the next column no matter what `zIndex` you set, an ancestor has
-a `transform`, `filter`, `opacity`, `contain` or `will-change` on it. This is
-CSS, not detent, and it has two workarounds —
-see [Stacking contexts](https://github.com/arshad-shah/detent/blob/main/docs/superpowers/notes/stacking-contexts.md).
-
-**Scroll anchoring can fight a reorder.** Chrome and Firefox adjust `scrollTop`
-when content above the viewport changes, which a reorder does. If a scrolling
-list jumps during a drag, set `overflow-anchor: none` on the container.
-
-## Using it on components you did not write
-
-The library writes to the elements you bind. On a third-party component that
-can be a problem, so know what it touches:
-
-| What | When | How to avoid it |
-| --- | --- | --- |
-| Appends 8 handle children | `resizable` | Pass your own `handles` |
-| Sets `position: relative` if static | `resizable`, `sortable` | Pass your own handles; position the item yourself |
-| Overwrites inline `transform` | during a drag | Bind a wrapper you own |
-| Overwrites `touch-action` | on bind | Restored on `destroy()` |
-| Sets `user-select: none` on `<body>` | during a drag | Restored on drop |
-| Adds `detent-dragging` / `detent-sorting` classes | during a drag | Harmless; style or ignore |
-
-Two behaviours are worth knowing rather than avoiding. A `transform` creates a
-new containing block, so `position: fixed` descendants — dropdowns, tooltips,
-popovers rendered inside a card — will anchor to the card while it is being
-dragged. And if the component sets its own inline transform (an animation
-library, for instance), the two will fight.
-
-**When in doubt, wrap it.** Put your own element around the component, bind to
-the wrapper, and the component itself is never touched.
-
-## How big can the pieces be
-
-Per-frame cost is constant: some pointer arithmetic and one transform write. A
-2000px panel costs the same to move as a 40px row.
-
-Per-swap cost is proportional to the number of items, not their size — every
-sibling is re-measured, and FLIP measures them again and starts an animation
-each. That is nothing at 20 items, noticeable around 200, and worth avoiding
-above that. Set `animation: 0` or virtualise the list.
-
-The real limit with large pieces is repainting. A big card with shadows, images
-or a deep subtree gets re-rastered as it moves; `will-change: transform` on
-`.detent-sorting` promotes it to its own layer and mostly solves this. A `filter`
-or `backdrop-filter` on the dragged element defeats that and will stutter
-regardless — drag a lightweight stand-in in that case.
-
-## Browser extensions
-
-- Any ancestor with a `transform` breaks `position: fixed`, which is common on
-  real pages. Nothing here relies on a fixed drag layer.
-- Pointer hit tests use `composedPath()`, so a grip inside a nested shadow
-  root is still found.
-- Keyboard reordering binds to the list itself, which sits in the same tree as
-  its items, so it works inside a shadow root without special handling.
+Classes are prefixed `detent-`, and `detent/styles.css` ships inside
+`@layer detent` — so an unlayered rule in your own stylesheet overrides it at
+any specificity, with no `!important` anywhere. The declarations the library
+cannot function without are written inline instead, beyond the reach of a host
+CSS reset. Dragging, sorting and keyboard reordering all work with no
+stylesheet at all; only library-created resize handles need it, because their
+size is cosmetic. [Full details](https://detent.arshadshah.com/guides/styling/).
 
 ## Development
 

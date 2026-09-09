@@ -1,6 +1,9 @@
 packages:
   - 'packages/*'
+  - 'apps/*'
 
-# esbuild fetches its platform binary in a postinstall script.
+# Each of these fetches or compiles a platform binary in a postinstall script.
 allowBuilds:
   esbuild: true
+  sharp: true
+  workerd: true

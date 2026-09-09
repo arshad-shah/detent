@@ -1,0 +1,48 @@
+name: docs
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # The site imports the library, whose types come from its emitted
+      # declarations, so the core has to be built first.
+      - run: pnpm -F detent build
+
+      - run: pnpm -F docs build
+
+      - name: Check the site
+        run: pnpm -F docs typecheck
+
+      # Deploy only from main. Pull requests stop at a verified build.
+      - name: Deploy to Cloudflare
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: apps/docs
+          command: deploy

@@ -1,0 +1,100 @@
+---
+title: draggable
+description: Move an element with the pointer, with optional bounds, axis locking and grid snapping.
+---
+
+import Demo from '../../../components/Demo.astro';
+
+Move an element with the pointer. Movement is applied as a transform, and the
+element keeps its offset between drags — a second drag carries on from where
+the first ended.
+
+```js
+import { draggable } from 'detent';
+
+const handle = draggable(element, { bounds: 'parent' });
+```
+
+<Demo id="draggable-basic" title="bounds: 'parent'">
+  <div class="demo-box">drag me</div>
+</Demo>
+
+## Locking an axis
+
+`axis` restricts movement to one direction. The left square is locked to `x`,
+the right one to `y`.
+
+<Demo id="draggable-axis" title="axis: 'x' and axis: 'y'">
+  <div style="display:flex;gap:1.5rem">
+    <div class="demo-box" data-axis="x">x only</div>
+    <div class="demo-box" data-axis="y">y only</div>
+  </div>
+</Demo>
+
+## Snapping to a grid
+
+`grid` rounds the position to the nearest step. The step is measured from the
+bounds area rather than from the page, so the element lands on lines you can
+actually see rather than an invisible page-wide grid.
+
+<Demo id="draggable-grid" title="grid: 40">
+  <div class="demo-box">40px steps</div>
+</Demo>
+
+## Options
+
+| Option | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `axis` | `'x' \| 'y' \| 'both'` | `'both'` | Restrict movement to one axis. |
+| `bounds` | `'parent' \| 'window' \| Element \| Box \| null` | `null` | Keep the element inside this area. |
+| `grid` | `number \| [number, number]` | — | Snap to a grid, in pixels. |
+| `gridOrigin` | `'bounds' \| 'viewport' \| Element` | `'bounds'` | Where the grid counts from. |
+| `handle` | `string` | — | Only start a drag from a descendant matching this selector. |
+| `cancel` | `string` | — | Never start a drag from a descendant matching this selector. |
+| `disabled` | `boolean` | `false` | Keep the binding but stop responding. |
+| `distance` | `number` | `4` | Pixels of travel before a mouse or pen drag starts. |
+| `delay` | `number` | `200` | Milliseconds of press before a touch drag starts. |
+| `tolerance` | `number` | `6` | How far a finger may drift during `delay` before it counts as a scroll. |
+| `touchAction` | `'none' \| 'auto' \| 'manipulation'` | `'none'` | Whether the element claims touch gestures. |
+
+## Callbacks
+
+```js
+draggable(element, {
+  onStart(event) {},          // return false to refuse the drag
+  onMove(event) {},
+  onEnd(event, cancelled) {},
+});
+```
+
+Each receives:
+
+| Field | What it is |
+| --- | --- |
+| `element` | The bound element. |
+| `offset` | Current offset from where the element sits in normal flow. |
+| `point` | Pointer position, in viewport coordinates. |
+| `delta` | Pointer travel since the press began. |
+| `event` | The `PointerEvent` that produced this position. |
+| `cancel()` | Abort the drag. `onEnd` fires with `cancelled: true`. |
+
+## What you get back
+
+```js
+handle.moveTo(120, 40);   // move to an explicit offset
+handle.reset();           // back to the natural position
+handle.setDisabled(true);
+handle.destroy();
+```
+
+## Notes
+
+**Escape cancels.** A drag in progress is abandoned and the element returns to
+where it started.
+
+**A drag never becomes a click.** If a drag finishes over a link or button,
+the click that would normally follow is swallowed.
+
+**`draggable` and `resizable` compose** on the same element — resizing from the
+top or left edge moves it as well as sizes it, and a following drag continues
+from there.

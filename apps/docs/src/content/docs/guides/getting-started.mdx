@@ -1,0 +1,89 @@
+---
+title: Getting started
+description: Install detent and bind your first draggable, sortable or resizable element.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+## Install
+
+<Tabs syncKey="framework">
+  <TabItem label="Vanilla">
+    ```bash
+    npm install detent
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```bash
+    npm install detent detent-react
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```bash
+    npm install detent detent-svelte
+    ```
+  </TabItem>
+  <TabItem label="Web Components">
+    ```bash
+    npm install detent detent-elements
+    ```
+  </TabItem>
+</Tabs>
+
+## The stylesheet
+
+```js
+import 'detent/styles.css';
+```
+
+Required for resize handles, which get their size from it. Dragging, sorting
+and keyboard reordering all work without it — see [Styling](/guides/styling/).
+
+## The three entry points
+
+Each takes an element and options, and returns a handle with `destroy()`.
+
+```js
+import { draggable, sortable, resizable } from 'detent';
+
+// Move an element, kept inside its parent.
+draggable(box, { bounds: 'parent' });
+
+// Reorder a list.
+sortable(list, {
+  animation: 180,
+  onSort({ item, from, to }) {
+    console.log(`moved ${from.index} -> ${to.index}`);
+  },
+});
+
+// Resize an element from any edge or corner.
+resizable(panel, { minWidth: 120, aspectRatio: 16 / 9 });
+```
+
+Always call `destroy()` when the element goes away:
+
+```js
+const handle = draggable(box);
+// later
+handle.destroy();
+```
+
+The framework wrappers do this for you.
+
+## Frameworks
+
+If you are using React, Svelte, or anything that speaks HTML, there is a
+wrapper that handles binding and teardown:
+
+- [React](/frameworks/react/) — hooks returning a callback ref
+- [Svelte](/frameworks/svelte/) — `use:` actions
+- [Web Components](/frameworks/web-components/) — custom elements, no peers,
+  works in Angular, Vue, Astro and plain HTML
+
+## What to read next
+
+- [`draggable`](/api/draggable/), [`sortable`](/api/sortable/) and
+  [`resizable`](/api/resizable/) — every option, with demos
+- [Styling](/guides/styling/) — the class contract and how to override it
+- [Limitations](/guides/limitations/) — the two things that will catch you out

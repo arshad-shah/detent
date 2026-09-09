@@ -1,0 +1,108 @@
+---
+title: resizable
+description: Resize an element from eight handles, or from elements you supply yourself.
+---
+
+import Demo from '../../../components/Demo.astro';
+
+Resize an element. By default the library creates eight handles — one per edge
+and corner — inside the target.
+
+```js
+import { resizable } from 'detent';
+import 'detent/styles.css';
+
+resizable(element, { minWidth: 80, minHeight: 60 });
+```
+
+Grab any edge or corner of the panel below.
+
+<Demo id="resizable-basic" title="All eight handles" height={200}>
+  <div class="demo-panel"></div>
+</Demo>
+
+## Holding a ratio
+
+`aspectRatio` keeps width and height in proportion. `true` holds the element's
+starting ratio; a number sets one explicitly. On a corner handle, whichever
+axis you push harder leads.
+
+<Demo id="resizable-aspect" title="aspectRatio: 16 / 9, bottom-right handle only" height={200}>
+  <div class="demo-panel"></div>
+</Demo>
+
+## Options
+
+| Option | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `handles` | `HandleName[] \| Record<HandleName, string \| HTMLElement>` | all eight | Which edges and corners can be grabbed. |
+| `minWidth`, `minHeight` | `number` | `16` | Smallest size a resize will produce. |
+| `maxWidth`, `maxHeight` | `number` | `Infinity` | Largest size a resize will produce. |
+| `aspectRatio` | `boolean \| number` | — | `true` keeps the starting ratio; a number sets one. |
+| `grid` | `number \| [number, number]` | — | Snap the size to a grid, in pixels. |
+| `bounds` | `'parent' \| 'window' \| Element \| Box \| null` | `null` | Keep the element inside this area. |
+| `disabled` | `boolean` | `false` | Keep the binding but stop responding. |
+
+`HandleName` is one of `'n'`, `'e'`, `'s'`, `'w'`, `'ne'`, `'nw'`, `'se'`,
+`'sw'`. Both `HandleName` and `HandleSpec` are exported, so you can type a
+helper that builds a handle list.
+
+## Supplying your own handles
+
+As an array, the library creates eight `<span>` children. As an object, it
+binds to elements you already have:
+
+```js
+resizable(card, {
+  handles: { se: '.card-corner', e: '.card-edge' },
+});
+```
+
+Use the object form when appending children would disturb your component —
+framework rendering, `:last-child` and `:nth-child` rules, or code that walks
+`element.children`. With supplied handles the library also leaves the target's
+`position` alone.
+
+:::caution[Library-created handles need the stylesheet]
+Their size and placement are cosmetic and live in `detent/styles.css`. Without
+it they exist and are correctly anchored, but have no dimensions — so there is
+nothing to grab. Either load the stylesheet, or supply your own handles and
+size them yourself.
+
+Dragging, sorting and keyboard reordering all work with no stylesheet at all.
+:::
+
+## Callbacks
+
+```js
+resizable(element, {
+  onStart(event) {},          // return false to refuse
+  onResize(event) {},
+  onEnd(event, cancelled) {},
+});
+```
+
+Each receives `{ element, width, height, handle, event, cancel() }`, where
+`handle` is the `HandleName` being dragged.
+
+## What you get back
+
+```js
+handle.setDisabled(true);
+handle.destroy();
+```
+
+`destroy()` removes only the handles the library created. Elements you supplied
+are given back as they were found.
+
+## Notes
+
+**Bounds become a size ceiling.** With `bounds` set, the element runs out of
+room rather than escaping its container.
+
+**Minimums win over ratios.** When `aspectRatio` and the size limits conflict,
+the limits are honoured — the less surprising of the two failures.
+
+**Resizing from the top or left moves the element as well as sizing it**, and
+the offset is derived from the final clamped size, so hitting a minimum never
+causes drift.
