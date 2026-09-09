@@ -3,7 +3,7 @@ import { ATTR, CLASS, DEFAULTS } from './core/constants';
 import { invariant } from './core/invariant';
 import { createAutoScroll, type AutoScrollOptions } from './core/autoscroll';
 import * as flip from './core/flip';
-import { boxOf, contains, detectAxis, resolveInsertIndex } from './core/geometry';
+import { boxOf, contains, detectAxis, isRtl, resolveInsertIndex } from './core/geometry';
 import { scrollAncestorsOf, scrollParentOf, totalScroll } from './core/scroll';
 import { bindPointer } from './core/pointer';
 import { scaleOf, unscale } from './core/scale';
@@ -124,6 +124,8 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
   let restoreZIndex = '';
   // Rendered pixels per layout pixel, from any transformed ancestor.
   let scale: Point = { x: 1, y: 1 };
+  // Read once per host, not per move: it needs a computed style.
+  let rtl = false;
 
   // Sibling positions are measured once and reused until something moves.
   let cachedSiblings: HTMLElement[] = [];
@@ -198,6 +200,8 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
     const scrolledSinceMeasure = scroll.x !== measuredScroll.x || scroll.y !== measuredScroll.y;
     if (target !== cacheHost || scrolledSinceMeasure) {
       host = target;
+      // A cross-list drop follows the destination's writing direction.
+      rtl = isRtl(target.container);
       refreshCache(target);
     }
     if (!cachedRects.length && !contains(boxOf(target.container), lastPoint)) return;
@@ -206,7 +210,7 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
       !target.options.direction || target.options.direction === 'auto'
         ? detectAxis(cachedRects)
         : target.options.direction;
-    const index = resolveInsertIndex(cachedRects, lastPoint, axis);
+    const index = resolveInsertIndex(cachedRects, lastPoint, axis, rtl);
 
     const before = cachedSiblings[index] ?? null;
     const alreadyThere = before
@@ -253,6 +257,7 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
       anchorOffset = { x: state.x, y: state.y };
       anchorDelta = { x: 0, y: 0 };
       scale = scaleOf(item);
+      rtl = isRtl(container);
       scrollAncestors = scrollAncestorsOf(item);
       anchorScroll = totalScroll(scrollAncestors);
       lastPoint = session.point;

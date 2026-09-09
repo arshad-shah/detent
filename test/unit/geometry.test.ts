@@ -128,3 +128,42 @@ describe('resolveInsertIndex', () => {
     expect(resolveInsertIndex(grid, { x: 180, y: 50 }, 'grid')).toBe(2);
   });
 });
+
+describe('resolveInsertIndex under RTL', () => {
+  // Three 100px boxes in a row. Visually under RTL, box at left:200 is FIRST.
+  const rects = [
+    { left: 200, top: 0, width: 100, height: 50 },
+    { left: 100, top: 0, width: 100, height: 50 },
+    { left: 0, top: 0, width: 100, height: 50 },
+  ];
+
+  it('inserts before everything when the pointer is at the right edge', () => {
+    expect(resolveInsertIndex(rects, { x: 290, y: 25 }, 'x', true)).toBe(0);
+  });
+
+  it('inserts after everything when the pointer is at the left edge', () => {
+    expect(resolveInsertIndex(rects, { x: 10, y: 25 }, 'x', true)).toBe(3);
+  });
+
+  it('inserts in the middle when the pointer is in the middle', () => {
+    expect(resolveInsertIndex(rects, { x: 140, y: 25 }, 'x', true)).toBe(2);
+  });
+
+  it('is unchanged for LTR', () => {
+    const ltr = [
+      { left: 0, top: 0, width: 100, height: 50 },
+      { left: 100, top: 0, width: 100, height: 50 },
+    ];
+    expect(resolveInsertIndex(ltr, { x: 10, y: 25 }, 'x', false)).toBe(0);
+    expect(resolveInsertIndex(ltr, { x: 190, y: 25 }, 'x', false)).toBe(2);
+  });
+
+  it('never lets RTL affect a vertical list', () => {
+    const column = [
+      { left: 0, top: 0, width: 100, height: 50 },
+      { left: 0, top: 50, width: 100, height: 50 },
+    ];
+    expect(resolveInsertIndex(column, { x: 50, y: 10 }, 'y', true)).toBe(0);
+    expect(resolveInsertIndex(column, { x: 50, y: 90 }, 'y', true)).toBe(2);
+  });
+});

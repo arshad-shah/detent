@@ -73,8 +73,17 @@ export function detectAxis(rects: Box[]): ListAxis {
  *
  * The answer is an insertion point: 0 means "before the first remaining item",
  * `rects.length` means "after the last one".
+ *
+ * `rects` is in DOM order. Under RTL that runs right-to-left on screen, so the
+ * horizontal comparison flips — otherwise every sideways reorder goes the
+ * opposite way to the one the user is pointing.
  */
-export function resolveInsertIndex(rects: Box[], pointer: Point, axis: ListAxis): number {
+export function resolveInsertIndex(
+  rects: Box[],
+  pointer: Point,
+  axis: ListAxis,
+  rtl = false,
+): number {
   const count = rects.length;
   if (count === 0) return 0;
 
@@ -89,12 +98,29 @@ export function resolveInsertIndex(rects: Box[], pointer: Point, axis: ListAxis)
       }
     }
     const c = centerOf(rects[best]);
-    const past = pointer.y > c.y + rects[best].height / 2 ? true : pointer.y < c.y - rects[best].height / 2 ? false : pointer.x > c.x;
+    const half = rects[best].height / 2;
+    const ahead = rtl ? pointer.x < c.x : pointer.x > c.x;
+    const past = pointer.y > c.y + half ? true : pointer.y < c.y - half ? false : ahead;
     return past ? best + 1 : best;
   }
 
-  const key = axis === 'x' ? 'x' : 'y';
+  if (axis === 'x') {
+    let index = 0;
+    while (
+      index < count &&
+      (rtl ? pointer.x < centerOf(rects[index]).x : pointer.x > centerOf(rects[index]).x)
+    ) {
+      index++;
+    }
+    return index;
+  }
+
   let index = 0;
-  while (index < count && pointer[key] > centerOf(rects[index])[key]) index++;
+  while (index < count && pointer.y > centerOf(rects[index]).y) index++;
   return index;
+}
+
+/** Whether an element's resolved writing direction runs right to left. */
+export function isRtl(el: Element): boolean {
+  return getComputedStyle(el).direction === 'rtl';
 }
