@@ -1,0 +1,18 @@
+---
+title: draggable
+description: Move an element with the pointer.
+---
+
+import Demo from '../../../components/Demo.astro';
+
+Drag the square. It cannot leave the box.
+
+<Demo id="draggable-basic" title="bounds: 'parent'">
+  <div class="demo-box">drag me</div>
+</Demo>
+
+```js
+import { draggable } from 'detent';
+
+draggable(element, { bounds: 'parent' });
+```

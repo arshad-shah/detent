@@ -1,0 +1,55 @@
+---
+interface Props {
+  /** Matches a module in src/demos/<id>.ts */
+  id: string;
+  title?: string;
+  /** Height of the stage in pixels. */
+  height?: number;
+}
+
+const { id, title, height = 220 } = Astro.props;
+---
+
+<figure class="demo" data-demo={id}>
+  {title && <figcaption class="demo-title">{title}</figcaption>}
+  <div class="demo-stage" style={`height:${height}px`} data-demo-stage>
+    <slot />
+  </div>
+  <button class="demo-reset" type="button" data-demo-reset>Reset</button>
+</figure>
+
+<script>
+  // Every demo module in the directory, resolved at build time. Vite needs a
+  // literal glob here — a computed path would not be bundled.
+  const modules = import.meta.glob<{
+    default: (stage: HTMLElement) => () => void;
+  }>('../demos/*.ts');
+
+  for (const figure of document.querySelectorAll<HTMLElement>('[data-demo]')) {
+    const id = figure.dataset.demo!;
+    const load = modules[`../demos/${id}.ts`];
+    if (!load) {
+      console.error(`[docs] no demo module for "${id}"`);
+      continue;
+    }
+
+    const stage = figure.querySelector<HTMLElement>('[data-demo-stage]')!;
+    const reset = figure.querySelector<HTMLButtonElement>('[data-demo-reset]')!;
+    const original = stage.innerHTML;
+
+    let teardown: (() => void) | null = null;
+
+    const mount = async () => {
+      const { default: run } = await load();
+      teardown = run(stage);
+    };
+
+    reset.addEventListener('click', async () => {
+      teardown?.();
+      stage.innerHTML = original;
+      await mount();
+    });
+
+    void mount();
+  }
+</script>
