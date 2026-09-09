@@ -4,7 +4,7 @@ Adversarial reviews of the source, and what came of them.
 
 | Date | Scope | Claims | Reproduced | Disproved |
 | --- | --- | --- | --- | --- |
-| 2026-09-09 | All four packages, post-Phase-4 | — | — | — |
+| 2026-09-09 | All four packages, post-Phase-4 | 8 behavioural + 6 structural | 7 + 6 | 1 |
 
 ## How these run
 
