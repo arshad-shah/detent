@@ -1,3 +1,4 @@
+import { DEFAULTS } from './constants';
 import { boxOf } from './geometry';
 import type { Box } from './types';
 
@@ -26,10 +27,14 @@ export function record(elements: Iterable<HTMLElement>): Map<HTMLElement, Box> {
 }
 
 /** Play everything back from the snapshot to wherever the DOM has put them. */
-export function play(before: Map<HTMLElement, Box>, duration = 180): void {
+export function play(before: Map<HTMLElement, Box>, duration: number = DEFAULTS.animation): void {
   if (!canAnimate() || reducedMotion() || duration <= 0) return;
 
-  for (const [el, from] of before) {
+  // Two passes, deliberately. Cancelling an animation snaps its element to its
+  // final position, which changes layout for everything after it — so every
+  // cancel has to happen before any measurement. Merging these loops looks
+  // like a tidy-up and is a correctness bug.
+  for (const el of before.keys()) {
     running.get(el)?.cancel();
     running.delete(el);
   }

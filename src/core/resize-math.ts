@@ -31,6 +31,39 @@ export interface ResizeResult {
 }
 
 /**
+ * Restore a width-to-height ratio that clamping has broken.
+ *
+ * Clamping happens per axis, so a box that was on-ratio before it hit a limit
+ * is off-ratio after. Rebuild from whichever axis still yields a legal box,
+ * preferring the smaller of the two so a maximum is never exceeded.
+ *
+ * When neither axis yields a legal box the clamped size is returned unchanged:
+ * the limits and the ratio are in genuine conflict, and honouring the limits
+ * is the less surprising of the two failures.
+ */
+export function reconcileAspect(
+  width: number,
+  height: number,
+  aspect: number,
+  limits: ResizeLimits,
+): { width: number; height: number } {
+  const fromWidth = { width, height: width / aspect };
+  const fromHeight = { width: height * aspect, height };
+
+  const widthLegal = fromWidth.height >= limits.minHeight && fromWidth.height <= limits.maxHeight;
+  const heightLegal = fromHeight.width >= limits.minWidth && fromHeight.width <= limits.maxWidth;
+
+  if (widthLegal && heightLegal) {
+    return fromWidth.width * fromWidth.height <= fromHeight.width * fromHeight.height
+      ? fromWidth
+      : fromHeight;
+  }
+  if (widthLegal) return fromWidth;
+  if (heightLegal) return fromHeight;
+  return { width, height };
+}
+
+/**
  * All eight handles are the same sum, expressed as a direction per axis. The
  * only extra work for the top and left handles is that shrinking has to move
  * the element as well as resize it — and that offset is derived from the final
@@ -64,27 +97,7 @@ export function computeResize(input: ResizeInput): ResizeResult {
   height = clamp(height, limits.minHeight, limits.maxHeight);
 
   if (aspect && aspect > 0) {
-    // Clamping may have broken the ratio; rebuild it from whichever axis is
-    // still legal, preferring the smaller box so we never exceed a maximum.
-    const fromWidth = { width, height: width / aspect };
-    const fromHeight = { width: height * aspect, height };
-    const widthLegal =
-      fromWidth.height >= limits.minHeight && fromWidth.height <= limits.maxHeight;
-    const heightLegal = fromHeight.width >= limits.minWidth && fromHeight.width <= limits.maxWidth;
-
-    if (widthLegal && heightLegal) {
-      const pick = fromWidth.width * fromWidth.height <= fromHeight.width * fromHeight.height
-        ? fromWidth
-        : fromHeight;
-      width = pick.width;
-      height = pick.height;
-    } else if (widthLegal) {
-      width = fromWidth.width;
-      height = fromWidth.height;
-    } else if (heightLegal) {
-      width = fromHeight.width;
-      height = fromHeight.height;
-    }
+    ({ width, height } = reconcileAspect(width, height, aspect, limits));
   }
 
   return {
