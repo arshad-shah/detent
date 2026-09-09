@@ -22,7 +22,7 @@
     "build": "node build.mjs",
     "test": "pnpm test:unit && pnpm test:browser",
     "test:watch": "vitest --project unit",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.test.json",
     "size": "node build.mjs --size",
     "playground": "node build.mjs && npx --yes serve playground -l 5173",
     "test:unit": "vitest run --project unit",
@@ -42,6 +42,7 @@
   "license": "MIT",
   "devDependencies": {
     "@playwright/test": "^1.63.0",
+    "@types/node": "^24.13.3",
     "@vitest/browser": "^5.0.0",
     "@vitest/browser-playwright": "^5.0.0",
     "esbuild": "^0.28.2",

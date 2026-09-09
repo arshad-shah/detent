@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { resizable } from '../../src/resizable';
+import { ATTR, CLASS } from '../../src/core/constants';
 import { resetState } from '../../src/core/box';
 import { layout, offsetOf, press } from './helpers';
 
@@ -17,19 +18,19 @@ beforeEach(() => {
   layout(el, { left: 100, top: 100, width: 200, height: 100 });
 });
 
-const grip = (name: string) => el.querySelector<HTMLElement>(`[data-dk-handle="${name}"]`)!;
+const grip = (name: string) => el.querySelector<HTMLElement>(`[${ATTR.handle}="${name}"]`)!;
 
 describe('resizable setup', () => {
   it('adds all eight handles by default', () => {
     resizable(el);
-    expect(el.querySelectorAll('[data-dk-handle]')).toHaveLength(8);
+    expect(el.querySelectorAll(`[${ATTR.handle}]`)).toHaveLength(8);
   });
 
   it('adds only the handles asked for', () => {
     resizable(el, { handles: ['se', 'e'] });
-    expect(el.querySelectorAll('[data-dk-handle]')).toHaveLength(2);
+    expect(el.querySelectorAll(`[${ATTR.handle}]`)).toHaveLength(2);
     expect(grip('se')).toBeTruthy();
-    expect(el.querySelector('[data-dk-handle="nw"]')).toBeNull();
+    expect(el.querySelector(`[${ATTR.handle}="nw"]`)).toBeNull();
   });
 
   it('hides handles from assistive technology', () => {
@@ -40,7 +41,7 @@ describe('resizable setup', () => {
   it('removes its handles on destroy', () => {
     const handle = resizable(el);
     handle.destroy();
-    expect(el.querySelectorAll('[data-dk-handle]')).toHaveLength(0);
+    expect(el.querySelectorAll(`[${ATTR.handle}]`)).toHaveLength(0);
   });
 });
 
@@ -51,7 +52,7 @@ describe('binding to handles you already have', () => {
     const before = el.children.length;
     resizable(el, { handles: { se: '.corner' } });
     expect(el.children.length).toBe(before);
-    expect(el.querySelector('.dk-handle')).toBeNull();
+    expect(el.querySelector(`.${CLASS.handle}`)).toBeNull();
   });
 
   it('resizes from a supplied handle', () => {
@@ -69,7 +70,7 @@ describe('binding to handles you already have', () => {
     const handle = resizable(el, { handles: { se: '.corner' } });
     handle.destroy();
     expect(el.querySelector('.corner')).not.toBeNull();
-    expect(el.querySelector('[data-dk-handle]')).toBeNull();
+    expect(el.querySelector(`[${ATTR.handle}]`)).toBeNull();
   });
 
   it('does not touch the element position when handles are supplied', () => {

@@ -1,3 +1,4 @@
+import { DEFAULTS } from './constants';
 import type { Activation, Handle, Point } from './types';
 
 export interface DragSession {
@@ -35,8 +36,6 @@ export interface PointerOptions extends Activation {
    */
   touchAction?: 'none' | 'auto' | 'manipulation';
 }
-
-const DEFAULTS = { distance: 4, delay: 200, tolerance: 6 };
 
 function matchesIn(path: EventTarget[], root: Element, selector: string): boolean {
   for (const node of path) {
