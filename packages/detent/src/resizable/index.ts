@@ -116,8 +116,11 @@ export function resizable(el: HTMLElement, options: ResizableOptions = {}): Resi
           if (dirY < 0) limits.maxHeight = Math.min(limits.maxHeight, top + startHeight - area.top);
         }
 
+        // Ask before marking, as draggable and sortable do. A refusal used to
+        // leave the element permanently styled as resizing.
+        if (options.onStart?.(payload(session.event, session.cancel)) === false) return false;
         el.classList.add(CLASS.resizing);
-        return options.onStart?.(payload(session.event, session.cancel));
+        return true;
       },
 
       onMove(session) {

@@ -4,14 +4,14 @@ description: Hooks that bind detent to an element, without re-binding on every r
 ---
 
 ```bash
-npm install detent detent-react
+npm install @arshad-shah/detent @arshad-shah/detent-react
 ```
 
 Each hook returns a **callback ref**. Attach it to the element you want bound.
 
 ```jsx
-import { useSortable } from 'detent-react';
-import 'detent/styles.css';
+import { useSortable } from '@arshad-shah/detent-react';
+import '@arshad-shah/detent/styles.css';
 
 function List({ items, onReorder }) {
   const ref = useSortable({

@@ -10,10 +10,10 @@
   "fixed": [],
   "linked": [
     [
-      "detent",
-      "detent-react",
-      "detent-svelte",
-      "detent-elements"
+      "@arshad-shah/detent",
+      "@arshad-shah/detent-react",
+      "@arshad-shah/detent-svelte",
+      "@arshad-shah/detent-elements"
     ]
   ],
   "access": "public",

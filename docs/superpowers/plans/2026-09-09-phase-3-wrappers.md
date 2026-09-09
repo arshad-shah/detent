@@ -200,7 +200,7 @@ const shared = {
   minify: true,
   target: 'es2020',
   define: { __DEV__: 'false' },
-  external: ['detent', 'react', 'react/jsx-runtime', 'svelte'],
+  external: ['@arshad-shah/detent', 'react', 'react/jsx-runtime', 'svelte'],
 };
 
 await build({ ...shared, format: 'esm', outfile: 'dist/index.js' });
@@ -545,7 +545,7 @@ export function useLatest<T>(value: T): { readonly current: T } {
 ```ts
 // packages/detent-react/src/use-draggable.ts
 import { useCallback, useRef } from 'react';
-import { draggable, type DraggableHandle, type DraggableOptions } from 'detent';
+import { draggable, type DraggableHandle, type DraggableOptions } from '@arshad-shah/detent';
 import { useLatest } from './latest';
 
 /**
@@ -594,8 +594,8 @@ passed through for the same reason.
 ```ts
 // packages/detent-react/src/use-sortable.ts
 import { useCallback, useRef } from 'react';
-import { sortable, type SortableOptions } from 'detent';
-import type { Handle } from 'detent';
+import { sortable, type SortableOptions } from '@arshad-shah/detent';
+import type { Handle } from '@arshad-shah/detent';
 import { useLatest } from './latest';
 
 /** Bind `sortable` to whatever element the returned ref is attached to. */
@@ -635,7 +635,7 @@ export function useSortable(options: SortableOptions = {}) {
 ```ts
 // packages/detent-react/src/use-resizable.ts
 import { useCallback, useRef } from 'react';
-import { resizable, type ResizableHandle, type ResizableOptions } from 'detent';
+import { resizable, type ResizableHandle, type ResizableOptions } from '@arshad-shah/detent';
 import { useLatest } from './latest';
 
 /** Bind `resizable` to whatever element the returned ref is attached to. */
@@ -687,7 +687,7 @@ export type {
   SortEvent,
   SortLocation,
   ResizeEvent,
-} from 'detent';
+} from '@arshad-shah/detent';
 ```
 
 - [ ] **Step 6: Run the tests**
@@ -878,7 +878,7 @@ import {
   type Handle,
   type ResizableOptions,
   type SortableOptions,
-} from 'detent';
+} from '@arshad-shah/detent';
 
 /** The contract Svelte expects back from an action. */
 export interface Action<Options> {
@@ -971,7 +971,7 @@ export type {
   SortEvent,
   SortLocation,
   ResizeEvent,
-} from 'detent';
+} from '@arshad-shah/detent';
 ```
 
 - [ ] **Step 5: Run the tests**
@@ -1156,7 +1156,7 @@ Expected: FAIL — `defineDetentElements` is not exported.
 
 ```ts
 // packages/detent-elements/src/base.ts
-import type { Handle } from 'detent';
+import type { Handle } from '@arshad-shah/detent';
 
 /**
  * Shared lifecycle for the custom elements.
@@ -1231,7 +1231,7 @@ export abstract class DetentElement extends HTMLElement {
 
 ```ts
 // packages/detent-elements/src/elements.ts
-import { draggable, resizable, sortable, type HandleName } from 'detent';
+import { draggable, resizable, sortable, type HandleName } from '@arshad-shah/detent';
 import { DetentElement } from './base';
 
 const AXES = ['x', 'y', 'both'] as const;
@@ -1379,7 +1379,7 @@ Astro and plain HTML."
 Now that there are packages to link, restore what Phase 2 deferred:
 
 ```json
-"linked": [["detent", "detent-react", "detent-svelte", "detent-elements"]],
+"linked": [["@arshad-shah/detent", "@arshad-shah/detent-react", "@arshad-shah/detent-svelte", "@arshad-shah/detent-elements"]],
 ```
 
 Naming them explicitly rather than globbing avoids the unmatched-glob config
@@ -1486,7 +1486,7 @@ npm install detent detent-react
 ```
 
 ```jsx
-import { useSortable } from 'detent-react';
+import { useSortable } from '@arshad-shah/detent-react';
 
 function List({ items, onReorder }) {
   const ref = useSortable({
@@ -1533,7 +1533,7 @@ interrupt it, and callbacks are always the newest ones. You do not need
 ## Styles
 
 ```js
-import 'detent/styles.css';
+import '@arshad-shah/detent/styles.css';
 ```
 
 Required for resize handles, optional otherwise.
@@ -1555,8 +1555,8 @@ npm install detent detent-svelte
 
 ```svelte
 <script>
-  import { sortable } from 'detent-svelte';
-  import 'detent/styles.css';
+  import { sortable } from '@arshad-shah/detent-svelte';
+  import '@arshad-shah/detent/styles.css';
 
   let items = $state([
     { id: 1, label: 'first' },
@@ -1605,7 +1605,7 @@ npm install detent detent-elements
 
 ```html
 <script type="module">
-  import { defineDetentElements } from 'detent-elements';
+  import { defineDetentElements } from '@arshad-shah/detent-elements';
   defineDetentElements();
 </script>
 <link rel="stylesheet" href="node_modules/detent/dist/styles.css">

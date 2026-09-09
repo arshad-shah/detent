@@ -16,9 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86  # v6
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7
         with:
           node-version: 24
           cache: pnpm
@@ -45,13 +45,13 @@ jobs:
       pull-requests: write   # open and update the Version Packages PR
       id-token: write        # OIDC, for provenance and trusted publishing
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v6
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86  # v6
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7
         with:
           node-version: 24
           cache: pnpm
@@ -65,7 +65,7 @@ jobs:
         run: npm install -g npm@^12
 
       # v2 renamed every one of these inputs from their v1 names.
-      - uses: changesets/action@v2.1.2
+      - uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51  # v2.1.2
         with:
           version-script: pnpm version-packages
           publish-script: pnpm release

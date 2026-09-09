@@ -122,8 +122,12 @@ export function draggable(el: HTMLElement, options: DraggableOptions = {}): Drag
       limit = area ? unscaleBox(area, scale) : null;
       gridOrigin = grid ? resolveGridOrigin(limit) : { x: 0, y: 0 };
 
+      // Ask before marking. A refusal has to leave the element exactly as it
+      // was; adding the class first left it permanently styled as dragging,
+      // because the pointer layer skips onEnd for a refused start.
+      if (options.onStart?.(payload(session)) === false) return false;
       el.classList.add(CLASS.dragging);
-      return options.onStart?.(payload(session));
+      return true;
     },
 
     onMove(session) {

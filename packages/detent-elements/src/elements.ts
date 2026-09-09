@@ -1,4 +1,4 @@
-import { draggable, resizable, sortable, type Bounds, type HandleName } from 'detent';
+import { draggable, resizable, sortable, type Bounds, type HandleName } from '@arshad-shah/detent';
 import { DetentElement } from './base';
 
 const AXES = ['x', 'y', 'both'] as const;

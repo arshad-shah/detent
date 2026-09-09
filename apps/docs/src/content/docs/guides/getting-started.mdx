@@ -10,22 +10,22 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 <Tabs syncKey="framework">
   <TabItem label="Vanilla">
     ```bash
-    npm install detent
+    npm install @arshad-shah/detent
     ```
   </TabItem>
   <TabItem label="React">
     ```bash
-    npm install detent detent-react
+    npm install @arshad-shah/detent @arshad-shah/detent-react
     ```
   </TabItem>
   <TabItem label="Svelte">
     ```bash
-    npm install detent detent-svelte
+    npm install @arshad-shah/detent @arshad-shah/detent-svelte
     ```
   </TabItem>
   <TabItem label="Web Components">
     ```bash
-    npm install detent detent-elements
+    npm install @arshad-shah/detent @arshad-shah/detent-elements
     ```
   </TabItem>
 </Tabs>
@@ -33,7 +33,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 ## The stylesheet
 
 ```js
-import 'detent/styles.css';
+import '@arshad-shah/detent/styles.css';
 ```
 
 Required for resize handles, which get their size from it. Dragging, sorting
@@ -44,7 +44,7 @@ and keyboard reordering all work without it — see [Styling](/guides/styling/).
 Each takes an element and options, and returns a handle with `destroy()`.
 
 ```js
-import { draggable, sortable, resizable } from 'detent';
+import { draggable, sortable, resizable } from '@arshad-shah/detent';
 
 // Move an element, kept inside its parent.
 draggable(box, { bounds: 'parent' });

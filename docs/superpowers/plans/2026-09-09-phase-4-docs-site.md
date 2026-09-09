@@ -111,7 +111,7 @@ a `pnpm -F` filter target, and the short one is what you will type.
     "deploy": "wrangler deploy"
   },
   "dependencies": {
-    "detent": "workspace:^"
+    "@arshad-shah/detent": "workspace:^"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
@@ -138,7 +138,7 @@ export default defineConfig({
   site: 'https://detent.arshadshah.com',
   integrations: [
     starlight({
-      title: 'detent',
+      title: '@arshad-shah/detent',
       description:
         'Tiny zero-dependency drag, reorder and resize for the web. ' +
         'Pointer-based, touch-ready, framework-free.',
@@ -486,7 +486,7 @@ click, which is a small free test of teardown.
 
 ```ts
 // apps/docs/src/demos/draggable-basic.ts
-import { draggable } from 'detent';
+import { draggable } from '@arshad-shah/detent';
 
 /**
  * Mount the demo into `stage` and return a teardown function.
@@ -520,7 +520,7 @@ Drag the square. It cannot leave the box.
 </Demo>
 
 ```js
-import { draggable } from 'detent';
+import { draggable } from '@arshad-shah/detent';
 
 draggable(element, { bounds: 'parent' });
 ```
@@ -610,7 +610,7 @@ destroy() on every click."
 
 ```ts
 // apps/docs/src/demos/draggable-axis.ts
-import { draggable } from 'detent';
+import { draggable } from '@arshad-shah/detent';
 
 export default function mount(stage: HTMLElement): () => void {
   const handles = Array.from(stage.querySelectorAll<HTMLElement>('.demo-box')).map((box) =>
@@ -622,7 +622,7 @@ export default function mount(stage: HTMLElement): () => void {
 
 ```ts
 // apps/docs/src/demos/draggable-grid.ts
-import { draggable } from 'detent';
+import { draggable } from '@arshad-shah/detent';
 
 export default function mount(stage: HTMLElement): () => void {
   const box = stage.querySelector<HTMLElement>('.demo-box');
@@ -634,7 +634,7 @@ export default function mount(stage: HTMLElement): () => void {
 
 ```ts
 // apps/docs/src/demos/sortable-list.ts
-import { sortable } from 'detent';
+import { sortable } from '@arshad-shah/detent';
 
 export default function mount(stage: HTMLElement): () => void {
   const list = stage.querySelector<HTMLElement>('.demo-list');
@@ -646,7 +646,7 @@ export default function mount(stage: HTMLElement): () => void {
 
 ```ts
 // apps/docs/src/demos/sortable-groups.ts
-import { sortable } from 'detent';
+import { sortable } from '@arshad-shah/detent';
 
 export default function mount(stage: HTMLElement): () => void {
   const handles = Array.from(stage.querySelectorAll<HTMLElement>('.demo-list')).map((list) =>
@@ -658,7 +658,7 @@ export default function mount(stage: HTMLElement): () => void {
 
 ```ts
 // apps/docs/src/demos/sortable-keyboard.ts
-import { sortable } from 'detent';
+import { sortable } from '@arshad-shah/detent';
 
 export default function mount(stage: HTMLElement): () => void {
   const list = stage.querySelector<HTMLElement>('.demo-list');
@@ -673,7 +673,7 @@ export default function mount(stage: HTMLElement): () => void {
 
 ```ts
 // apps/docs/src/demos/resizable-basic.ts
-import { resizable } from 'detent';
+import { resizable } from '@arshad-shah/detent';
 
 export default function mount(stage: HTMLElement): () => void {
   const panel = stage.querySelector<HTMLElement>('.demo-panel');
@@ -685,7 +685,7 @@ export default function mount(stage: HTMLElement): () => void {
 
 ```ts
 // apps/docs/src/demos/resizable-aspect.ts
-import { resizable } from 'detent';
+import { resizable } from '@arshad-shah/detent';
 
 export default function mount(stage: HTMLElement): () => void {
   const panel = stage.querySelector<HTMLElement>('.demo-panel');
@@ -701,7 +701,7 @@ The resizable demos need `detent/styles.css`, or the handles have no size.
 Add it to the Starlight config's `customCss`, so it is loaded once site-wide:
 
 ```js
-customCss: ['detent/styles.css', './src/styles/custom.css'],
+customCss: ['@arshad-shah/detent/styles.css', './src/styles/custom.css'],
 ```
 
 Order matters. `detent/styles.css` is inside `@layer detent`, so the site's own
@@ -794,7 +794,7 @@ Each step is announced to screen readers.
 ## Reading the order
 
 ```js
-import { orderOf } from 'detent';
+import { orderOf } from '@arshad-shah/detent';
 
 orderOf(list);           // HTMLElement[] in current DOM order
 orderOf(list, '.card');  // only children matching a selector
@@ -907,7 +907,7 @@ cross-list groups, keyboard reordering, aspect ratio."
 
 ```ts
 // apps/docs/src/demos/hero.ts
-import { resizable, sortable } from 'detent';
+import { resizable, sortable } from '@arshad-shah/detent';
 
 /** All three ideas in one stage: a sortable list beside a resizable panel. */
 export default function mount(stage: HTMLElement): () => void {

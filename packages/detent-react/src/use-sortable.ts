@@ -1,5 +1,5 @@
 import { useCallback, useRef } from 'react';
-import { sortable, type Handle, type SortableOptions } from 'detent';
+import { sortable, type Handle, type SortableOptions } from '@arshad-shah/detent';
 import { useLatest } from './latest';
 
 /**

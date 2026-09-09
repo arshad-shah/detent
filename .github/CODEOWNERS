@@ -1,0 +1,9 @@
+# Everything, by default.
+*                       @arshad-shah
+
+# The parts where a mistake is expensive or hard to reverse: publishing
+# credentials, branch protection, and anything that runs with elevated
+# permissions.
+/.github/               @arshad-shah
+/.changeset/config.json @arshad-shah
+/packages/*/package.json @arshad-shah

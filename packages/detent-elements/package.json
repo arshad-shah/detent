@@ -1,7 +1,7 @@
 {
-  "name": "detent-elements",
+  "name": "@arshad-shah/detent-elements",
   "version": "0.2.0",
-  "description": "Custom elements for detent — drag, reorder and resize in any framework.",
+  "description": "Custom elements for detent \u2014 drag, reorder and resize in any framework.",
   "type": "module",
   "sideEffects": false,
   "license": "MIT",
@@ -37,7 +37,7 @@
     "typecheck": "tsc --noEmit && tsc -p tsconfig.test.json"
   },
   "dependencies": {
-    "detent": "workspace:^"
+    "@arshad-shah/detent": "workspace:^"
   },
   "devDependencies": {
     "@types/node": "^24.13.3",
@@ -55,6 +55,9 @@
     "drag",
     "sortable",
     "resize",
-    "detent"
-  ]
+    "@arshad-shah/detent"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
 }

@@ -1,4 +1,10 @@
-/** The prefix every class and attribute the library writes begins with. */
+/**
+ * The prefix every class and attribute the library writes begins with.
+ *
+ * Deliberately unscoped and independent of the npm package name: this ends up
+ * in `class="detent-dragging"` and `data-detent-handle`, where a scope would
+ * be both ugly and, for an attribute, invalid.
+ */
 export const PREFIX = 'detent';
 
 /** Class names the library adds to host elements. */

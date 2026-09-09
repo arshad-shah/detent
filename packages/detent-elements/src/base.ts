@@ -1,4 +1,4 @@
-import type { Handle } from 'detent';
+import type { Handle } from '@arshad-shah/detent';
 
 /**
  * Shared lifecycle for the custom elements.

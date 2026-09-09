@@ -1,5 +1,5 @@
 {
-  "name": "detent",
+  "name": "@arshad-shah/detent",
   "version": "0.2.1",
   "description": "Tiny zero-dependency drag, reorder and resize for the web. Pointer-based, touch-ready, framework-free.",
   "type": "module",
@@ -25,10 +25,20 @@
     "./styles.css": "./dist/styles.css",
     "./package.json": "./package.json"
   },
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "keywords": [
-    "drag", "drop", "sortable", "reorder", "resize",
-    "touch", "pointer-events", "zero-dependency"
+    "drag",
+    "drop",
+    "sortable",
+    "reorder",
+    "resize",
+    "touch",
+    "pointer-events",
+    "zero-dependency"
   ],
   "scripts": {
     "build": "node build.mjs",
@@ -52,5 +62,8 @@
     "typescript": "^7.0.2",
     "vite": "^7.3.6",
     "vitest": "^5.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

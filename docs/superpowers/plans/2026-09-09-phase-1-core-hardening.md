@@ -307,7 +307,7 @@ Expected: FAIL — `Failed to resolve import "../../src/core/options"`.
 // src/core/constants.ts
 
 /** The prefix every class and attribute the library writes begins with. */
-export const PREFIX = 'detent';
+export const PREFIX = '@arshad-shah/detent';
 
 /** Class names the library adds to host elements. */
 export const CLASS = {
@@ -3018,7 +3018,7 @@ Expected: FAIL — the stylesheet is unlayered and still uses `dk-`. Add `?raw` 
 The TypeScript side already reads from `constants.ts` after Task 2, so this is a one-line change there:
 
 ```bash
-# In src/core/constants.ts the PREFIX is already 'detent'; verify no stragglers.
+# In src/core/constants.ts the PREFIX is already '@arshad-shah/detent'; verify no stragglers.
 grep -rn "dk-" src/ test/ e2e/ README.md
 ```
 

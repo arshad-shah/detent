@@ -1,0 +1,31 @@
+version: 2
+
+updates:
+  # Workspace dependencies. One PR per group keeps the review surface small;
+  # majors stay separate because they are the ones that need thought.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    versioning-strategy: increase-if-necessary
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+    ignore:
+      # The docs app is pinned to TypeScript 6 on purpose: astro check needs
+      # the programmatic API the native 7.x compiler does not expose yet.
+      # See apps/docs/package.json.
+      - dependency-name: typescript
+        versions: ['7.x']
+    labels: [dependencies]
+
+  # Actions are pinned to commit SHAs, so this is the only thing that can move
+  # them — and it is the main defence against a compromised action tag.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    labels: [dependencies, ci]

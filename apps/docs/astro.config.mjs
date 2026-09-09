@@ -5,7 +5,7 @@ export default defineConfig({
   site: 'https://detent.arshadshah.com',
   integrations: [
     starlight({
-      title: 'detent',
+      title: '@arshad-shah/detent',
       // The lockup carries the word, so the header does not repeat it.
       logo: {
         light: './src/assets/lockup.svg',
@@ -60,7 +60,7 @@ export default defineConfig({
           attrs: { name: 'twitter:card', content: 'summary_large_image' },
         },
       ],
-      customCss: ['detent/styles.css', './src/styles/custom.css'],
+      customCss: ['@arshad-shah/detent/styles.css', './src/styles/custom.css'],
       sidebar: [
         {
           label: 'Guides',

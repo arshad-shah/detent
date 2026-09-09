@@ -99,7 +99,7 @@ special-casing it.
 
 ```json
 {
-  "name": "detent",
+  "name": "@arshad-shah/detent",
   "version": "0.0.0",
   "description": "Tiny zero-dependency drag, reorder and resize for the web. Pointer-based, touch-ready, framework-free.",
   "type": "module",
@@ -206,7 +206,7 @@ The root is no longer a workspace member — it is private and publishes nothing
 - [ ] **Step 5: Write the root README**
 
 ```markdown
-<img src="brand/logo/detent-lockup.svg" alt="detent" height="48">
+<img src="brand/logo/detent-lockup.svg" alt="@arshad-shah/detent" height="48">
 
 Drag, reorder and resize for the web. No dependencies, no framework, one input
 path for mouse, touch and pen.
@@ -513,7 +513,7 @@ and a README this repository does not need.
   "changelog": ["@changesets/changelog-github", { "repo": "arshad-shah/detent" }],
   "commit": false,
   "fixed": [],
-  "linked": [["detent", "detent-*"]],
+  "linked": [["@arshad-shah/detent", "detent-*"]],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
@@ -535,7 +535,7 @@ pnpm add -Dw @changesets/changelog-github@^0.6.0
 
 ```markdown
 ---
-'detent': minor
+'@arshad-shah/detent': minor
 ---
 
 First release.
