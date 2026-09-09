@@ -1,0 +1,60 @@
+{
+  "name": "detent-elements",
+  "version": "0.0.0",
+  "description": "Custom elements for detent — drag, reorder and resize in any framework.",
+  "type": "module",
+  "sideEffects": false,
+  "license": "MIT",
+  "author": "Arshad Shah",
+  "homepage": "https://detent.arshadshah.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arshad-shah/detent.git",
+    "directory": "packages/detent-elements"
+  },
+  "bugs": "https://github.com/arshad-shah/detent/issues",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "node build.mjs",
+    "size": "node scripts/size-check.mjs",
+    "test": "pnpm test:browser",
+    "test:browser": "vitest run --project browser",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.test.json"
+  },
+  "dependencies": {
+    "detent": "workspace:^"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.3",
+    "@vitest/browser": "^5.0.0",
+    "@vitest/browser-playwright": "^5.0.0",
+    "esbuild": "^0.28.2",
+    "playwright": "^1.63.0",
+    "typescript": "^7.0.2",
+    "vite": "^7.3.6",
+    "vitest": "^5.0.0"
+  },
+  "keywords": [
+    "web-components",
+    "custom-elements",
+    "drag",
+    "sortable",
+    "resize",
+    "detent"
+  ]
+}

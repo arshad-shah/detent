@@ -1,4 +1,7 @@
 import type { HandleName } from '../core/resize-math';
+
+/** The eight edge and corner names a resize handle can take. */
+export type { HandleName } from '../core/resize-math';
 import type { Activation, Bounds } from '../core/types';
 
 export interface ResizeEvent {

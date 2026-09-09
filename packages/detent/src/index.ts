@@ -5,7 +5,13 @@ export { sortable, orderOf } from './sortable/index';
 export type { SortableOptions, SortEvent, SortLocation } from './sortable/types';
 
 export { resizable } from './resizable/index';
-export type { ResizableOptions, ResizableHandle, ResizeEvent } from './resizable/types';
+export type {
+  ResizableOptions,
+  ResizableHandle,
+  ResizeEvent,
+  HandleName,
+  HandleSpec,
+} from './resizable/types';
 
 export { bindPointer } from './core/pointer';
 export type { DragSession, PointerOptions } from './core/pointer';
