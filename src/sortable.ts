@@ -1,5 +1,6 @@
 import { paintNow, stateOf } from './core/box';
 import { ATTR, CLASS, DEFAULTS } from './core/constants';
+import { invariant } from './core/invariant';
 import { createAutoScroll, type AutoScrollOptions } from './core/autoscroll';
 import * as flip from './core/flip';
 import {
@@ -100,6 +101,7 @@ function placeAt(container: HTMLElement, item: HTMLElement, siblings: HTMLElemen
 }
 
 export function sortable(container: HTMLElement, options: SortableOptions = {}): Handle {
+  invariant(container instanceof HTMLElement, 'sortable() needs an HTMLElement container');
   const animation = options.animation ?? DEFAULTS.animation;
   const useKeyboard = options.keyboard !== false;
   let disabled = options.disabled ?? false;

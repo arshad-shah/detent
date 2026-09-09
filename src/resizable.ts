@@ -1,5 +1,6 @@
 import { paint, resolveBounds, stateOf } from './core/box';
 import { ATTR, CLASS, DEFAULTS, handleClass } from './core/constants';
+import { invariant } from './core/invariant';
 import { normaliseGrid } from './core/options';
 import { boxOf } from './core/geometry';
 import { bindPointer } from './core/pointer';
@@ -56,6 +57,15 @@ export interface ResizableHandle extends Handle {
 }
 
 export function resizable(el: HTMLElement, options: ResizableOptions = {}): ResizableHandle {
+  invariant(el instanceof HTMLElement, `resizable() needs an HTMLElement, got ${typeof el}`);
+  invariant(
+    (options.maxWidth ?? Infinity) >= (options.minWidth ?? DEFAULTS.minSize),
+    'resizable() maxWidth is below minWidth',
+  );
+  invariant(
+    (options.maxHeight ?? Infinity) >= (options.minHeight ?? DEFAULTS.minSize),
+    'resizable() maxHeight is below minHeight',
+  );
   const supplied = Array.isArray(options.handles) || !options.handles ? null : options.handles;
   const names = (supplied ? Object.keys(supplied) : (options.handles as HandleName[] | undefined) ?? ALL_HANDLES) as HandleName[];
   const grid = normaliseGrid(options.grid);

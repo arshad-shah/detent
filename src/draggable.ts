@@ -1,5 +1,6 @@
 import { paint, paintNow, resolveBounds, stateOf } from './core/box';
 import { CLASS } from './core/constants';
+import { invariant } from './core/invariant';
 import { normaliseGrid } from './core/options';
 import { boxOf, clampOffset, snap } from './core/geometry';
 import { bindPointer, type DragSession } from './core/pointer';
@@ -47,6 +48,7 @@ export interface DraggableHandle extends Handle {
 }
 
 export function draggable(el: HTMLElement, options: DraggableOptions = {}): DraggableHandle {
+  invariant(el instanceof HTMLElement, `draggable() needs an HTMLElement, got ${typeof el}`);
   const grid = normaliseGrid(options.grid);
 
   let disabled = options.disabled ?? false;
