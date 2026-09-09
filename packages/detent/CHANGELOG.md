@@ -1,5 +1,19 @@
 # detent
 
+## 0.2.1
+
+### Patch Changes
+
+- [#11](https://github.com/arshad-shah/detent/pull/11) [`a3de44b`](https://github.com/arshad-shah/detent/commit/a3de44b213fc4ec938170536513086643d6418d7) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Trim the readme to link to the documentation site rather than duplicate it.
+  
+  The styling contract, stacking-context guidance and large-list notes now live
+  at [detent.arshadshah.com](https://detent.arshadshah.com), where they sit
+  beside demos you can actually drag. The readme keeps the quick API sketch, the
+  size table and a one-paragraph styling summary, so it still stands alone on
+  npm.
+  
+  No code changes.
+
 ## 0.2.0
 
 ### Minor Changes
