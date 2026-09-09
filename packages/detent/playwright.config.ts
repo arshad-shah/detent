@@ -17,7 +17,10 @@ export default defineConfig({
   webServer: {
     command: './node_modules/.bin/vite --port 5174 --strictPort',
     port: 5174,
-    reuseExistingServer: !process.env.CI,
+    // Always start a fresh server. Reusing one means silently testing
+    // whatever an unrelated dev server happens to be serving on this port,
+    // which fails in ways that look like library bugs.
+    reuseExistingServer: false,
   },
   use: { baseURL: 'http://localhost:5174' },
   projects: [
