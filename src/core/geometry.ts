@@ -73,8 +73,17 @@ export function detectAxis(rects: Box[]): ListAxis {
  *
  * The answer is an insertion point: 0 means "before the first remaining item",
  * `rects.length` means "after the last one".
+ *
+ * `rects` is in DOM order. Under RTL that runs right-to-left on screen, so the
+ * horizontal comparison flips — otherwise every sideways reorder goes the
+ * opposite way to the one the user is pointing.
  */
-export function resolveInsertIndex(rects: Box[], pointer: Point, axis: ListAxis): number {
+export function resolveInsertIndex(
+  rects: Box[],
+  pointer: Point,
+  axis: ListAxis,
+  rtl = false,
+): number {
   const count = rects.length;
   if (count === 0) return 0;
 
@@ -89,53 +98,29 @@ export function resolveInsertIndex(rects: Box[], pointer: Point, axis: ListAxis)
       }
     }
     const c = centerOf(rects[best]);
-    const past = pointer.y > c.y + rects[best].height / 2 ? true : pointer.y < c.y - rects[best].height / 2 ? false : pointer.x > c.x;
+    const half = rects[best].height / 2;
+    const ahead = rtl ? pointer.x < c.x : pointer.x > c.x;
+    const past = pointer.y > c.y + half ? true : pointer.y < c.y - half ? false : ahead;
     return past ? best + 1 : best;
   }
 
-  const key = axis === 'x' ? 'x' : 'y';
+  if (axis === 'x') {
+    let index = 0;
+    while (
+      index < count &&
+      (rtl ? pointer.x < centerOf(rects[index]).x : pointer.x > centerOf(rects[index]).x)
+    ) {
+      index++;
+    }
+    return index;
+  }
+
   let index = 0;
-  while (index < count && pointer[key] > centerOf(rects[index])[key]) index++;
+  while (index < count && pointer.y > centerOf(rects[index]).y) index++;
   return index;
 }
 
-/** Every ancestor that scrolls, nearest first. */
-export function scrollAncestorsOf(el: Element): Element[] {
-  const out: Element[] = [];
-  let node = el.parentElement;
-  while (node && node !== document.body && node !== document.documentElement) {
-    const style = getComputedStyle(node);
-    if (/auto|scroll|overlay/.test(style.overflowY + style.overflowX)) out.push(node);
-    node = node.parentElement;
-  }
-  return out;
-}
-
-/**
- * How far everything above an element has scrolled, added together.
- *
- * A drag works in viewport coordinates, but an element's resting position moves
- * when anything above it scrolls. Tracking the total lets a drag stay under the
- * pointer instead of sliding away with the content.
- */
-export function totalScroll(ancestors: Element[]): Point {
-  let x = typeof window === 'undefined' ? 0 : window.scrollX;
-  let y = typeof window === 'undefined' ? 0 : window.scrollY;
-  for (const node of ancestors) {
-    x += node.scrollLeft;
-    y += node.scrollTop;
-  }
-  return { x, y };
-}
-
-/** The nearest ancestor that actually scrolls, or null if only the page does. */
-export function scrollParentOf(el: Element): Element | null {
-  let node = el.parentElement;
-  while (node && node !== document.body && node !== document.documentElement) {
-    const style = getComputedStyle(node);
-    const overflow = style.overflowY + style.overflowX;
-    if (/auto|scroll|overlay/.test(overflow)) return node;
-    node = node.parentElement;
-  }
-  return null;
+/** Whether an element's resolved writing direction runs right to left. */
+export function isRtl(el: Element): boolean {
+  return getComputedStyle(el).direction === 'rtl';
 }

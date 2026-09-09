@@ -1,0 +1,26 @@
+{
+  "comment": "Tests and fixtures. Runs in modern browsers and Node only, so it gets a modern lib and is never emitted.",
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": [
+      "ES2023",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "declaration": false,
+    "emitDeclarationOnly": false,
+    "noEmit": true,
+    "types": [
+      "vite/client",
+      "node"
+    ],
+    "rootDir": "."
+  },
+  "include": [
+    "src",
+    "test",
+    "e2e",
+    "vitest.config.ts",
+    "playwright.config.ts"
+  ]
+}

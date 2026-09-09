@@ -1,6 +1,10 @@
 import { paint, paintNow, resolveBounds, stateOf } from './core/box';
+import { CLASS } from './core/constants';
+import { invariant } from './core/invariant';
+import { normaliseGrid } from './core/options';
 import { boxOf, clampOffset, snap } from './core/geometry';
 import { bindPointer, type DragSession } from './core/pointer';
+import { scaleOf, unscale, unscaleBox } from './core/scale';
 import type { Activation, Axis, Bounds, Box, Handle, Point } from './core/types';
 
 export interface DragEvent {
@@ -44,14 +48,9 @@ export interface DraggableHandle extends Handle {
   setDisabled(disabled: boolean): void;
 }
 
-const DRAGGING_CLASS = 'dk-dragging';
-
 export function draggable(el: HTMLElement, options: DraggableOptions = {}): DraggableHandle {
-  const grid: [number, number] | null = options.grid
-    ? typeof options.grid === 'number'
-      ? [options.grid, options.grid]
-      : options.grid
-    : null;
+  invariant(el instanceof HTMLElement, `draggable() needs an HTMLElement, got ${typeof el}`);
+  const grid = normaliseGrid(options.grid);
 
   let disabled = options.disabled ?? false;
 
@@ -60,6 +59,8 @@ export function draggable(el: HTMLElement, options: DraggableOptions = {}): Drag
   let limit: Box | null = null;
   let startOffset: Point = { x: 0, y: 0 };
   let gridOrigin: Point = { x: 0, y: 0 };
+  // Rendered pixels per layout pixel, from any transformed ancestor.
+  let scale: Point = { x: 1, y: 1 };
 
   function resolveGridOrigin(area: Box | null): Point {
     if (options.gridOrigin === 'viewport') return { x: 0, y: 0 };
@@ -103,25 +104,33 @@ export function draggable(el: HTMLElement, options: DraggableOptions = {}): Drag
       const state = stateOf(el);
       const visual = boxOf(el);
 
+      scale = scaleOf(el);
       startOffset = { x: state.x, y: state.y };
-      // Where the element would sit with no offset applied.
-      origin = {
-        left: visual.left - state.x,
-        top: visual.top - state.y,
-        width: visual.width,
-        height: visual.height,
-      };
-      limit = resolveBounds(el, options.bounds ?? null);
+      // Where the element would sit with no offset applied, in layout pixels.
+      // The offset we compute is a CSS translate, so every box it is compared
+      // against has to be in the same units.
+      origin = unscaleBox(
+        {
+          left: visual.left - state.x * scale.x,
+          top: visual.top - state.y * scale.y,
+          width: visual.width,
+          height: visual.height,
+        },
+        scale,
+      );
+      const area = resolveBounds(el, options.bounds ?? null);
+      limit = area ? unscaleBox(area, scale) : null;
       gridOrigin = grid ? resolveGridOrigin(limit) : { x: 0, y: 0 };
 
-      el.classList.add(DRAGGING_CLASS);
+      el.classList.add(CLASS.dragging);
       return options.onStart?.(payload(session));
     },
 
     onMove(session) {
       const state = stateOf(el);
-      let x = options.axis === 'y' ? startOffset.x : startOffset.x + session.delta.x;
-      let y = options.axis === 'x' ? startOffset.y : startOffset.y + session.delta.y;
+      const delta = unscale(session.delta, scale);
+      let x = options.axis === 'y' ? startOffset.x : startOffset.x + delta.x;
+      let y = options.axis === 'x' ? startOffset.y : startOffset.y + delta.y;
 
       if (grid) {
         x = snap(origin.left + x, grid[0], gridOrigin.x) - origin.left;
@@ -144,7 +153,7 @@ export function draggable(el: HTMLElement, options: DraggableOptions = {}): Drag
         state.y = startOffset.y;
         paint(el);
       }
-      el.classList.remove(DRAGGING_CLASS);
+      el.classList.remove(CLASS.dragging);
       options.onEnd?.(payload(session), cancelled);
     },
   });
@@ -167,7 +176,7 @@ export function draggable(el: HTMLElement, options: DraggableOptions = {}): Drag
     },
     destroy() {
       pointer.destroy();
-      el.classList.remove(DRAGGING_CLASS);
+      el.classList.remove(CLASS.dragging);
     },
   };
 }

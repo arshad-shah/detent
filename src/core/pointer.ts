@@ -1,3 +1,5 @@
+import { lockPage, unlockPage } from './body-state';
+import { DEFAULTS } from './constants';
 import type { Activation, Handle, Point } from './types';
 
 export interface DragSession {
@@ -36,8 +38,6 @@ export interface PointerOptions extends Activation {
   touchAction?: 'none' | 'auto' | 'manipulation';
 }
 
-const DEFAULTS = { distance: 4, delay: 200, tolerance: 6 };
-
 function matchesIn(path: EventTarget[], root: Element, selector: string): boolean {
   for (const node of path) {
     if (node === root) return false;
@@ -65,7 +65,6 @@ export function bindPointer(el: HTMLElement, opts: PointerOptions): Handle {
   let session: DragSession | null = null;
   let active = false;
   let timer: ReturnType<typeof setTimeout> | null = null;
-  let restoreUserSelect = '';
 
   const previousTouchAction = el.style.touchAction;
   el.style.touchAction = opts.touchAction ?? 'none';
@@ -84,9 +83,7 @@ export function bindPointer(el: HTMLElement, opts: PointerOptions): Handle {
       return;
     }
     active = true;
-    restoreUserSelect = document.body.style.userSelect;
-    document.body.style.userSelect = 'none';
-    document.body.setAttribute('data-dragging', '');
+    lockPage();
   }
 
   function onMove(e: PointerEvent) {
@@ -155,8 +152,7 @@ export function bindPointer(el: HTMLElement, opts: PointerOptions): Handle {
     active = false;
 
     if (wasActive) {
-      document.body.style.userSelect = restoreUserSelect;
-      document.body.removeAttribute('data-dragging');
+      unlockPage();
       swallowNextClick();
     }
     if (finished && wasActive) opts.onEnd?.(finished, cancelled);

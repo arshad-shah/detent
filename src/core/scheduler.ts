@@ -44,3 +44,13 @@ export function flush(): void {
   queue.clear();
   for (const job of jobs) job();
 }
+
+/**
+ * How many jobs are waiting for the next frame.
+ *
+ * Exists so tests can assert that batching actually batches. Not part of the
+ * public API.
+ */
+export function queued(): number {
+  return queue.size;
+}

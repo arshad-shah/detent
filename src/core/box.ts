@@ -1,5 +1,5 @@
 import { boxOf } from './geometry';
-import { write } from './scheduler';
+import { unschedule, write } from './scheduler';
 import type { Box, Bounds } from './types';
 
 /**
@@ -19,6 +19,15 @@ export interface BoxState {
 
 const states = new WeakMap<HTMLElement, BoxState>();
 
+/**
+ * One painter per element, created once and reused.
+ *
+ * The scheduler dedupes its queue by function identity. Allocating a fresh
+ * closure per call — which is what this used to do — meant the queue grew by
+ * one entry per pointer event and nothing was ever batched.
+ */
+const painters = new WeakMap<HTMLElement, () => void>();
+
 export function stateOf(el: HTMLElement): BoxState {
   let state = states.get(el);
   if (!state) {
@@ -30,24 +39,43 @@ export function stateOf(el: HTMLElement): BoxState {
 
 export function resetState(el: HTMLElement): void {
   states.delete(el);
+  const painter = painters.get(el);
+  if (painter) {
+    unschedule(painter);
+    painters.delete(el);
+  }
 }
 
-/** Push the element's current offset and size to the DOM on the next frame. */
-export function paint(el: HTMLElement): void {
-  const state = stateOf(el);
-  write(() => {
-    el.style.transform = state.x || state.y ? `translate3d(${state.x}px, ${state.y}px, 0)` : '';
-    if (state.width !== null) el.style.width = `${state.width}px`;
-    if (state.height !== null) el.style.height = `${state.height}px`;
-  });
-}
-
-/** Same as paint, but immediate — used when a frame of lag would show. */
-export function paintNow(el: HTMLElement): void {
+function apply(el: HTMLElement): void {
   const state = stateOf(el);
   el.style.transform = state.x || state.y ? `translate3d(${state.x}px, ${state.y}px, 0)` : '';
   if (state.width !== null) el.style.width = `${state.width}px`;
   if (state.height !== null) el.style.height = `${state.height}px`;
+}
+
+function painterOf(el: HTMLElement): () => void {
+  let painter = painters.get(el);
+  if (!painter) {
+    painter = () => apply(el);
+    painters.set(el, painter);
+  }
+  return painter;
+}
+
+/** Push the element's current offset and size to the DOM on the next frame. */
+export function paint(el: HTMLElement): void {
+  write(painterOf(el));
+}
+
+/**
+ * Same as paint, but immediate — used when a frame of lag would show.
+ *
+ * Cancels any pending queued paint for the element, so a stale write cannot
+ * land afterwards and undo it.
+ */
+export function paintNow(el: HTMLElement): void {
+  unschedule(painterOf(el));
+  apply(el);
 }
 
 export function resolveBounds(el: HTMLElement, bounds: Bounds): Box | null {
