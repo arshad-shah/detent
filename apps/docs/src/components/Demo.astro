@@ -3,7 +3,7 @@ interface Props {
   /** Matches a module in src/demos/<id>.ts */
   id: string;
   title?: string;
-  /** Height of the stage in pixels. */
+  /** Minimum stage height in pixels. Content taller than this grows it. */
   height?: number;
 }
 
@@ -12,7 +12,7 @@ const { id, title, height = 220 } = Astro.props;
 
 <figure class="demo" data-demo={id}>
   {title && <figcaption class="demo-title">{title}</figcaption>}
-  <div class="demo-stage" style={`height:${height}px`} data-demo-stage>
+  <div class="demo-stage" style={`min-height:${height}px`} data-demo-stage>
     <slot />
   </div>
   <button class="demo-reset" type="button" data-demo-reset>Reset</button>

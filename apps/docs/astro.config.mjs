@@ -7,8 +7,8 @@ export default defineConfig({
     starlight({
       title: 'detent',
       description:
-        'Tiny zero-dependency drag, reorder and resize for the web. ' +
-        'Pointer-based, touch-ready, framework-free.',
+        'Drag, reorder and resize for the web. 6.7 KB gzipped, no dependencies, ' +
+        'one input path for mouse, touch and pen.',
       social: [
         { icon: 'github', label: 'GitHub', href: 'https://github.com/arshad-shah/detent' },
         { icon: 'npm', label: 'npm', href: 'https://www.npmjs.com/package/detent' },
@@ -21,6 +21,26 @@ export default defineConfig({
         {
           tag: 'link',
           attrs: { rel: 'apple-touch-icon', href: '/icon-180.png' },
+        },
+        // The brand faces: Bricolage Grotesque for interface, JetBrains Mono
+        // for code and measurements.
+        {
+          tag: 'link',
+          attrs: { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        },
+        {
+          tag: 'link',
+          attrs: { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: true },
+        },
+        {
+          tag: 'link',
+          attrs: {
+            rel: 'stylesheet',
+            href:
+              'https://fonts.googleapis.com/css2?' +
+              'family=Bricolage+Grotesque:opsz,wght@12..96,300..800&' +
+              'family=JetBrains+Mono:wght@400;600&display=swap',
+          },
         },
         {
           tag: 'meta',
