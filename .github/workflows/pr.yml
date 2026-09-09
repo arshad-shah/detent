@@ -32,13 +32,15 @@ jobs:
       - name: Install browsers
         run: pnpm exec playwright install --with-deps chromium firefox webkit
 
+      # Build first: a wrapper's types resolve through detent's emitted
+      # declarations, which do not exist until the core has been built.
+      - run: pnpm build
+
       - run: pnpm typecheck
 
       - run: pnpm test:unit
 
       - run: pnpm test:browser
-
-      - run: pnpm build
 
       - name: Bundle size budget
         run: pnpm size

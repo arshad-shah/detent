@@ -17,10 +17,15 @@ pnpm test          # unit + browser, every package
 pnpm test:unit     # pure functions, happy-dom, fast
 pnpm test:browser  # anything touching layout, in chromium/firefox/webkit
 pnpm test:e2e      # the hostile host-page fixture
-pnpm typecheck     # library and tests, separately
+pnpm typecheck     # library and tests, separately — run `pnpm build` first
 pnpm build         # bundles and type declarations
 pnpm size          # gzip table and the budget check
 ```
+
+**Build before you typecheck.** The wrapper packages resolve `detent`'s types
+through its emitted declarations, so `pnpm typecheck` fails with
+`Cannot find module 'detent'` on a clean checkout until `pnpm build` has run.
+CI runs them in that order for the same reason.
 
 ## How tests are organised
 
