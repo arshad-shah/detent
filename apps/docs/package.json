@@ -18,7 +18,7 @@
     "@astrojs/check": "^0.9.10",
     "@astrojs/starlight": "^0.42.0",
     "astro": "^7.3.2",
-    "sharp": "^0.34.0",
+    "sharp": "^0.35.4",
     "typescript": "^6.0.3",
     "wrangler": "^4.130.0"
   }
