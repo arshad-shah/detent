@@ -49,7 +49,9 @@ describe('draggable', () => {
     // A container that does not start on a round number: the element should
     // still land on lines drawn inside that container.
     layout(parent, { left: 7, top: 3, width: 400, height: 400 });
-    layout(el, { left: 27, top: 23, width: 50, height: 50 });
+    // Offsets are relative to the positioned parent, so this sits at 27/23 in
+    // the viewport — 20px inside a container that starts on an odd number.
+    layout(el, { left: 20, top: 20, width: 50, height: 50 });
     draggable(el, { distance: 0, grid: 20, bounds: 'parent' });
     press(el, 0, 0).move(9, 9);
     // 27 + 9 = 36, and 20px steps from 7 land on 27 and 47 — so it stays put.
@@ -61,7 +63,8 @@ describe('draggable', () => {
 
   it('can count the grid from the viewport when asked', () => {
     layout(parent, { left: 7, top: 3, width: 400, height: 400 });
-    layout(el, { left: 30, top: 30, width: 50, height: 50 });
+    // 23/27 inside the parent puts the element at 30/30 in the viewport.
+    layout(el, { left: 23, top: 27, width: 50, height: 50 });
     draggable(el, { distance: 0, grid: 20, gridOrigin: 'viewport' });
     press(el, 0, 0).move(14, 14);
     // 30 + 14 = 44, which rounds to 40 on a viewport-aligned grid.

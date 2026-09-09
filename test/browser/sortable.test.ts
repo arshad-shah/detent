@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { sortable } from '../../src/sortable/index';
 import { CLASS } from '../../src/core/constants';
 import { idsOf, layout, makeList, offsetOf, press, stack } from './helpers';
-import type { Box } from '../../src/core/types';
+import { flush } from '../../src/core/scheduler';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -178,56 +178,69 @@ describe('sortable across lists', () => {
 });
 
 describe('sortable inside something that scrolls', () => {
-  function scrollingColumn(count: number) {
-    const { list, items } = column(count);
+  /** A real scrolling list: 8 rows of 50px inside a 200px viewport. */
+  function scrollingColumn(count = 8) {
+    const { list, items } = makeList(count);
+    layout(list, { left: 0, top: 0, width: 200, height: 200 });
+    stack(items, 50);
     list.style.overflowY = 'auto';
-    (list as unknown as { scrollTop: number }).scrollTop = 0;
+    // Chrome and Firefox implement scroll anchoring: when a reorder shifts
+    // content above the viewport they compensate by moving scrollTop, which
+    // makes an assertion about scroll position non-deterministic. Turned off
+    // so these tests measure the library, not the browser's compensation.
+    list.style.overflowAnchor = 'none';
     return { list, items };
   }
 
-  /** Move the whole list's content up by `amount`, as a real scroll would. */
-  function scrollBy(list: HTMLElement, items: HTMLElement[], amount: number) {
-    (list as unknown as { scrollTop: number }).scrollTop += amount;
-    for (const el of items) (el as unknown as { __box: Box }).__box.top -= amount;
-    list.dispatchEvent(new Event('scroll', { bubbles: false }));
+  /** Scroll for real and let the scroll event reach the library. */
+  async function scrollBy(list: HTMLElement, amount: number) {
+    list.scrollTop += amount;
+    for (let i = 0; i < 2; i++) {
+      await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+    }
+    flush();
   }
 
-  it('keeps the item under the pointer when the list scrolls beneath it', () => {
-    const { list, items } = scrollingColumn(8);
+  it('keeps the item under the pointer when the list scrolls beneath it', async () => {
+    const { list, items } = scrollingColumn();
     sortable(list, { distance: 0, animation: 0, autoScroll: false });
 
     press(items[0], 10, 25).move(10, 40);
-    const before = offsetOf(items[0]).y;
+    // Where it sits on screen — the invariant the user actually sees. Its
+    // offset is not the right measure, because scrolling can also trigger a
+    // reorder, and re-anchoring after a move changes the offset by design.
+    const before = items[0].getBoundingClientRect().top;
 
-    scrollBy(list, items, 100);
+    await scrollBy(list, 100);
+    expect(list.scrollTop).toBe(100);
 
-    // The item's resting place moved up 100, so its offset must go up 100 to
-    // leave it visually where the pointer still is.
-    expect(offsetOf(items[0]).y).toBe(before + 100);
+    // The pointer has not moved, so neither should the item.
+    expect(items[0].getBoundingClientRect().top).toBeCloseTo(before, 0);
   });
 
-  it('reorders against where the rows are now, not where they were', () => {
-    const { list, items } = scrollingColumn(8);
+  it('reorders against where the rows are now, not where they were', async () => {
+    const { list, items } = scrollingColumn();
     sortable(list, { distance: 0, animation: 0, autoScroll: false });
 
     const gesture = press(items[0], 10, 25);
-    gesture.move(10, 40);
-    // Two rows scroll past. The pointer has not moved, but row 3 is now under
-    // it, so that is where the item belongs.
-    scrollBy(list, items, 100);
+    await scrollBy(list, 100);
+    // With the content scrolled up 100, viewport y=130 sits over what was
+    // row 4. Measuring against the stale boxes would land it two rows short.
+    gesture.move(10, 130);
     gesture.up();
 
-    expect(idsOf(list)).toEqual(['1', '2', '0', '3', '4', '5', '6', '7']);
+    expect(idsOf(list)).toEqual(['1', '2', '3', '4', '0', '5', '6', '7']);
   });
 
-  it('stops listening for scrolls once the drag ends', () => {
-    const { list, items } = scrollingColumn(6);
+  it('stops listening for scrolls once the drag ends', async () => {
+    const { list, items } = scrollingColumn();
     sortable(list, { distance: 0, animation: 0, autoScroll: false });
 
     press(items[0], 10, 25).move(10, 40).up();
     const settled = offsetOf(items[0]);
 
-    scrollBy(list, items, 120);
+    await scrollBy(list, 100);
+
     expect(offsetOf(items[0])).toEqual(settled);
   });
 });
