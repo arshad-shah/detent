@@ -3,15 +3,8 @@ import { ATTR, CLASS, DEFAULTS } from './core/constants';
 import { invariant } from './core/invariant';
 import { createAutoScroll, type AutoScrollOptions } from './core/autoscroll';
 import * as flip from './core/flip';
-import {
-  boxOf,
-  contains,
-  detectAxis,
-  resolveInsertIndex,
-  scrollAncestorsOf,
-  scrollParentOf,
-  totalScroll,
-} from './core/geometry';
+import { boxOf, contains, detectAxis, resolveInsertIndex } from './core/geometry';
+import { scrollAncestorsOf, scrollParentOf, totalScroll } from './core/scroll';
 import { bindPointer } from './core/pointer';
 import type { Activation, Box, Handle, Point } from './core/types';
 
