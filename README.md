@@ -9,10 +9,10 @@ you feel when a dial lands on a setting. Brand assets live in
 
 | bundle | gzipped |
 | --- | --- |
-| `draggable` only | 1.96 KB |
-| `resizable` only | 2.61 KB |
-| `sortable` only | 3.91 KB |
-| all three | 5.83 KB |
+| `draggable` only | 2.35 KB |
+| `resizable` only | 3.11 KB |
+| `sortable` only | 4.62 KB |
+| all three | 6.73 KB |
 
 ```bash
 npm install detent
@@ -20,7 +20,7 @@ npm install detent
 
 ```js
 import { draggable, sortable, resizable } from 'detent';
-import 'detent/styles.css'; // only needed for resize handles
+import 'detent/styles.css'; // required for resize handles; optional otherwise
 ```
 
 ## draggable
@@ -131,7 +131,7 @@ The library writes as little as it can get away with, but it does write.
 | `touch-action` | inline, on the bound element | Set `touchAction` to change it. |
 | `position`, `z-index` | inline, only while sorting | `position` is only set if the item was static, and both are restored on drop. |
 | `user-select` | on `<body>`, only during a drag | Restored on drop. |
-| `.dk-dragging`, `.dk-sorting`, `.dk-resizing` | classes | Style them however you like. |
+| `.detent-dragging`, `.detent-sorting`, `.detent-resizing` | classes | Style them however you like. |
 
 Reorder animations use `composite: 'add'`, so they stack on top of any
 transform an item already has rather than replacing it.
@@ -202,6 +202,63 @@ clicks still register. Both are tunable with `delay`, `distance` and
 A sortable list that scrolls itself keeps its swipe gesture automatically —
 press and hold to lift instead. Override with `touchAction` if you need to.
 
+## Styling
+
+Every class the library writes is prefixed `detent-`:
+
+| Class | On | When |
+| --- | --- | --- |
+| `detent-dragging` | a draggable element | during a drag |
+| `detent-sorting` | a sortable item | while it moves, by pointer or keyboard |
+| `detent-sortable` | a sortable container | for its lifetime |
+| `detent-resizable` | a resizable element | for its lifetime |
+| `detent-resizing` | a resizable element | during a resize |
+| `detent-handle`, `detent-handle-{n,e,s,w,ne,nw,se,sw}` | a created handle | for its lifetime |
+
+There is also `[data-detent-dragging]` on `<body>` for the duration of any
+drag, which is handy for cursor and pointer-events rules.
+
+**Overriding is meant to be easy.** `detent/styles.css` ships inside
+`@layer detent`. Unlayered CSS beats layered CSS at any specificity, so your
+own rule wins without `!important` and without a specificity war:
+
+```css
+/* This wins. No !important needed. */
+.detent-handle {
+  background: var(--brand);
+  border-radius: 2px;
+}
+```
+
+Handle size comes from a custom property:
+
+```css
+.detent-handle { --detent-handle-size: 20px; }
+```
+
+**What the stylesheet is not responsible for.** Three declarations are written
+inline instead — a handle's `position` and `touch-action`, and a static
+target's `position` — because a host reset such as `* { position: static }`
+would otherwise detach every handle. That means dragging, sorting and keyboard
+reordering all work with no stylesheet loaded at all.
+
+The exception is resize handles: their size and placement are cosmetic, so
+without `detent/styles.css` a library-created handle has no dimensions and
+nothing to grab. Either load the stylesheet, or pass your own `handles` and
+size them yourself.
+
+## Known limitations
+
+**A dragged item cannot escape an ancestor's stacking context.** If a card
+renders behind the next column no matter what `zIndex` you set, an ancestor has
+a `transform`, `filter`, `opacity`, `contain` or `will-change` on it. This is
+CSS, not detent, and it has two workarounds —
+see [Stacking contexts](docs/superpowers/notes/stacking-contexts.md).
+
+**Scroll anchoring can fight a reorder.** Chrome and Firefox adjust `scrollTop`
+when content above the viewport changes, which a reorder does. If a scrolling
+list jumps during a drag, set `overflow-anchor: none` on the container.
+
 ## Using it on components you did not write
 
 The library writes to the elements you bind. On a third-party component that
@@ -214,7 +271,7 @@ can be a problem, so know what it touches:
 | Overwrites inline `transform` | during a drag | Bind a wrapper you own |
 | Overwrites `touch-action` | on bind | Restored on `destroy()` |
 | Sets `user-select: none` on `<body>` | during a drag | Restored on drop |
-| Adds `dk-dragging` / `dk-sorting` classes | during a drag | Harmless; style or ignore |
+| Adds `detent-dragging` / `detent-sorting` classes | during a drag | Harmless; style or ignore |
 
 Two behaviours are worth knowing rather than avoiding. A `transform` creates a
 new containing block, so `position: fixed` descendants — dropdowns, tooltips,
@@ -237,7 +294,7 @@ above that. Set `animation: 0` or virtualise the list.
 
 The real limit with large pieces is repainting. A big card with shadows, images
 or a deep subtree gets re-rastered as it moves; `will-change: transform` on
-`.dk-sorting` promotes it to its own layer and mostly solves this. A `filter`
+`.detent-sorting` promotes it to its own layer and mostly solves this. A `filter`
 or `backdrop-filter` on the dragged element defeats that and will stutter
 regardless — drag a lightweight stand-in in that case.
 
@@ -245,18 +302,24 @@ regardless — drag a lightweight stand-in in that case.
 
 - Any ancestor with a `transform` breaks `position: fixed`, which is common on
   real pages. Nothing here relies on a fixed drag layer.
-- Inside a shadow root, `event.target` alone is not enough. Every hit test uses
-  `composedPath()`.
-- Handles and grips work through shadow boundaries for the same reason.
+- Pointer hit tests use `composedPath()`, so a grip inside a nested shadow
+  root is still found.
+- Keyboard reordering binds to the list itself, which sits in the same tree as
+  its items, so it works inside a shadow root without special handling.
 
 ## Development
 
 ```bash
-npm test        # 92 unit tests
-npm run build   # bundles, types, size table
-node playground.mjs   # writes playground/index.html
-node e2e.mjs          # real-browser interaction checks (needs playwright)
+pnpm test          # unit (happy-dom) + browser (chromium, firefox, webkit)
+pnpm test:unit     # pure functions only, fast
+pnpm test:browser  # everything that touches layout, in a real engine
+pnpm test:e2e      # the hostile host-page fixture
+pnpm build         # bundles, types, size table
+pnpm typecheck     # library and tests, separately
 ```
+
+No test fakes layout. Anything whose result depends on a real box lives in the
+browser tier, because the alternative hid four defects for a year.
 
 `playground/index.html` is fully self-contained — open it straight from disk.
 
