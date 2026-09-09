@@ -1,8 +1,9 @@
 name: pr
 
+# Every pull request, not only those targeting main: stacked branches are
+# normal and need the same gates as anything else.
 on:
   pull_request:
-    branches: [main]
 
 concurrency:
   group: pr-${{ github.event.pull_request.number }}
