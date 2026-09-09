@@ -6,6 +6,7 @@ import * as flip from './core/flip';
 import { boxOf, contains, detectAxis, resolveInsertIndex } from './core/geometry';
 import { scrollAncestorsOf, scrollParentOf, totalScroll } from './core/scroll';
 import { bindPointer } from './core/pointer';
+import { scaleOf, unscale } from './core/scale';
 import type { Activation, Box, Handle, Point } from './core/types';
 
 export interface SortLocation {
@@ -121,6 +122,8 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
   let lastDelta: Point = { x: 0, y: 0 };
   let restorePosition = '';
   let restoreZIndex = '';
+  // Rendered pixels per layout pixel, from any transformed ancestor.
+  let scale: Point = { x: 1, y: 1 };
 
   // Sibling positions are measured once and reused until something moves.
   let cachedSiblings: HTMLElement[] = [];
@@ -161,8 +164,8 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
 
     item.style.transform = '';
     const base = boxOf(item);
-    state.x = visual.left - base.left;
-    state.y = visual.top - base.top;
+    state.x = (visual.left - base.left) / scale.x;
+    state.y = (visual.top - base.top) / scale.y;
     paintNow(item);
 
     anchorOffset = { x: state.x, y: state.y };
@@ -184,8 +187,11 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
 
     // Scrolled content drags the item's resting position along with it, so add
     // the scroll back to keep the item under the pointer.
-    state.x = anchorOffset.x + (lastDelta.x - anchorDelta.x) + (scroll.x - anchorScroll.x);
-    state.y = anchorOffset.y + (lastDelta.y - anchorDelta.y) + (scroll.y - anchorScroll.y);
+    // Pointer travel is rendered pixels; the offset written is a CSS translate.
+    // Scroll positions are already in the scroller's own layout pixels.
+    const travel = unscale({ x: lastDelta.x - anchorDelta.x, y: lastDelta.y - anchorDelta.y }, scale);
+    state.x = anchorOffset.x + travel.x + (scroll.x - anchorScroll.x);
+    state.y = anchorOffset.y + travel.y + (scroll.y - anchorScroll.y);
     paintNow(item);
 
     const target = hostFor(lastPoint);
@@ -246,6 +252,7 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
       const state = stateOf(item);
       anchorOffset = { x: state.x, y: state.y };
       anchorDelta = { x: 0, y: 0 };
+      scale = scaleOf(item);
       scrollAncestors = scrollAncestorsOf(item);
       anchorScroll = totalScroll(scrollAncestors);
       lastPoint = session.point;
