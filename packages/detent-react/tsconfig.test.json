@@ -1,0 +1,25 @@
+{
+  "comment": "Tests. Modern lib, never emitted.",
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": [
+      "ES2023",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "rootDir": ".",
+    "declaration": false,
+    "emitDeclarationOnly": false,
+    "noEmit": true,
+    "types": [
+      "vite/client",
+      "node"
+    ],
+    "jsx": "react-jsx"
+  },
+  "include": [
+    "src",
+    "test",
+    "vitest.config.ts"
+  ]
+}

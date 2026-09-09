@@ -1,0 +1,25 @@
+{
+  "comment": "The shipped package. lib stays at ES2020 to match the build target.",
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": [
+      "ES2020",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "strict": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "skipLibCheck": true,
+    "verbatimModuleSyntax": true,
+    "types": [],
+    "jsx": "react-jsx"
+  },
+  "include": [
+    "src"
+  ]
+}
