@@ -61,12 +61,13 @@ jobs:
       - name: Use an npm new enough for trusted publishing
         run: npm install -g npm@^12
 
+      # v2 renamed every one of these inputs from their v1 names.
       - uses: changesets/action@v2.1.2
         with:
-          version: pnpm version-packages
-          publish: pnpm release
-          commit: 'chore: version packages'
-          title: 'chore: version packages'
+          version-script: pnpm version-packages
+          publish-script: pnpm release
+          commit-message: 'chore: version packages'
+          pr-title: 'chore: version packages'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: 'true'
