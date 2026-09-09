@@ -10,6 +10,7 @@
     "typecheck": "astro check",
     "deploy": "wrangler deploy"
   },
+  "typescriptComment": "Pinned to 6.x: astro check needs TypeScript's programmatic API, which the native 7.x compiler does not expose yet. The published packages still build with 7. See https://github.com/withastro/roadmap/discussions/1321",
   "dependencies": {
     "detent": "workspace:^"
   },
@@ -18,7 +19,7 @@
     "@astrojs/starlight": "^0.42.0",
     "astro": "^7.3.2",
     "sharp": "^0.34.0",
-    "typescript": "^7.0.2",
+    "typescript": "^6.0.3",
     "wrangler": "^4.130.0"
   }
 }
