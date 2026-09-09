@@ -11,3 +11,5 @@ export { bindPointer } from './core/pointer';
 export type { DragSession, PointerOptions } from './core/pointer';
 
 export type { Activation, Axis, Bounds, Box, Handle, Point } from './core/types';
+
+// gate probe
