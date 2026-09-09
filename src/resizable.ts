@@ -4,6 +4,7 @@ import { invariant } from './core/invariant';
 import { normaliseGrid } from './core/options';
 import { boxOf } from './core/geometry';
 import { bindPointer } from './core/pointer';
+import { scaleOf, unscale, unscaleBox } from './core/scale';
 import {
   ALL_HANDLES,
   computeResize,
@@ -11,7 +12,7 @@ import {
   type HandleName,
   type ResizeLimits,
 } from './core/resize-math';
-import type { Activation, Bounds, Box, Handle } from './core/types';
+import type { Activation, Bounds, Box, Handle, Point } from './core/types';
 
 export interface ResizeEvent {
   element: HTMLElement;
@@ -120,6 +121,8 @@ export function resizable(el: HTMLElement, options: ResizableOptions = {}): Resi
       maxHeight: Infinity,
     };
     let aspect: number | null = null;
+    // Rendered pixels per layout pixel, from any transformed ancestor.
+    let scale: Point = { x: 1, y: 1 };
 
     function payload(event: PointerEvent, cancel: () => void): ResizeEvent {
       const state = stateOf(el);
@@ -144,12 +147,16 @@ export function resizable(el: HTMLElement, options: ResizableOptions = {}): Resi
         const state = stateOf(el);
         const visual = boxOf(el);
 
-        startWidth = visual.width;
-        startHeight = visual.height;
+        // Everything below is in layout pixels: state.width is written to CSS,
+        // so the measured box and the bounds have to be converted out of the
+        // rendered pixels getBoundingClientRect reports.
+        scale = scaleOf(el);
+        startWidth = visual.width / scale.x;
+        startHeight = visual.height / scale.y;
         startX = state.x;
         startY = state.y;
-        originLeft = visual.left - state.x;
-        originTop = visual.top - state.y;
+        originLeft = visual.left / scale.x - state.x;
+        originTop = visual.top / scale.y - state.y;
 
         aspect =
           options.aspectRatio === true
@@ -167,7 +174,8 @@ export function resizable(el: HTMLElement, options: ResizableOptions = {}): Resi
 
         // Turn the containing area into a size ceiling for this handle, so the
         // element runs out of room instead of escaping its container.
-        const area: Box | null = resolveBounds(el, options.bounds ?? null);
+        const rendered: Box | null = resolveBounds(el, options.bounds ?? null);
+        const area = rendered ? unscaleBox(rendered, scale) : null;
         if (area) {
           const left = originLeft + startX;
           const top = originTop + startY;
@@ -187,7 +195,7 @@ export function resizable(el: HTMLElement, options: ResizableOptions = {}): Resi
           startHeight,
           dirX,
           dirY,
-          delta: session.delta,
+          delta: unscale(session.delta, scale),
           limits,
           aspect,
           grid,
