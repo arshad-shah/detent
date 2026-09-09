@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { sortable } from '../../src/sortable';
+import { sortable } from '../../src/sortable/index';
 import { flush } from '../../src/core/scheduler';
 
 const base = {

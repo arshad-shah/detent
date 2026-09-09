@@ -1,8 +1,8 @@
 export { draggable } from './draggable';
 export type { DraggableOptions, DraggableHandle, DragEvent } from './draggable';
 
-export { sortable, orderOf } from './sortable';
-export type { SortableOptions, SortEvent, SortLocation } from './sortable';
+export { sortable, orderOf } from './sortable/index';
+export type { SortableOptions, SortEvent, SortLocation } from './sortable/types';
 
 export { resizable } from './resizable';
 export type { ResizableOptions, ResizableHandle, ResizeEvent } from './resizable';

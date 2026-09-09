@@ -1,98 +1,18 @@
-import { paintNow, stateOf } from './core/box';
-import { ATTR, CLASS, DEFAULTS } from './core/constants';
-import { invariant } from './core/invariant';
-import { createAutoScroll, type AutoScrollOptions } from './core/autoscroll';
-import * as flip from './core/flip';
-import { boxOf, contains, detectAxis, isRtl, resolveInsertIndex } from './core/geometry';
-import { scrollAncestorsOf, scrollParentOf, totalScroll } from './core/scroll';
-import { bindPointer } from './core/pointer';
-import { scaleOf, unscale } from './core/scale';
-import type { Activation, Box, Handle, Point } from './core/types';
-
-export interface SortLocation {
-  container: HTMLElement;
-  index: number;
-}
-
-export interface SortEvent {
-  item: HTMLElement;
-  from: SortLocation;
-  to: SortLocation;
-}
-
-export interface SortableOptions extends Activation {
-  /**
-   * Lists sharing a group name can pass items between each other. Leave it
-   * unset to keep a list self-contained.
-   */
-  group?: string;
-  /** Which children are sortable. Defaults to every element child. */
-  items?: string;
-  /** How the list reads. 'auto' works it out from where the items sit. */
-  direction?: 'auto' | 'x' | 'y' | 'grid';
-  /** Reorder animation in milliseconds. 0 turns it off. Default 180. */
-  animation?: number;
-  /** Scroll the list when the pointer nears its edges. Default true. */
-  autoScroll?: boolean | AutoScrollOptions;
-  /** Allow reordering with the keyboard. Default true. */
-  keyboard?: boolean;
-  /** Stacking order for the item being moved. Default 20. */
-  zIndex?: number;
-  /**
-   * Whether the list claims touch gestures. Defaults to 'none', or 'auto' when
-   * the list scrolls itself so that swiping still works.
-   */
-  touchAction?: 'none' | 'auto' | 'manipulation';
-  disabled?: boolean;
-  onStart?(item: HTMLElement, from: SortLocation): void | boolean;
-  onMove?(item: HTMLElement, to: SortLocation): void;
-  /** Fires once, on drop, only when the item actually moved. */
-  onSort?(event: SortEvent): void;
-  onEnd?(item: HTMLElement, cancelled: boolean): void;
-}
-
-interface Instance {
-  container: HTMLElement;
-  options: SortableOptions;
-  items(): HTMLElement[];
-}
-
-const registry = new Set<Instance>();
-
-function childrenOf(instance: Instance): HTMLElement[] {
-  const { container, options } = instance;
-  const nodes = options.items
-    ? container.querySelectorAll<HTMLElement>(options.items)
-    : container.children;
-  const out: HTMLElement[] = [];
-  for (const node of Array.from(nodes)) {
-    if (node instanceof HTMLElement && !node.hasAttribute(ATTR.ignore)) out.push(node);
-  }
-  return out;
-}
-
-function announce(message: string) {
-  let region = document.getElementById('dk-live-region');
-  if (!region) {
-    region = document.createElement('div');
-    region.id = 'dk-live-region';
-    region.setAttribute('aria-live', 'assertive');
-    region.setAttribute('aria-atomic', 'true');
-    region.style.cssText =
-      'position:fixed;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap';
-    document.body.appendChild(region);
-  }
-  region.textContent = message;
-}
-
-/** Put `item` at `index` among `siblings` inside `container`. */
-function placeAt(container: HTMLElement, item: HTMLElement, siblings: HTMLElement[], index: number) {
-  const before = siblings[index] ?? null;
-  if (before === item) return false;
-  if (!before && item.parentElement === container && item.nextElementSibling === null) return false;
-  container.insertBefore(item, before);
-  return true;
-}
+import { paintNow, stateOf } from '../core/box';
+import { createAutoScroll } from '../core/autoscroll';
+import { CLASS, DEFAULTS } from '../core/constants';
+import * as flip from '../core/flip';
+import { boxOf, contains, detectAxis, isRtl, resolveInsertIndex } from '../core/geometry';
+import { invariant } from '../core/invariant';
+import { bindPointer } from '../core/pointer';
+import { scaleOf, unscale } from '../core/scale';
+import { scrollAncestorsOf, scrollParentOf, totalScroll } from '../core/scroll';
+import type { Box, Handle, Point } from '../core/types';
+import { bindKeyboard } from './keyboard';
+import { acquireLiveRegion, releaseLiveRegion } from './live-region';
+import { childrenOf, placeAt } from './place';
+import { eachList, registerList, unregisterList, type Instance } from './registry';
+import type { SortableOptions } from './types';
 
 export function sortable(container: HTMLElement, options: SortableOptions = {}): Handle {
   invariant(container instanceof HTMLElement, 'sortable() needs an HTMLElement container');
@@ -101,8 +21,9 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
   let disabled = options.disabled ?? false;
 
   const instance: Instance = { container, options, items: () => childrenOf(instance) };
-  registry.add(instance);
+  registerList(instance);
   container.classList.add(CLASS.sortable);
+  if (useKeyboard) acquireLiveRegion();
 
   // --- Live drag state -----------------------------------------------------
   let item: HTMLElement | null = null;
@@ -141,7 +62,7 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
 
   function hostFor(point: Point): Instance {
     if (contains(boxOf(host.container), point)) return host;
-    for (const candidate of registry) {
+    for (const candidate of eachList()) {
       if (candidate === host) continue;
       const sameGroup =
         candidate.options.group != null && candidate.options.group === instance.options.group;
@@ -188,10 +109,13 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
     const scroll = totalScroll(scrollAncestors);
 
     // Scrolled content drags the item's resting position along with it, so add
-    // the scroll back to keep the item under the pointer.
-    // Pointer travel is rendered pixels; the offset written is a CSS translate.
-    // Scroll positions are already in the scroller's own layout pixels.
-    const travel = unscale({ x: lastDelta.x - anchorDelta.x, y: lastDelta.y - anchorDelta.y }, scale);
+    // the scroll back to keep the item under the pointer. Pointer travel is in
+    // rendered pixels while the offset written is a CSS translate; scroll
+    // positions are already in the scroller's own layout pixels.
+    const travel = unscale(
+      { x: lastDelta.x - anchorDelta.x, y: lastDelta.y - anchorDelta.y },
+      scale,
+    );
     state.x = anchorOffset.x + travel.x + (scroll.x - anchorScroll.x);
     state.y = anchorOffset.y + travel.y + (scroll.y - anchorScroll.y);
     paintNow(item);
@@ -232,8 +156,9 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
   // A list that scrolls itself must keep its swipe gesture, or a finger can
   // never reach the items further down. The press delay is what separates a
   // scroll from a lift in that case.
+  const containerStyle = getComputedStyle(container);
   const scrollsItself = /auto|scroll|overlay/.test(
-    getComputedStyle(container).overflowY + getComputedStyle(container).overflowX,
+    containerStyle.overflowY + containerStyle.overflowX,
   );
 
   const pointer = bindPointer(container, {
@@ -343,84 +268,21 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
     },
   });
 
-  // --- Keyboard reordering -------------------------------------------------
-  let lifted: HTMLElement | null = null;
-  let liftedFrom = 0;
-
-  function onKeyDown(event: KeyboardEvent) {
-    if (!useKeyboard || disabled) return;
-    const target = event.target as HTMLElement | null;
-    if (!target) return;
-    const list = instance.items();
-    const current = lifted ?? list.find((node) => node === target || node.contains(target)) ?? null;
-    if (!current) return;
-
-    const index = list.indexOf(current);
-
-    if (event.key === ' ' || event.key === 'Enter') {
-      event.preventDefault();
-      if (lifted) {
-        const to = list.indexOf(lifted);
-        lifted.classList.remove(CLASS.sorting);
-        announce(`Dropped at position ${to + 1} of ${list.length}.`);
-        if (to !== liftedFrom) {
-          options.onSort?.({
-            item: lifted,
-            from: { container, index: liftedFrom },
-            to: { container, index: to },
-          });
-        }
-        lifted = null;
-      } else {
-        lifted = current;
-        liftedFrom = index;
-        current.classList.add(CLASS.sorting);
-        announce(`Lifted from position ${index + 1} of ${list.length}. Use the arrow keys to move.`);
-      }
-      return;
-    }
-
-    if (event.key === 'Escape' && lifted) {
-      event.preventDefault();
-      const siblings = list.filter((node) => node !== lifted);
-      const snapshot = flip.record(list);
-      placeAt(container, lifted, siblings, liftedFrom);
-      flip.play(snapshot, animation);
-      lifted.classList.remove(CLASS.sorting);
-      announce('Move cancelled.');
-      lifted = null;
-      return;
-    }
-
-    if (!lifted) return;
-    const step =
-      event.key === 'ArrowDown' || event.key === 'ArrowRight'
-        ? 1
-        : event.key === 'ArrowUp' || event.key === 'ArrowLeft'
-          ? -1
-          : 0;
-    if (!step) return;
-
-    event.preventDefault();
-    const next = Math.max(0, Math.min(list.length - 1, index + step));
-    if (next === index) return;
-
-    const siblings = list.filter((node) => node !== lifted);
-    const snapshot = flip.record(list);
-    placeAt(container, lifted, siblings, next);
-    flip.play(snapshot, animation);
-    lifted.focus?.();
-    announce(`Position ${next + 1} of ${list.length}.`);
-  }
-
-  container.addEventListener('keydown', onKeyDown);
+  const keyboard = useKeyboard
+    ? bindKeyboard(instance, {
+        animation,
+        isDisabled: () => disabled,
+        onSort: options.onSort,
+      })
+    : null;
 
   return {
     destroy() {
       pointer.destroy();
-      container.removeEventListener('keydown', onKeyDown);
+      keyboard?.destroy();
+      if (useKeyboard) releaseLiveRegion();
       container.classList.remove(CLASS.sortable);
-      registry.delete(instance);
+      unregisterList(instance);
     },
   };
 }
@@ -429,3 +291,5 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
 export function orderOf(container: HTMLElement, items?: string): HTMLElement[] {
   return childrenOf({ container, options: { items }, items: () => [] });
 }
+
+export type { SortableOptions, SortEvent, SortLocation } from './types';
