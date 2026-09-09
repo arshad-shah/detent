@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { ALL_HANDLES, computeResize, directionOf } from '../../src/core/resize-math';
+import {
+  ALL_HANDLES,
+  computeResize,
+  directionOf,
+  reconcileAspect,
+} from '../../src/core/resize-math';
 
 const free = { minWidth: 0, minHeight: 0, maxWidth: Infinity, maxHeight: Infinity };
 
@@ -138,5 +143,32 @@ describe('computeResize', () => {
     expect(r.width).toBe(300);
     expect(r.height).toBe(150);
     expect(r.width / r.height).toBe(2);
+  });
+});
+
+describe('reconcileAspect', () => {
+  const limits = { minWidth: 50, minHeight: 50, maxWidth: 400, maxHeight: 200 };
+
+  it('leaves a legal ratio alone', () => {
+    expect(reconcileAspect(200, 100, 2, limits)).toEqual({ width: 200, height: 100 });
+  });
+
+  it('prefers the smaller box when both axes could lead', () => {
+    const result = reconcileAspect(300, 100, 2, limits);
+    expect(result.width / result.height).toBeCloseTo(2, 5);
+    expect(result.width).toBeLessThanOrEqual(300);
+  });
+
+  it('leads with height when width would exceed the maximum', () => {
+    const result = reconcileAspect(400, 100, 4, limits);
+    expect(result.width).toBeLessThanOrEqual(limits.maxWidth);
+    expect(result.height).toBeLessThanOrEqual(limits.maxHeight);
+  });
+
+  it('honours the limits rather than the ratio when they conflict', () => {
+    const tight = { minWidth: 390, minHeight: 190, maxWidth: 400, maxHeight: 200 };
+    const result = reconcileAspect(395, 195, 10, tight);
+    expect(result.width).toBeGreaterThanOrEqual(tight.minWidth);
+    expect(result.width).toBeLessThanOrEqual(tight.maxWidth);
   });
 });
