@@ -1,55 +1,27 @@
 {
-  "name": "detent",
-  "version": "0.1.0",
-  "description": "Tiny zero-dependency drag, reorder and resize for the web. Pointer-based, touch-ready, framework-free.",
+  "name": "detent-repo",
+  "version": "0.0.0",
+  "private": true,
   "type": "module",
-  "sideEffects": false,
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    },
-    "./styles.css": "./dist/styles.css"
-  },
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "build": "node build.mjs",
-    "test": "pnpm test:unit && pnpm test:browser",
-    "test:watch": "vitest --project unit",
-    "typecheck": "tsc --noEmit && tsc -p tsconfig.test.json",
-    "size": "node build.mjs --size",
-    "playground": "node build.mjs && npx --yes serve playground -l 5173",
-    "test:unit": "vitest run --project unit",
-    "test:browser": "vitest run --project browser",
-    "test:e2e": "playwright test"
-  },
-  "keywords": [
-    "drag",
-    "drop",
-    "sortable",
-    "reorder",
-    "resize",
-    "touch",
-    "pointer-events",
-    "zero-dependency"
-  ],
   "license": "MIT",
+  "packageManager": "pnpm@11.1.2",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "test:unit": "pnpm -r test:unit",
+    "test:browser": "pnpm -r test:browser",
+    "test:e2e": "pnpm -r test:e2e",
+    "typecheck": "pnpm -r typecheck",
+    "size": "pnpm -r size",
+    "changeset": "changeset",
+    "version-packages": "changeset version && pnpm install --lockfile-only",
+    "release": "pnpm -r build && changeset publish"
+  },
   "devDependencies": {
-    "@playwright/test": "^1.63.0",
-    "@types/node": "^24.13.3",
-    "@vitest/browser": "^5.0.0",
-    "@vitest/browser-playwright": "^5.0.0",
-    "esbuild": "^0.28.2",
-    "happy-dom": "^15.11.7",
-    "playwright": "^1.63.0",
-    "typescript": "^7.0.2",
-    "vite": "^7.3.6",
-    "vitest": "^5.0.0"
+    "@changesets/changelog-github": "^0.6.0",
+    "@changesets/cli": "^3.0.2"
   }
 }
