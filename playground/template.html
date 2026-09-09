@@ -191,26 +191,26 @@ main { padding-top: 40px; }
   user-select: none;
 }
 
-.card.dk-dragging,
-.card.dk-resizing {
+.card.detent-dragging,
+.card.detent-resizing {
   cursor: grabbing;
   border-color: var(--hot);
   box-shadow: 4px 4px 0 var(--hot-soft);
 }
 
 /* Handles are invisible by default; the demo cards get a visible corner. */
-.card .dk-handle-se::after,
-.card .dk-handle-nw::after {
+.card .detent-handle-se::after,
+.card .detent-handle-nw::after {
   content: "";
   position: absolute;
   width: 9px;
   height: 9px;
   border: 2px solid var(--ink);
 }
-.card .dk-handle-se::after { right: 3px; bottom: 3px; border-top: 0; border-left: 0; }
-.card .dk-handle-nw::after { left: 3px; top: 3px; border-bottom: 0; border-right: 0; }
-.card:hover .dk-handle-se::after,
-.card:hover .dk-handle-nw::after { border-color: var(--hot); }
+.card .detent-handle-se::after { right: 3px; bottom: 3px; border-top: 0; border-left: 0; }
+.card .detent-handle-nw::after { left: 3px; top: 3px; border-bottom: 0; border-right: 0; }
+.card:hover .detent-handle-se::after,
+.card:hover .detent-handle-nw::after { border-color: var(--hot); }
 
 .grip {
   display: flex;
@@ -290,9 +290,9 @@ main { padding-top: 40px; }
   margin-left: auto;
 }
 
-.list li.dk-sorting,
-.tile.dk-sorting,
-.chip.dk-sorting {
+.list li.detent-sorting,
+.tile.detent-sorting,
+.chip.detent-sorting {
   border-color: var(--hot);
   background: var(--hot-soft);
   box-shadow: 3px 3px 0 rgba(168, 42, 87, 0.18);
@@ -391,8 +391,8 @@ main { padding-top: 40px; }
   overflow: hidden;
 }
 
-.widget.dk-dragging,
-.widget.dk-resizing {
+.widget.detent-dragging,
+.widget.detent-resizing {
   border-color: var(--hot);
   box-shadow: 4px 4px 0 var(--hot-soft);
   z-index: 5;
@@ -421,7 +421,7 @@ main { padding-top: 40px; }
   color: var(--muted);
 }
 
-.widget .dk-handle-se::after {
+.widget .detent-handle-se::after {
   content: "";
   position: absolute;
   right: 3px;
@@ -432,7 +432,7 @@ main { padding-top: 40px; }
   border-top: 0;
   border-left: 0;
 }
-.widget:hover .dk-handle-se::after { border-color: var(--hot); }
+.widget:hover .detent-handle-se::after { border-color: var(--hot); }
 
 /* ---------- log ---------- */
 
@@ -703,7 +703,7 @@ function heroPaint() {
 
 draggable(heroCard, {
   bounds: 'parent',
-  cancel: '.dk-handle',
+  cancel: '.detent-handle',
   onStart: () => log('drag:start', 'hero card'),
   onMove: heroPaint,
   onEnd: (e, cancelled) => log('drag:end', cancelled ? 'cancelled' : `${round(e.offset.x)}, ${round(e.offset.y)}`),
