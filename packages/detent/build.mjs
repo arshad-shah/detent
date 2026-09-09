@@ -1,8 +1,6 @@
 import { build } from 'esbuild';
 import { execSync } from 'node:child_process';
-import { mkdirSync, statSync } from 'node:fs';
-import { gzipSync } from 'node:zlib';
-import { readFileSync } from 'node:fs';
+import { mkdirSync } from 'node:fs';
 
 mkdirSync('dist', { recursive: true });
 
@@ -35,18 +33,4 @@ for (const name of ['draggable', 'sortable', 'resizable']) {
 // whose "types" field points at a file that was never emitted.
 execSync('tsc -p tsconfig.json', { stdio: 'inherit', env: { ...process.env, PATH: `${process.cwd()}/node_modules/.bin:${process.env.PATH}` } });
 
-const gz = (f) => (gzipSync(readFileSync(f)).length / 1024).toFixed(2) + ' KB';
-const raw = (f) => (statSync(f).size / 1024).toFixed(2) + ' KB';
-
-console.log('\n  bundle             minified    gzipped');
-console.log('  ' + '-'.repeat(42));
-for (const [label, file] of [
-  ['everything', 'dist/index.js'],
-  ['draggable only', 'dist/_size-draggable.js'],
-  ['sortable only', 'dist/_size-sortable.js'],
-  ['resizable only', 'dist/_size-resizable.js'],
-  ['styles.css', 'dist/styles.css'],
-]) {
-  console.log('  ' + label.padEnd(19) + raw(file).padStart(9) + gz(file).padStart(11));
-}
-console.log();
+console.log('\n  built. run `pnpm size` for the gzip table and budget check.\n');
