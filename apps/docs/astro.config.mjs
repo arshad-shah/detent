@@ -6,6 +6,12 @@ export default defineConfig({
   integrations: [
     starlight({
       title: 'detent',
+      // The lockup carries the word, so the header does not repeat it.
+      logo: {
+        light: './src/assets/lockup.svg',
+        dark: './src/assets/lockup-inverse.svg',
+        replacesTitle: true,
+      },
       description:
         'Drag, reorder and resize for the web. 6.7 KB gzipped, no dependencies, ' +
         'one input path for mouse, touch and pen.',

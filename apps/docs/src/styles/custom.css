@@ -25,10 +25,15 @@
   --detent-muted: #6e7264;
   --detent-line: #c9c6b8;
 
-  /* Derived only where the brand names no dark-surface equivalent. */
+  /*
+   * The brand names Ink as a dark surface, not a dark scale. A real theme
+   * needs separation between page, raised surface and item, so these step
+   * down from and up past Ink on its own hue rather than crowding it.
+   */
+  --detent-ink-deep: #141610;
   --detent-ink-raised: #34362c;
-  --detent-ink-panel: #3d4034;
-  --detent-ink-line: #454839;
+  --detent-ink-panel: #414437;
+  --detent-ink-line: #4a4d3f;
   --detent-signal-light: #e39bb4; /* 6.3:1 on Ink */
   --detent-signal-deep: #4a2333;
 
@@ -38,15 +43,15 @@
 
 /* Roles: dark, matching Starlight's own base. */
 :root {
-  --role-bg: var(--detent-ink);
-  --role-surface: var(--detent-ink-raised);
+  --role-bg: var(--detent-ink-deep);
+  --role-surface: var(--detent-ink);
   --role-raised: var(--detent-ink-panel);
-  --role-line: var(--detent-ink-line);
+  --role-line: #4a4d3f;
   --role-text: var(--detent-paper);
   --role-text-strong: var(--detent-panel);
   --role-text-soft: #cfcdc2;
-  --role-text-muted: #a5a89a;
-  --role-text-faint: #767a6b;
+  --role-text-muted: #b0b3a5;
+  --role-text-faint: #85897a;
   --role-accent: var(--detent-signal-light);
   --role-accent-low: var(--detent-signal-deep);
   --role-accent-high: #f2cdd9;
@@ -59,7 +64,7 @@
   :root:not([data-theme='dark']) {
     --role-bg: var(--detent-paper);
     --role-surface: var(--detent-panel);
-    --role-raised: var(--detent-paper);
+    --role-raised: var(--detent-panel);
     --role-line: var(--detent-line);
     --role-text: #3a3d31;
     --role-text-strong: var(--detent-ink);
@@ -77,7 +82,7 @@
 :root[data-theme='light'] {
   --role-bg: var(--detent-paper);
   --role-surface: var(--detent-panel);
-  --role-raised: var(--detent-paper);
+  --role-raised: var(--detent-panel);
   --role-line: var(--detent-line);
   --role-text: #3a3d31;
   --role-text-strong: var(--detent-ink);
@@ -118,6 +123,7 @@
   --sl-color-hairline-shade: var(--role-line);
 
   --demo-surface: var(--role-surface);
+  --demo-stage-bg: var(--role-bg);
   --demo-line: var(--role-line);
   --demo-item: var(--role-raised);
   --demo-item-text: var(--role-text);
@@ -183,6 +189,7 @@ h1 {
   position: relative;
   padding: 1.25rem;
   overflow: hidden;
+  background: var(--demo-stage-bg);
 }
 
 .demo-reset {
