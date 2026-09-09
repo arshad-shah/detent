@@ -78,10 +78,18 @@ export function bindPointer(el: HTMLElement, opts: PointerOptions): Handle {
 
   function activate() {
     if (!session || active) return;
-    if (opts.onStart?.(session) === false) {
+
+    // onStart can re-enter: a consumer may call session.cancel() or the
+    // handle's destroy() from inside it, both of which run teardown and null
+    // the session. Without re-checking, we would go on to lock the page for a
+    // drag that no longer exists, and never unlock it.
+    const refused = opts.onStart?.(session) === false;
+    if (refused) {
       teardown(true);
       return;
     }
+    if (!session) return;
+
     active = true;
     lockPage();
   }

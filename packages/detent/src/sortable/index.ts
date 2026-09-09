@@ -2,7 +2,14 @@ import { paintNow, stateOf } from '../core/box';
 import { createAutoScroll } from '../core/autoscroll';
 import { CLASS, DEFAULTS } from '../core/constants';
 import * as flip from '../core/flip';
-import { boxOf, contains, detectAxis, isRtl, resolveInsertIndex } from '../core/geometry';
+import {
+  boxOf,
+  contains,
+  detectAxis,
+  isRtl,
+  resolveInsertIndex,
+  type ListAxis,
+} from '../core/geometry';
 import { invariant } from '../core/invariant';
 import { bindPointer } from '../core/pointer';
 import { scaleOf, unscale } from '../core/scale';
@@ -52,6 +59,16 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
   let scale: Point = { x: 1, y: 1 };
   // Read once per host, not per move: it needs a computed style.
   let rtl = false;
+  /*
+   * The axis measured at lift, from every item including the one being
+   * dragged and before any transform is applied.
+   *
+   * applyMove detects the axis from the *remaining* siblings, which is one
+   * box short. For a two-item list that leaves a single box, and detectAxis
+   * defaults a single box to 'y' — so a two-item row could never be
+   * reordered. This is the fallback whenever too few siblings remain to tell.
+   */
+  let liftAxis: ListAxis = 'y';
 
   // Sibling positions are measured once and reused until something moves.
   let cachedSiblings: HTMLElement[] = [];
@@ -161,7 +178,9 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
 
     const axis =
       !target.options.direction || target.options.direction === 'auto'
-        ? detectAxis(cachedRects)
+        ? cachedRects.length >= 2
+          ? detectAxis(cachedRects)
+          : liftAxis
         : target.options.direction;
     const index = resolveInsertIndex(cachedRects, lastPoint, axis, rtl);
 
@@ -199,6 +218,8 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
     anchorDelta = { x: 0, y: 0 };
     scale = scaleOf(found);
     rtl = isRtl(container);
+    // Measured before the item is lifted, so every box is still in place.
+    liftAxis = detectAxis(instance.items().map(boxOf));
     scrollAncestors = scrollAncestorsOf(found);
     anchorScroll = totalScroll(scrollAncestors);
     lastPoint = point;
@@ -305,8 +326,13 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
       paintNow(dragged);
       flip.play(landing, animation);
 
-      const toContainer = dragged.parentElement as HTMLElement;
-      const toIndex = childrenOf({ ...instance, container: toContainer }).indexOf(dragged);
+      // Ask the destination how it counts its own children. Spreading this
+      // instance and swapping the container carried the SOURCE list's `items`
+      // selector, so a drop into a list with different rules reported an index
+      // counted over the wrong subset — or -1.
+      const toContainer = dragged.parentElement ?? fromContainer;
+      const destination = host.container === toContainer ? host : instance;
+      const toIndex = childrenOf({ ...destination, container: toContainer }).indexOf(dragged);
       const moved = !cancelled && (toContainer !== fromContainer || toIndex !== fromIndex);
 
       endDrag();
@@ -326,7 +352,10 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
     ? bindKeyboard(instance, {
         animation,
         isDisabled: () => disabled,
+        onStart: options.onStart,
+        onMove: options.onMove,
         onSort: options.onSort,
+        onEnd: options.onEnd,
       })
     : null;
 

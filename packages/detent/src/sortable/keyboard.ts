@@ -4,12 +4,16 @@ import type { Handle } from '../core/types';
 import { announce } from './live-region';
 import { placeAt } from './place';
 import type { Instance } from './registry';
-import type { SortEvent } from './types';
+import type { SortEvent, SortLocation } from './types';
 
 export interface KeyboardDeps {
   animation: number;
   isDisabled(): boolean;
+  /** Return false to refuse the lift, exactly as on the pointer path. */
+  onStart?(item: HTMLElement, from: SortLocation): void | boolean;
+  onMove?(item: HTMLElement, to: SortLocation): void;
   onSort?(event: SortEvent): void;
+  onEnd?(item: HTMLElement, cancelled: boolean): void;
 }
 
 /**
@@ -49,8 +53,10 @@ export function bindKeyboard(instance: Instance, deps: KeyboardDeps): Handle {
             to: { container, index: to },
           });
         }
+        deps.onEnd?.(lifted, false);
         lifted = null;
       } else {
+        if (deps.onStart?.(current, { container, index }) === false) return;
         lifted = current;
         liftedFrom = index;
         current.classList.add(CLASS.sorting);
@@ -69,6 +75,7 @@ export function bindKeyboard(instance: Instance, deps: KeyboardDeps): Handle {
       flip.play(snapshot, deps.animation);
       lifted.classList.remove(CLASS.sorting);
       announce('Move cancelled.');
+      deps.onEnd?.(lifted, true);
       lifted = null;
       return;
     }
@@ -91,6 +98,7 @@ export function bindKeyboard(instance: Instance, deps: KeyboardDeps): Handle {
     placeAt(container, lifted, siblings, next);
     flip.play(snapshot, deps.animation);
     lifted.focus?.();
+    deps.onMove?.(lifted, { container, index: next });
     announce(`Position ${next + 1} of ${list.length}.`);
   }
 
