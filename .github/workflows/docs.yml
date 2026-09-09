@@ -1,3 +1,7 @@
+# Build only. Deployment is handled by Cloudflare Workers Builds, connected to
+# this repository from the Cloudflare dashboard — so no API token is stored
+# here. This job exists so a site that does not build fails in the pull
+# request rather than after merge.
 name: docs
 
 on:
@@ -36,13 +40,3 @@ jobs:
 
       - name: Check the site
         run: pnpm -F docs typecheck
-
-      # Deploy only from main. Pull requests stop at a verified build.
-      - name: Deploy to Cloudflare
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0  # v4
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: apps/docs
-          command: deploy

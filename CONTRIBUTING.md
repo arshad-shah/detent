@@ -110,29 +110,27 @@ first; changesets rewrites those to real version ranges at publish time.
 
 ## Repository secrets
 
-| Secret | Used by | Needed for |
-| --- | --- | --- |
-| `CLOUDFLARE_API_TOKEN` | `docs.yml` | Deploying the documentation site |
-| `CLOUDFLARE_ACCOUNT_ID` | `docs.yml` | Deploying the documentation site |
+**There are none, deliberately.**
 
-There is deliberately no `NPM_TOKEN`. Publishing authenticates over OIDC.
+npm publishing authenticates over OIDC through Trusted Publishing, scoped to
+this repository and `main.yml`. The documentation site is built and deployed by
+Cloudflare Workers Builds, connected to this repository through Cloudflare's
+own GitHub App — `docs.yml` only builds it as a pull-request check.
+
+So there is no long-lived credential in this repository to leak or rotate. If
+you are about to add one, check first whether OIDC or a provider-side Git
+integration can do the same job.
 
 > The full one-time setup — npm publishing, Trusted Publishing, Cloudflare
 > tokens and branch protection, with the exact values to enter — is in
 > [docs/SETUP.md](docs/SETUP.md).
 
-### Setting up the docs deployment, once
+### The docs deployment
 
-1. Create a Cloudflare API token from the **Edit Cloudflare Workers** template,
-   scoped to the account that owns `arshadshah.com`.
-2. Add it as the repository secret `CLOUDFLARE_API_TOKEN`, and the account id
-   as `CLOUDFLARE_ACCOUNT_ID`.
-3. The first `wrangler deploy` creates the `detent-docs` Worker and claims
-   `detent.arshadshah.com` as a custom domain. That requires the zone for
-   `arshadshah.com` to be on the same Cloudflare account.
-
-Until the secrets exist the deploy step fails and everything before it — the
-build and the type check — passes. Pull requests never deploy.
+Cloudflare Workers Builds is connected to this repository from the Cloudflare
+dashboard and deploys `main` on push; pull requests get a preview URL. No API
+token is stored here — Cloudflare authenticates through its own GitHub App.
+`docs.yml` only builds the site as a pull-request check.
 
 ## The documentation site
 

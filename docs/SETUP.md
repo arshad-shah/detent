@@ -93,75 +93,92 @@ badge linking back to the exact workflow run that built it.
 
 ---
 
-## 3. Cloudflare: create an API token
+## 3. Cloudflare: connect the repository
 
-You need the zone for `arshadshah.com` to be on the same Cloudflare account.
+No API token, and no secret stored in GitHub. Cloudflare builds and deploys
+directly from the repo through its own GitHub App.
 
-1. Go to <https://dash.cloudflare.com/profile/api-tokens> → **Create Token**.
-2. Use the **Edit Cloudflare Workers** template.
-3. Set the permissions to exactly these — the template gives you most of them;
-   add the last one, which the template omits and the custom domain needs:
+Go to <https://dash.cloudflare.com> → **Compute (Workers)** → **Create** →
+**Import a repository**, and enter exactly:
 
-| Type | Resource | Permission |
-| --- | --- | --- |
-| Account | Workers Scripts | Edit |
-| Account | Workers KV Storage | Edit |
-| Account | Account Settings | Read |
-| Zone | Workers Routes | Edit |
-| Zone | DNS | Edit |
-
-4. **Account Resources**: Include → the account that owns `arshadshah.com`.
-5. **Zone Resources**: Include → Specific zone → `arshadshah.com`.
-6. Leave the IP filter and TTL empty unless you have a reason.
-7. **Continue to summary** → **Create Token** → copy it now. It is shown once.
-
-The **DNS: Edit** permission is what lets the first deploy create the
-`detent.arshadshah.com` record. Without it the deploy succeeds but the custom
-domain never attaches, and the site is reachable only at
-`detent-docs.<subdomain>.workers.dev`.
-
-## 4. Find your account ID
-
-<https://dash.cloudflare.com> → pick the account → the **Account ID** is in the
-right-hand sidebar of the overview page, and in the URL:
-
-```
-https://dash.cloudflare.com/<THIS IS THE ACCOUNT ID>/workers
-```
-
-It is a 32-character hex string.
-
-## 5. Add both as repository secrets
-
-<https://github.com/arshad-shah/detent/settings/secrets/actions> → **New
-repository secret**, twice:
-
-| Name | Value |
+| Field | Value |
 | --- | --- |
-| `CLOUDFLARE_API_TOKEN` | the token from step 3 |
-| `CLOUDFLARE_ACCOUNT_ID` | the 32-char hex id from step 4 |
+| Git account | `arshad-shah` — authorise the Cloudflare GitHub App if prompted |
+| Repository | `detent` |
+| Git branch | `main` |
+| **Project name** | `detent-docs` |
+| **Root directory** | `apps/docs` |
+| **Build command** | `pnpm install --frozen-lockfile && pnpm -F @arshad-shah/detent build && pnpm -F docs build` |
+| **Deploy command** | `npx wrangler deploy` |
+| Non-production branch deploy command | `npx wrangler versions upload` |
 
-Names are case-sensitive and must match exactly — `.github/workflows/docs.yml`
-reads them literally.
+Then add one build variable:
+
+| Variable | Value |
+| --- | --- |
+| `NODE_VERSION` | `24` |
+
+Leave the optional **API token** field empty. It exists for people who want to
+deploy with a scoped token; connecting through the dashboard does not need one.
+
+### Why these exact values
+
+**Project name must be `detent-docs`.** Cloudflare requires the Worker name in
+the dashboard to match `name` in the Wrangler config it finds, and
+[`apps/docs/wrangler.toml`](../apps/docs/wrangler.toml) says `detent-docs`. A
+mismatch fails the build with a confusing error.
+
+**Root directory is `apps/docs`**, because that is where `wrangler.toml` lives.
+The build command still reaches the whole workspace: pnpm walks up to find
+`pnpm-workspace.yaml`, so `pnpm install` from `apps/docs` installs everything.
+
+**The build command builds the core first.** The site imports
+`@arshad-shah/detent` and resolves its types from that package's emitted
+declarations, which do not exist until it is built. Skip that step and the
+docs build fails with `Cannot find module '@arshad-shah/detent'`.
+
+**Non-production branches upload a version rather than deploying**, so every
+pull request gets a preview URL without touching the live site.
+
+## 4. Attach the custom domain
+
+The first successful deploy creates the Worker. Then:
+
+**Workers & Pages** → `detent-docs` → **Settings** → **Domains & Routes** →
+**Add** → **Custom domain**, and enter:
+
+```
+detent.arshadshah.com
+```
+
+Cloudflare creates the DNS record itself; the zone for `arshadshah.com` must be
+on the same account. `wrangler.toml` also declares this route, so once the
+domain is attached it stays attached across deploys.
 
 ### Checking it worked
 
-Push anything to `main`. The `docs` workflow builds, then runs
-`wrangler deploy` from `apps/docs`. On success:
-
 ```bash
 curl -sI https://detent.arshadshah.com | head -1     # HTTP/2 200
+curl -sI https://detent.arshadshah.com/api/sortable/ | head -1   # HTTP/2 200
 ```
 
-The first deploy also creates the Worker (`detent-docs`) and claims the custom
-domain. Later deploys just replace the assets.
+The second one matters: it proves `not_found_handling` is right. Astro emits
+`<page>/index.html`, so without it every nested URL 404s while the home page
+works.
 
-If the deploy fails with **`Authentication error [code: 10000]`**, the token
-lacks a permission from step 3 — most often `Account Settings: Read`.
-If it fails on the route with **`workers.api.error.zone_not_found`**, the zone
-for `arshadshah.com` is on a different account than the token's.
+If the build fails on **`Cannot find module '@arshad-shah/detent'`**, the build
+command is missing the core build step.
+If it fails on **`Worker name does not match`**, the project name is not
+`detent-docs`.
+If the domain never attaches, the zone for `arshadshah.com` is on a different
+Cloudflare account than the one you connected.
 
----
+## 5. What CI still does
+
+`.github/workflows/docs.yml` builds the site and runs `astro check` on every
+pull request, and deploys nothing. That keeps a broken site failing in the PR —
+where you see it — while Cloudflare owns the deploy. There is deliberately no
+`CLOUDFLARE_API_TOKEN` secret.
 
 ## 6. Protect `main`
 
@@ -196,21 +213,27 @@ Should print `["verify","changeset","build"]`.
 
 ---
 
-## Where each secret is used
+## How each system authenticates
 
-| Secret | Used by | Scope |
-| --- | --- | --- |
-| `CLOUDFLARE_API_TOKEN` | `.github/workflows/docs.yml` | Deploy the docs site |
-| `CLOUDFLARE_ACCOUNT_ID` | `.github/workflows/docs.yml` | Deploy the docs site |
-| *(none for npm)* | `.github/workflows/main.yml` | Publishing uses OIDC |
+**There are no repository secrets, and that is the point.**
+
+| What | How it authenticates |
+| --- | --- |
+| npm publishing | OIDC, via npm Trusted Publishing scoped to this repo and `main.yml` |
+| Docs deployment | Cloudflare's own GitHub App, configured in the Cloudflare dashboard |
+
+Nothing long-lived is stored in GitHub, so there is nothing to leak or rotate
+on a schedule.
 
 `GITHUB_TOKEN` is provided automatically and scoped per job. The default for
 this repo is read-only; each workflow grants only what it needs, and only
 `main.yml`'s release job gets `id-token: write`.
 
-## Rotating the Cloudflare token
+## Revoking access
 
-Tokens do not expire unless you set a TTL. To rotate: create a new token with
-the same permissions, update the repository secret, confirm one deploy
-succeeds, then delete the old token from the Cloudflare dashboard. There is no
-window where both must be valid.
+**Cloudflare** — Workers & Pages → `detent-docs` → Settings → Build →
+Disconnect, and remove the Cloudflare app from
+<https://github.com/settings/installations>.
+
+**npm** — remove the trusted publisher on each package's Access page. CI can no
+longer publish; local `npm publish` with your own login still works.
