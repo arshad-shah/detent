@@ -18,7 +18,9 @@
     "size": "pnpm -r size",
     "changeset": "changeset",
     "version-packages": "changeset version && pnpm install --lockfile-only",
-    "release": "pnpm -r build && changeset publish"
+    "release": "pnpm -r build && changeset publish",
+    "docs": "pnpm -F docs dev",
+    "docs:build": "pnpm -F docs build"
   },
   "devDependencies": {
     "@changesets/changelog-github": "^0.6.0",
