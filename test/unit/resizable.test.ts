@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { resizable } from '../../src/resizable';
+import { resizable } from '../../src/resizable/index';
 import { ATTR, CLASS } from '../../src/core/constants';
 import { resetState } from '../../src/core/box';
 import { layout, offsetOf, press } from './helpers';

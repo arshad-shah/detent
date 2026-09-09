@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { draggable } from '../../src/draggable';
-import { resizable } from '../../src/resizable';
+import { resizable } from '../../src/resizable/index';
 import { sortable } from '../../src/sortable/index';
 import { ATTR } from '../../src/core/constants';
 import { flush } from '../../src/core/scheduler';

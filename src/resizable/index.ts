@@ -1,61 +1,14 @@
-import { paint, resolveBounds, stateOf } from './core/box';
-import { ATTR, CLASS, DEFAULTS, handleClass } from './core/constants';
-import { invariant } from './core/invariant';
-import { normaliseGrid } from './core/options';
-import { boxOf } from './core/geometry';
-import { bindPointer } from './core/pointer';
-import { scaleOf, unscale, unscaleBox } from './core/scale';
-import {
-  ALL_HANDLES,
-  computeResize,
-  directionOf,
-  type HandleName,
-  type ResizeLimits,
-} from './core/resize-math';
-import type { Activation, Bounds, Box, Handle, Point } from './core/types';
-
-export interface ResizeEvent {
-  element: HTMLElement;
-  width: number;
-  height: number;
-  handle: HandleName;
-  event: PointerEvent;
-  cancel(): void;
-}
-
-export interface ResizableOptions extends Omit<Activation, 'handle'> {
-  /**
-   * Which edges and corners can be grabbed. Defaults to all eight.
-   *
-   * As an array, the library creates its own handle elements inside the
-   * target. As an object, it binds to elements you already have — pass a
-   * selector or an element per direction. Use the object form when appending
-   * children would disturb your component: framework rendering, `:last-child`
-   * and `:nth-child` rules, or code that walks `element.children`.
-   */
-  handles?: HandleName[] | Partial<Record<HandleName, string | HTMLElement>>;
-  minWidth?: number;
-  minHeight?: number;
-  maxWidth?: number;
-  maxHeight?: number;
-  /**
-   * Hold a width-to-height ratio. `true` keeps the element's starting ratio,
-   * a number sets one explicitly (16 / 9).
-   */
-  aspectRatio?: boolean | number;
-  /** Snap the size to a grid, in pixels. */
-  grid?: number | [number, number];
-  /** Keep the element inside this area. */
-  bounds?: Bounds;
-  disabled?: boolean;
-  onStart?(event: ResizeEvent): void | boolean;
-  onResize?(event: ResizeEvent): void;
-  onEnd?(event: ResizeEvent, cancelled: boolean): void;
-}
-
-export interface ResizableHandle extends Handle {
-  setDisabled(disabled: boolean): void;
-}
+import { paint, resolveBounds, stateOf } from '../core/box';
+import { ATTR, CLASS, DEFAULTS } from '../core/constants';
+import { boxOf } from '../core/geometry';
+import { invariant } from '../core/invariant';
+import { normaliseGrid } from '../core/options';
+import { bindPointer } from '../core/pointer';
+import { computeResize, type HandleName, type ResizeLimits } from '../core/resize-math';
+import { scaleOf, unscale, unscaleBox } from '../core/scale';
+import type { Box, Handle, Point } from '../core/types';
+import { resolveHandles, type ResolvedHandle } from './handles';
+import type { ResizableHandle, ResizableOptions, ResizeEvent } from './types';
 
 export function resizable(el: HTMLElement, options: ResizableOptions = {}): ResizableHandle {
   invariant(el instanceof HTMLElement, `resizable() needs an HTMLElement, got ${typeof el}`);
@@ -67,47 +20,25 @@ export function resizable(el: HTMLElement, options: ResizableOptions = {}): Resi
     (options.maxHeight ?? Infinity) >= (options.minHeight ?? DEFAULTS.minSize),
     'resizable() maxHeight is below minHeight',
   );
-  const supplied = Array.isArray(options.handles) || !options.handles ? null : options.handles;
-  const names = (supplied ? Object.keys(supplied) : (options.handles as HandleName[] | undefined) ?? ALL_HANDLES) as HandleName[];
-  const grid = normaliseGrid(options.grid);
 
+  const grid = normaliseGrid(options.grid);
   let disabled = options.disabled ?? false;
 
-  const restorePosition = el.style.position;
-  // Only needed for handles the library positions itself.
-  if (!supplied && getComputedStyle(el).position === 'static') el.style.position = 'relative';
+  const handles = resolveHandles(el, options.handles);
+  const createdAny = handles.some((handle) => handle.created);
+
+  // A positioning context is only needed for handles the library places
+  // itself. Record what we changed so destroy can revert exactly that and
+  // nothing else — writing el.style.position unconditionally used to wipe
+  // whatever inline position the host page had.
+  let restorePosition: string | null = null;
+  if (createdAny && getComputedStyle(el).position === 'static') {
+    restorePosition = el.style.position;
+    el.style.position = 'relative';
+  }
   el.classList.add(CLASS.resizable);
 
-  const bindings: Handle[] = [];
-  const created: HTMLElement[] = [];
-
-  for (const name of names) {
-    const direction = directionOf(name);
-    if (!direction) continue;
-
-    let node: HTMLElement | null;
-    if (supplied) {
-      const target = supplied[name];
-      node = typeof target === 'string' ? el.querySelector<HTMLElement>(target) : (target ?? null);
-      if (!node) continue;
-      node.setAttribute(ATTR.handle, name);
-    } else {
-      node = document.createElement('span');
-      node.className = `${CLASS.handle} ${handleClass(name)}`;
-      node.setAttribute(ATTR.handle, name);
-      node.setAttribute('aria-hidden', 'true');
-      el.appendChild(node);
-      created.push(node);
-    }
-
-    bindings.push(bindHandle(node, name, direction));
-  }
-
-  function bindHandle(
-    node: HTMLElement,
-    name: HandleName,
-    [dirX, dirY]: [-1 | 0 | 1, -1 | 0 | 1],
-  ): Handle {
+  function bindHandle({ node, name, direction: [dirX, dirY] }: ResolvedHandle): Handle {
     let startWidth = 0;
     let startHeight = 0;
     let startX = 0;
@@ -225,19 +156,28 @@ export function resizable(el: HTMLElement, options: ResizableOptions = {}): Resi
     });
   }
 
+  const bindings = handles.map(bindHandle);
+
   return {
     setDisabled(next) {
       disabled = next;
     },
     destroy() {
       for (const binding of bindings) binding.destroy();
-      // Only remove handles the library made. Elements you supplied are yours.
-      for (const node of created) node.remove();
-      if (supplied) {
-        for (const name of names) el.querySelector(`[${ATTR.handle}="${name}"]`)?.removeAttribute(ATTR.handle);
+      for (const handle of handles) {
+        if (handle.created) {
+          handle.node.remove();
+        } else {
+          // Elements you supplied are yours; give them back as we found them.
+          handle.node.removeAttribute(ATTR.handle);
+          handle.node.style.position = '';
+          handle.node.style.touchAction = '';
+        }
       }
-      el.style.position = restorePosition;
+      if (restorePosition !== null) el.style.position = restorePosition;
       el.classList.remove(CLASS.resizable, CLASS.resizing);
     },
   };
 }
+
+export type { ResizableOptions, ResizableHandle, ResizeEvent, HandleName };
