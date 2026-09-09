@@ -1,0 +1,47 @@
+{
+  "name": "detent",
+  "version": "0.1.0",
+  "description": "Tiny zero-dependency drag, reorder and resize for the web. Pointer-based, touch-ready, framework-free.",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "size": "node build.mjs --size",
+    "playground": "node build.mjs && npx --yes serve playground -l 5173"
+  },
+  "keywords": [
+    "drag",
+    "drop",
+    "sortable",
+    "reorder",
+    "resize",
+    "touch",
+    "pointer-events",
+    "zero-dependency"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "happy-dom": "^15.11.7",
+    "playwright": "^1.49.1",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
