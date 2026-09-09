@@ -16,6 +16,24 @@ export default defineConfig({
       editLink: {
         baseUrl: 'https://github.com/arshad-shah/detent/edit/main/apps/docs/',
       },
+      favicon: '/favicon.svg',
+      head: [
+        {
+          tag: 'link',
+          attrs: { rel: 'apple-touch-icon', href: '/icon-180.png' },
+        },
+        {
+          tag: 'meta',
+          attrs: {
+            property: 'og:image',
+            content: 'https://detent.arshadshah.com/og-image.png',
+          },
+        },
+        {
+          tag: 'meta',
+          attrs: { name: 'twitter:card', content: 'summary_large_image' },
+        },
+      ],
       customCss: ['detent/styles.css', './src/styles/custom.css'],
       sidebar: [
         {
