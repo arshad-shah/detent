@@ -24,7 +24,7 @@
     "protect-main": "gh api -X PUT repos/arshad-shah/detent/branches/main/protection --input .github/branch-protection.json"
   },
   "devDependencies": {
-    "@changesets/changelog-github": "^0.6.0",
+    "@changesets/changelog-github": "^1.0.1",
     "@changesets/cli": "^3.0.2",
     "playwright": "^1.63.0"
   }
