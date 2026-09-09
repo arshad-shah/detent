@@ -12,7 +12,12 @@ import { bindKeyboard } from './keyboard';
 import { acquireLiveRegion, releaseLiveRegion } from './live-region';
 import { childrenOf, placeAt } from './place';
 import { eachList, registerList, unregisterList, type Instance } from './registry';
-import type { SortableOptions } from './types';
+import type { SortableOptions, SortLocation } from './types';
+
+interface Candidate {
+  instance: Instance;
+  box: Box;
+}
 
 export function sortable(container: HTMLElement, options: SortableOptions = {}): Handle {
   invariant(container instanceof HTMLElement, 'sortable() needs an HTMLElement container');
@@ -52,26 +57,50 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
   let cachedSiblings: HTMLElement[] = [];
   let cachedRects: Box[] = [];
   let cacheHost: Instance | null = null;
+  let candidates: Candidate[] = [];
 
   function refreshCache(target: Instance) {
     cacheHost = target;
+    measureCandidates();
     cachedSiblings = target.items().filter((node) => node !== item);
     cachedRects = cachedSiblings.map(boxOf);
     measuredScroll = totalScroll(scrollAncestors);
   }
 
-  function hostFor(point: Point): Instance {
-    if (contains(boxOf(host.container), point)) return host;
+  /**
+   * Which lists this drag could land in, measured once.
+   *
+   * hostFor used to call getBoundingClientRect on every registered list on
+   * every pointer move — a forced synchronous layout per list per move, which
+   * on a twenty-column board is twenty reflows a frame.
+   */
+  function measureCandidates() {
+    candidates = [];
     for (const candidate of eachList()) {
-      if (candidate === host) continue;
       const sameGroup =
         candidate.options.group != null && candidate.options.group === instance.options.group;
-      const sameList = candidate === instance;
-      if (!sameGroup && !sameList) continue;
+      if (candidate !== instance && !sameGroup) continue;
       if (!candidate.container.isConnected) continue;
-      if (contains(boxOf(candidate.container), point)) return candidate;
+      candidates.push({ instance: candidate, box: boxOf(candidate.container) });
+    }
+  }
+
+  function hostFor(point: Point): Instance {
+    for (const candidate of candidates) {
+      if (candidate.instance === host && contains(candidate.box, point)) return host;
+    }
+    for (const candidate of candidates) {
+      if (contains(candidate.box, point)) return candidate.instance;
     }
     return host;
+  }
+
+  /** The measured box of a candidate list, falling back to a fresh measure. */
+  function boxOfHost(target: Instance): Box {
+    for (const candidate of candidates) {
+      if (candidate.instance === target) return candidate.box;
+    }
+    return boxOf(target.container);
   }
 
   /**
@@ -128,7 +157,7 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
       rtl = isRtl(target.container);
       refreshCache(target);
     }
-    if (!cachedRects.length && !contains(boxOf(target.container), lastPoint)) return;
+    if (!cachedRects.length && !contains(boxOfHost(target), lastPoint)) return;
 
     const axis =
       !target.options.direction || target.options.direction === 'auto'
@@ -153,6 +182,72 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
     options.onMove?.(item, { container: target.container, index });
   }
 
+  /**
+   * Take ownership of the item: listeners, lifted styles, measurements.
+   *
+   * Every mutation a drag makes happens here and is undone by endDrag, so
+   * there is exactly one teardown path however the drag finishes.
+   */
+  function beginDrag(found: HTMLElement, from: SortLocation, point: Point, delta: Point) {
+    item = found;
+    host = instance;
+    fromContainer = from.container;
+    fromIndex = from.index;
+
+    const state = stateOf(found);
+    anchorOffset = { x: state.x, y: state.y };
+    anchorDelta = { x: 0, y: 0 };
+    scale = scaleOf(found);
+    rtl = isRtl(container);
+    scrollAncestors = scrollAncestorsOf(found);
+    anchorScroll = totalScroll(scrollAncestors);
+    lastPoint = point;
+    lastDelta = delta;
+
+    // Scroll events do not bubble, but they do pass through the capture phase
+    // — so one listener on the window catches the page scrolling, any
+    // container scrolling, and a wheel or trackpad while the pointer is held
+    // perfectly still.
+    window.addEventListener('scroll', applyMove, { capture: true, passive: true });
+
+    // Lift the item above its neighbours without disturbing how it is
+    // positioned. Only a statically positioned item needs a position at all,
+    // and anything already positioned keeps whatever it had.
+    restorePosition = found.style.position;
+    restoreZIndex = found.style.zIndex;
+    if (getComputedStyle(found).position === 'static') found.style.position = 'relative';
+    found.style.zIndex = String(options.zIndex ?? DEFAULTS.zIndex);
+
+    found.classList.add(CLASS.sorting);
+    refreshCache(instance);
+
+    if (options.autoScroll !== false) {
+      scroller = createAutoScroll(scrollParentOf(found), {
+        ...(typeof options.autoScroll === 'object' ? options.autoScroll : {}),
+        onScroll: applyMove,
+      });
+    }
+  }
+
+  /** The exact inverse of beginDrag. Safe to call when no drag is running. */
+  function endDrag() {
+    window.removeEventListener('scroll', applyMove, { capture: true } as EventListenerOptions);
+    scroller?.stop();
+    scroller = null;
+
+    if (item) {
+      item.style.position = restorePosition;
+      item.style.zIndex = restoreZIndex;
+      item.classList.remove(CLASS.sorting);
+    }
+
+    item = null;
+    cachedSiblings = [];
+    cachedRects = [];
+    cacheHost = null;
+    candidates = [];
+  }
+
   // A list that scrolls itself must keep its swipe gesture, or a finger can
   // never reach the items further down. The press delay is what separates a
   // scroll from a lift in that case.
@@ -167,52 +262,21 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
     onStart(session) {
       if (disabled) return false;
 
-      const candidates = instance.items();
+      const siblings = instance.items();
       const found = session.path.find(
-        (node) => node instanceof HTMLElement && candidates.includes(node),
+        (node) => node instanceof HTMLElement && siblings.includes(node),
       ) as HTMLElement | undefined;
       if (!found) return false;
 
-      item = found;
-      host = instance;
-      fromContainer = container;
-      fromIndex = candidates.indexOf(item);
+      const from = { container, index: siblings.indexOf(found) };
 
-      const state = stateOf(item);
-      anchorOffset = { x: state.x, y: state.y };
-      anchorDelta = { x: 0, y: 0 };
-      scale = scaleOf(item);
-      rtl = isRtl(container);
-      scrollAncestors = scrollAncestorsOf(item);
-      anchorScroll = totalScroll(scrollAncestors);
-      lastPoint = session.point;
-      lastDelta = session.delta;
+      // Ask before touching anything. A refusal has to leave the page exactly
+      // as it was; this used to add the scroll listener and lift the item
+      // first, and nothing reverted either.
+      if (options.onStart?.(found, from) === false) return false;
 
-      // Scroll events do not bubble, but they do pass through the capture
-      // phase — so one listener on the window catches the page scrolling, any
-      // container scrolling, and a wheel or trackpad while the pointer is held
-      // perfectly still.
-      window.addEventListener('scroll', applyMove, { capture: true, passive: true });
-
-      // Lift the item above its neighbours without disturbing how it is
-      // positioned. Only a statically positioned item needs a position at all,
-      // and anything already positioned keeps whatever it had.
-      restorePosition = item.style.position;
-      restoreZIndex = item.style.zIndex;
-      if (getComputedStyle(item).position === 'static') item.style.position = 'relative';
-      item.style.zIndex = String(options.zIndex ?? DEFAULTS.zIndex);
-
-      item.classList.add(CLASS.sorting);
-      refreshCache(instance);
-
-      if (options.autoScroll !== false) {
-        scroller = createAutoScroll(scrollParentOf(item), {
-          ...(typeof options.autoScroll === 'object' ? options.autoScroll : {}),
-          onScroll: applyMove,
-        });
-      }
-
-      return options.onStart?.(item, { container: fromContainer, index: fromIndex });
+      beginDrag(found, from, session.point, session.delta);
+      return true;
     },
 
     onMove(session) {
@@ -226,9 +290,6 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
       if (!item) return;
       const dragged = item;
       const state = stateOf(dragged);
-      window.removeEventListener('scroll', applyMove, { capture: true } as EventListenerOptions);
-      scroller?.stop();
-      scroller = null;
 
       if (cancelled) {
         const siblings = childrenOf({ ...instance, container: fromContainer }).filter(
@@ -244,18 +305,11 @@ export function sortable(container: HTMLElement, options: SortableOptions = {}):
       paintNow(dragged);
       flip.play(landing, animation);
 
-      dragged.style.position = restorePosition;
-      dragged.style.zIndex = restoreZIndex;
-      dragged.classList.remove(CLASS.sorting);
-
       const toContainer = dragged.parentElement as HTMLElement;
       const toIndex = childrenOf({ ...instance, container: toContainer }).indexOf(dragged);
       const moved = !cancelled && (toContainer !== fromContainer || toIndex !== fromIndex);
 
-      item = null;
-      cachedSiblings = [];
-      cachedRects = [];
-      cacheHost = null;
+      endDrag();
 
       if (moved) {
         options.onSort?.({
