@@ -1,0 +1,122 @@
+---
+title: sortable
+description: Reorder a list with the pointer or the keyboard, and pass items between lists.
+---
+
+import Demo from '../../../components/Demo.astro';
+
+Reorder a list. `direction: 'auto'` reads the layout from where the items sit,
+so a row, a column and a wrapping grid all work without configuration.
+
+```js
+import { sortable } from 'detent';
+
+sortable(list, {
+  animation: 180,
+  onSort({ item, from, to }) {},
+});
+```
+
+<Demo id="sortable-list" title="A single list">
+  <ul class="demo-list">
+    <li>first</li>
+    <li>second</li>
+    <li>third</li>
+    <li>fourth</li>
+  </ul>
+</Demo>
+
+## Between lists
+
+Lists sharing a `group` name pass items to each other. Drag an item from
+either column into the other.
+
+<Demo id="sortable-groups" title="group: 'docs-demo'" height={260}>
+  <div style="display:flex;gap:1rem">
+    <ul class="demo-list" style="flex:1">
+      <li>alpha</li>
+      <li>beta</li>
+      <li>gamma</li>
+    </ul>
+    <ul class="demo-list" style="flex:1">
+      <li>delta</li>
+      <li>epsilon</li>
+    </ul>
+  </div>
+</Demo>
+
+## Keyboard
+
+Give the items `tabindex="0"` and they can be reordered without a pointer.
+Tab to an item, then:
+
+| Key | What it does |
+| --- | --- |
+| <kbd>Space</kbd> | Lift the item, or drop it if already lifted. |
+| <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> | Move the lifted item one place. |
+| <kbd>Escape</kbd> | Cancel and put it back. |
+
+Each step is announced to screen readers through a live region the library
+creates and removes with the last sortable list.
+
+<Demo id="sortable-keyboard" title="Tab into the list, then press space">
+  <ul class="demo-list">
+    <li>one</li>
+    <li>two</li>
+    <li>three</li>
+  </ul>
+</Demo>
+
+## Options
+
+| Option | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `group` | `string` | — | Lists sharing a name pass items to each other. |
+| `items` | `string` | — | Which children are sortable. Defaults to every element child. |
+| `direction` | `'auto' \| 'x' \| 'y' \| 'grid'` | `'auto'` | How the list reads. `auto` works it out from where the items sit. |
+| `animation` | `number` | `180` | Reorder animation in milliseconds. `0` turns it off. |
+| `autoScroll` | `boolean \| { threshold, speed }` | `true` | Scroll the list when the pointer nears its edges. |
+| `keyboard` | `boolean` | `true` | Allow reordering with the keyboard. |
+| `zIndex` | `number` | `20` | Stacking order for the item being moved. |
+| `disabled` | `boolean` | `false` | Keep the binding but stop responding. |
+
+Activation options — `distance`, `delay`, `tolerance`, `handle`, `cancel` and
+`touchAction` — behave as they do for [`draggable`](/api/draggable/).
+
+Add `data-detent-ignore` to a child to exclude it from sorting.
+
+## Callbacks
+
+```js
+sortable(list, {
+  onStart(item, from) {},         // return false to refuse
+  onMove(item, to) {},
+  onSort({ item, from, to }) {},  // once, on drop, only if it actually moved
+  onEnd(item, cancelled) {},
+});
+```
+
+`from` and `to` are `{ container, index }`.
+
+## Reading the order
+
+```js
+import { orderOf } from 'detent';
+
+orderOf(list);           // HTMLElement[] in current DOM order
+orderOf(list, '.card');  // only children matching a selector
+```
+
+## Notes
+
+**Scrolling is handled.** Cached measurements are corrected whenever anything
+scrolls mid-drag, including the page itself. Auto-scroll re-runs the drop
+decision on every step, so a finger held against the edge of a list keeps
+reordering without moving.
+
+**A scrolling list keeps its swipe gesture.** When the container scrolls
+itself, `touchAction` defaults to `'auto'` so a finger can still reach items
+further down. The press delay is what separates a scroll from a lift.
+
+**RTL is respected.** Under `dir="rtl"` a horizontal list reorders in the
+direction you drag, not the direction the DOM runs.
