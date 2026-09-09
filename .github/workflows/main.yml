@@ -1,0 +1,72 @@
+name: main
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: main
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Install browsers
+        run: pnpm -F detent exec playwright install --with-deps chromium firefox webkit
+      - run: pnpm typecheck
+      - run: pnpm test:unit
+      - run: pnpm test:browser
+      - run: pnpm build
+      - name: Bundle size budget
+        run: pnpm size
+      - run: pnpm test:e2e
+
+  release:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write        # commit the version bump, push tags
+      pull-requests: write   # open and update the Version Packages PR
+      id-token: write        # OIDC, for provenance and trusted publishing
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - run: pnpm install --frozen-lockfile
+
+      # npm >= 11.5 authenticates to the registry over OIDC when the repository
+      # is registered as a trusted publisher, so no token is stored here.
+      - name: Use an npm new enough for trusted publishing
+        run: npm install -g npm@^12
+
+      - uses: changesets/action@v2.1.2
+        with:
+          version: pnpm version-packages
+          publish: pnpm release
+          commit: 'chore: version packages'
+          title: 'chore: version packages'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_CONFIG_PROVENANCE: 'true'

@@ -1,6 +1,5 @@
-# Phase 2 adds packages/* and apps/*. For now the root package is the library.
 packages:
-  - '.'
+  - 'packages/*'
 
 # esbuild fetches its platform binary in a postinstall script.
 allowBuilds:

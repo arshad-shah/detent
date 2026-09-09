@@ -1,0 +1,56 @@
+{
+  "name": "detent",
+  "version": "0.0.0",
+  "description": "Tiny zero-dependency drag, reorder and resize for the web. Pointer-based, touch-ready, framework-free.",
+  "type": "module",
+  "sideEffects": false,
+  "license": "MIT",
+  "author": "Arshad Shah",
+  "homepage": "https://detent.arshadshah.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arshad-shah/detent.git",
+    "directory": "packages/detent"
+  },
+  "bugs": "https://github.com/arshad-shah/detent/issues",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./styles.css": "./dist/styles.css",
+    "./package.json": "./package.json"
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "keywords": [
+    "drag", "drop", "sortable", "reorder", "resize",
+    "touch", "pointer-events", "zero-dependency"
+  ],
+  "scripts": {
+    "build": "node build.mjs",
+    "size": "node scripts/size-check.mjs",
+    "test": "pnpm test:unit && pnpm test:browser",
+    "test:unit": "vitest run --project unit",
+    "test:browser": "vitest run --project browser",
+    "test:e2e": "playwright test",
+    "test:watch": "vitest --project unit",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.test.json",
+    "playground": "node playground.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^24.13.3",
+    "@vitest/browser": "^5.0.0",
+    "@vitest/browser-playwright": "^5.0.0",
+    "esbuild": "^0.28.2",
+    "happy-dom": "^15.11.7",
+    "playwright": "^1.63.0",
+    "typescript": "^7.0.2",
+    "vite": "^7.3.6",
+    "vitest": "^5.0.0"
+  }
+}

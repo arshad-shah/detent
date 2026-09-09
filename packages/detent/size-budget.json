@@ -1,0 +1,10 @@
+{
+  "comment": "Gzipped ceilings in bytes. Raise deliberately, in the same PR as the change that needs it, and say why in the changeset.",
+  "budgets": {
+    "dist/index.js": 7000,
+    "dist/_size-draggable.js": 2500,
+    "dist/_size-sortable.js": 4800,
+    "dist/_size-resizable.js": 3300,
+    "dist/styles.css": 500
+  }
+}
