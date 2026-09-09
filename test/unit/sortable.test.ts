@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { sortable } from '../../src/sortable';
+import { sortable } from '../../src/sortable/index';
 import { CLASS } from '../../src/core/constants';
 import { idsOf, layout, makeList, offsetOf, press, stack } from './helpers';
 import type { Box } from '../../src/core/types';
