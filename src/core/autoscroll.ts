@@ -1,3 +1,4 @@
+import { DEFAULTS } from './constants';
 import { boxOf } from './geometry';
 import type { Point } from './types';
 
@@ -21,8 +22,8 @@ export interface AutoScrollOptions {
  * on abruptly, which makes long drags controllable.
  */
 export function createAutoScroll(target: Element | null, options: AutoScrollOptions = {}) {
-  const threshold = options.threshold ?? 60;
-  const speed = options.speed ?? 14;
+  const threshold = options.threshold ?? DEFAULTS.scrollThreshold;
+  const speed = options.speed ?? DEFAULTS.scrollSpeed;
 
   let pointer: Point | null = null;
   let frame = 0;
@@ -52,8 +53,13 @@ export function createAutoScroll(target: Element | null, options: AutoScrollOpti
     if (dx || dy) {
       const beforeTop = scroller.scrollTop;
       const beforeLeft = scroller.scrollLeft;
-      scroller.scrollTop += dy;
-      scroller.scrollLeft += dx;
+
+      // `behavior: 'instant'` overrides a host page's `scroll-behavior: smooth`.
+      // Without it the browser animates every step, so each frame reads a
+      // position still in flight from the previous one and auto-scroll stalls
+      // outright rather than merely stuttering.
+      scroller.scrollBy({ top: dy, left: dx, behavior: 'instant' });
+
       if (scroller.scrollTop !== beforeTop || scroller.scrollLeft !== beforeLeft) {
         options.onScroll?.();
       }

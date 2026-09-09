@@ -10,6 +10,8 @@ const bundle = await build({
   format: 'iife',
   globalName: 'detent',
   target: 'es2020',
+  // Same as the shipped build: invariant() and its messages are stripped.
+  define: { __DEV__: 'false' },
   // `var` at the top of an inline script is already global in a browser, but
   // being explicit keeps this working under headless DOM implementations too.
   footer: { js: 'globalThis.detent = detent;' },

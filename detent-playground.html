@@ -191,26 +191,26 @@ main { padding-top: 40px; }
   user-select: none;
 }
 
-.card.dk-dragging,
-.card.dk-resizing {
+.card.detent-dragging,
+.card.detent-resizing {
   cursor: grabbing;
   border-color: var(--hot);
   box-shadow: 4px 4px 0 var(--hot-soft);
 }
 
 /* Handles are invisible by default; the demo cards get a visible corner. */
-.card .dk-handle-se::after,
-.card .dk-handle-nw::after {
+.card .detent-handle-se::after,
+.card .detent-handle-nw::after {
   content: "";
   position: absolute;
   width: 9px;
   height: 9px;
   border: 2px solid var(--ink);
 }
-.card .dk-handle-se::after { right: 3px; bottom: 3px; border-top: 0; border-left: 0; }
-.card .dk-handle-nw::after { left: 3px; top: 3px; border-bottom: 0; border-right: 0; }
-.card:hover .dk-handle-se::after,
-.card:hover .dk-handle-nw::after { border-color: var(--hot); }
+.card .detent-handle-se::after { right: 3px; bottom: 3px; border-top: 0; border-left: 0; }
+.card .detent-handle-nw::after { left: 3px; top: 3px; border-bottom: 0; border-right: 0; }
+.card:hover .detent-handle-se::after,
+.card:hover .detent-handle-nw::after { border-color: var(--hot); }
 
 .grip {
   display: flex;
@@ -290,9 +290,9 @@ main { padding-top: 40px; }
   margin-left: auto;
 }
 
-.list li.dk-sorting,
-.tile.dk-sorting,
-.chip.dk-sorting {
+.list li.detent-sorting,
+.tile.detent-sorting,
+.chip.detent-sorting {
   border-color: var(--hot);
   background: var(--hot-soft);
   box-shadow: 3px 3px 0 rgba(168, 42, 87, 0.18);
@@ -391,8 +391,8 @@ main { padding-top: 40px; }
   overflow: hidden;
 }
 
-.widget.dk-dragging,
-.widget.dk-resizing {
+.widget.detent-dragging,
+.widget.detent-resizing {
   border-color: var(--hot);
   box-shadow: 4px 4px 0 var(--hot-soft);
   z-index: 5;
@@ -421,7 +421,7 @@ main { padding-top: 40px; }
   color: var(--muted);
 }
 
-.widget .dk-handle-se::after {
+.widget .detent-handle-se::after {
   content: "";
   position: absolute;
   right: 3px;
@@ -432,7 +432,7 @@ main { padding-top: 40px; }
   border-top: 0;
   border-left: 0;
 }
-.widget:hover .dk-handle-se::after { border-color: var(--hot); }
+.widget:hover .detent-handle-se::after { border-color: var(--hot); }
 
 /* ---------- log ---------- */
 
@@ -513,7 +513,7 @@ kbd {
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
-.dk-resizable{box-sizing:border-box}.dk-handle{position:absolute;touch-action:none;--dk-handle-size: 12px;--dk-handle-inset: calc(var(--dk-handle-size) / -2)}.dk-handle-n,.dk-handle-s{left:var(--dk-handle-size);right:var(--dk-handle-size);height:var(--dk-handle-size);cursor:ns-resize}.dk-handle-e,.dk-handle-w{top:var(--dk-handle-size);bottom:var(--dk-handle-size);width:var(--dk-handle-size);cursor:ew-resize}.dk-handle-n{top:var(--dk-handle-inset)}.dk-handle-s{bottom:var(--dk-handle-inset)}.dk-handle-e{right:var(--dk-handle-inset)}.dk-handle-w{left:var(--dk-handle-inset)}.dk-handle-ne,.dk-handle-nw,.dk-handle-se,.dk-handle-sw{width:var(--dk-handle-size);height:var(--dk-handle-size)}.dk-handle-ne{top:var(--dk-handle-inset);right:var(--dk-handle-inset);cursor:nesw-resize}.dk-handle-nw{top:var(--dk-handle-inset);left:var(--dk-handle-inset);cursor:nwse-resize}.dk-handle-se{bottom:var(--dk-handle-inset);right:var(--dk-handle-inset);cursor:nwse-resize}.dk-handle-sw{bottom:var(--dk-handle-inset);left:var(--dk-handle-inset);cursor:nesw-resize}.dk-dragging,.dk-sorting{will-change:transform}[data-dragging]{cursor:grabbing}@media(prefers-reduced-motion:reduce){.dk-dragging,.dk-sorting{will-change:auto}}
+@layer detent{.detent-resizable{box-sizing:border-box}.detent-handle{--detent-handle-size: 12px;--detent-handle-inset: calc(var(--detent-handle-size) / -2)}.detent-handle-n,.detent-handle-s{left:var(--detent-handle-size);right:var(--detent-handle-size);height:var(--detent-handle-size);cursor:ns-resize}.detent-handle-e,.detent-handle-w{top:var(--detent-handle-size);bottom:var(--detent-handle-size);width:var(--detent-handle-size);cursor:ew-resize}.detent-handle-n{top:var(--detent-handle-inset)}.detent-handle-s{bottom:var(--detent-handle-inset)}.detent-handle-e{right:var(--detent-handle-inset)}.detent-handle-w{left:var(--detent-handle-inset)}.detent-handle-ne,.detent-handle-nw,.detent-handle-se,.detent-handle-sw{width:var(--detent-handle-size);height:var(--detent-handle-size)}.detent-handle-ne{top:var(--detent-handle-inset);right:var(--detent-handle-inset);cursor:nesw-resize}.detent-handle-nw{top:var(--detent-handle-inset);left:var(--detent-handle-inset);cursor:nwse-resize}.detent-handle-se{bottom:var(--detent-handle-inset);right:var(--detent-handle-inset);cursor:nwse-resize}.detent-handle-sw{bottom:var(--detent-handle-inset);left:var(--detent-handle-inset);cursor:nesw-resize}.detent-dragging,.detent-sorting{will-change:transform}[data-detent-dragging]{cursor:grabbing}@media(prefers-reduced-motion:reduce){.detent-dragging,.detent-sorting{will-change:auto}}}
 
 </style>
 </head>
@@ -740,7 +740,7 @@ var detent = (() => {
     if (sameColumn && !sameRow) return "y";
     return sameRow ? "x" : "grid";
   }
-  function resolveInsertIndex(rects, pointer, axis) {
+  function resolveInsertIndex(rects, pointer, axis, rtl = false) {
     const count = rects.length;
     if (count === 0) return 0;
     if (axis === "grid") {
@@ -754,42 +754,24 @@ var detent = (() => {
         }
       }
       const c = centerOf(rects[best]);
-      const past = pointer.y > c.y + rects[best].height / 2 ? true : pointer.y < c.y - rects[best].height / 2 ? false : pointer.x > c.x;
+      const half = rects[best].height / 2;
+      const ahead = rtl ? pointer.x < c.x : pointer.x > c.x;
+      const past = pointer.y > c.y + half ? true : pointer.y < c.y - half ? false : ahead;
       return past ? best + 1 : best;
     }
-    const key = axis === "x" ? "x" : "y";
+    if (axis === "x") {
+      let index2 = 0;
+      while (index2 < count && (rtl ? pointer.x < centerOf(rects[index2]).x : pointer.x > centerOf(rects[index2]).x)) {
+        index2++;
+      }
+      return index2;
+    }
     let index = 0;
-    while (index < count && pointer[key] > centerOf(rects[index])[key]) index++;
+    while (index < count && pointer.y > centerOf(rects[index]).y) index++;
     return index;
   }
-  function scrollAncestorsOf(el) {
-    const out = [];
-    let node = el.parentElement;
-    while (node && node !== document.body && node !== document.documentElement) {
-      const style = getComputedStyle(node);
-      if (/auto|scroll|overlay/.test(style.overflowY + style.overflowX)) out.push(node);
-      node = node.parentElement;
-    }
-    return out;
-  }
-  function totalScroll(ancestors) {
-    let x = typeof window === "undefined" ? 0 : window.scrollX;
-    let y = typeof window === "undefined" ? 0 : window.scrollY;
-    for (const node of ancestors) {
-      x += node.scrollLeft;
-      y += node.scrollTop;
-    }
-    return { x, y };
-  }
-  function scrollParentOf(el) {
-    let node = el.parentElement;
-    while (node && node !== document.body && node !== document.documentElement) {
-      const style = getComputedStyle(node);
-      const overflow = style.overflowY + style.overflowX;
-      if (/auto|scroll|overlay/.test(overflow)) return node;
-      node = node.parentElement;
-    }
-    return null;
+  function isRtl(el) {
+    return getComputedStyle(el).direction === "rtl";
   }
 
   // src/core/scheduler.ts
@@ -800,6 +782,9 @@ var detent = (() => {
   function write(job) {
     queue.add(job);
     if (!frame) frame = raf(flush);
+  }
+  function unschedule(job) {
+    queue.delete(job);
   }
   function flush() {
     if (frame) {
@@ -814,6 +799,7 @@ var detent = (() => {
 
   // src/core/box.ts
   var states = /* @__PURE__ */ new WeakMap();
+  var painters = /* @__PURE__ */ new WeakMap();
   function stateOf(el) {
     let state = states.get(el);
     if (!state) {
@@ -822,19 +808,26 @@ var detent = (() => {
     }
     return state;
   }
-  function paint(el) {
-    const state = stateOf(el);
-    write(() => {
-      el.style.transform = state.x || state.y ? `translate3d(${state.x}px, ${state.y}px, 0)` : "";
-      if (state.width !== null) el.style.width = `${state.width}px`;
-      if (state.height !== null) el.style.height = `${state.height}px`;
-    });
-  }
-  function paintNow(el) {
+  function apply(el) {
     const state = stateOf(el);
     el.style.transform = state.x || state.y ? `translate3d(${state.x}px, ${state.y}px, 0)` : "";
     if (state.width !== null) el.style.width = `${state.width}px`;
     if (state.height !== null) el.style.height = `${state.height}px`;
+  }
+  function painterOf(el) {
+    let painter = painters.get(el);
+    if (!painter) {
+      painter = () => apply(el);
+      painters.set(el, painter);
+    }
+    return painter;
+  }
+  function paint(el) {
+    write(painterOf(el));
+  }
+  function paintNow(el) {
+    unschedule(painterOf(el));
+    apply(el);
   }
   function resolveBounds(el, bounds) {
     if (!bounds) return null;
@@ -850,8 +843,87 @@ var detent = (() => {
     return bounds;
   }
 
+  // src/core/constants.ts
+  var PREFIX = "detent";
+  var CLASS = {
+    /** On a draggable element, for the duration of a drag. */
+    dragging: `${PREFIX}-dragging`,
+    /** On a sortable item, while it is being moved by pointer or keyboard. */
+    sorting: `${PREFIX}-sorting`,
+    /** On a sortable container, for its lifetime. */
+    sortable: `${PREFIX}-sortable`,
+    /** On a resizable element, for its lifetime. */
+    resizable: `${PREFIX}-resizable`,
+    /** On a resizable element, for the duration of a resize. */
+    resizing: `${PREFIX}-resizing`,
+    /** On every handle element the library creates. */
+    handle: `${PREFIX}-handle`
+  };
+  var ATTR = {
+    /** On `<body>`, while any drag is active. Refcounted. */
+    dragging: `data-${PREFIX}-dragging`,
+    /** On a handle element, naming its direction. */
+    handle: `data-${PREFIX}-handle`,
+    /** Read from a list child to exclude it from sorting. */
+    ignore: `data-${PREFIX}-ignore`,
+    /** On the screen-reader announcer element. */
+    liveRegion: `data-${PREFIX}-live-region`
+  };
+  function handleClass(name) {
+    return `${CLASS.handle}-${name}`;
+  }
+  var DEFAULTS = {
+    /** Pixels of travel before a mouse or pen drag starts. */
+    distance: 4,
+    /** Milliseconds of press before a touch drag starts. */
+    delay: 200,
+    /** How far a finger may drift during `delay` before we assume a scroll. */
+    tolerance: 6,
+    /** Reorder animation, in milliseconds. */
+    animation: 180,
+    /** Stacking order applied to a sortable item while it moves. */
+    zIndex: 20,
+    /** How close to an edge, in pixels, before auto-scrolling begins. */
+    scrollThreshold: 60,
+    /** Auto-scroll pixels per frame at full speed. */
+    scrollSpeed: 14,
+    /** Smallest width or height a resize will produce, in pixels. */
+    minSize: 16,
+    /** Edge length of a library-created resize handle, in pixels. */
+    handleSize: 12
+  };
+
+  // src/core/invariant.ts
+  function invariant(condition, message) {
+    if (false) {
+      throw new Error(`[${PREFIX}] ${message}`);
+    }
+  }
+
+  // src/core/options.ts
+  function normaliseGrid(grid) {
+    if (!grid) return null;
+    if (typeof grid === "number") return [grid, grid];
+    return [grid[0], grid[1]];
+  }
+
+  // src/core/body-state.ts
+  var depth = 0;
+  var restoreUserSelect = "";
+  function lockPage() {
+    if (depth++ > 0) return;
+    restoreUserSelect = document.body.style.userSelect;
+    document.body.style.userSelect = "none";
+    document.body.setAttribute(ATTR.dragging, "");
+  }
+  function unlockPage() {
+    if (depth === 0) return;
+    if (--depth > 0) return;
+    document.body.style.userSelect = restoreUserSelect;
+    document.body.removeAttribute(ATTR.dragging);
+  }
+
   // src/core/pointer.ts
-  var DEFAULTS = { distance: 4, delay: 200, tolerance: 6 };
   function matchesIn(path, root, selector) {
     for (const node of path) {
       if (node === root) return false;
@@ -869,7 +941,6 @@ var detent = (() => {
     let session = null;
     let active = false;
     let timer = null;
-    let restoreUserSelect = "";
     const previousTouchAction = el.style.touchAction;
     el.style.touchAction = opts.touchAction ?? "none";
     function update(e) {
@@ -885,9 +956,7 @@ var detent = (() => {
         return;
       }
       active = true;
-      restoreUserSelect = document.body.style.userSelect;
-      document.body.style.userSelect = "none";
-      document.body.setAttribute("data-dragging", "");
+      lockPage();
     }
     function onMove(e) {
       if (!session || e.pointerId !== session.pointerId) return;
@@ -941,8 +1010,7 @@ var detent = (() => {
       session = null;
       active = false;
       if (wasActive) {
-        document.body.style.userSelect = restoreUserSelect;
-        document.body.removeAttribute("data-dragging");
+        unlockPage();
         swallowNextClick();
       }
       if (finished && wasActive) opts.onEnd?.(finished, cancelled);
@@ -985,15 +1053,39 @@ var detent = (() => {
     };
   }
 
+  // src/core/scale.ts
+  var NONE = { x: 1, y: 1 };
+  function scaleOf(el) {
+    const rect = el.getBoundingClientRect();
+    const width = el.offsetWidth;
+    const height = el.offsetHeight;
+    if (!width || !height || !rect.width || !rect.height) return NONE;
+    return { x: rect.width / width, y: rect.height / height };
+  }
+  function unscale(delta, scale) {
+    if (scale.x === 1 && scale.y === 1) return delta;
+    return { x: delta.x / scale.x, y: delta.y / scale.y };
+  }
+  function unscaleBox(box, scale) {
+    if (scale.x === 1 && scale.y === 1) return box;
+    return {
+      left: box.left / scale.x,
+      top: box.top / scale.y,
+      width: box.width / scale.x,
+      height: box.height / scale.y
+    };
+  }
+
   // src/draggable.ts
-  var DRAGGING_CLASS = "dk-dragging";
   function draggable(el, options = {}) {
-    const grid = options.grid ? typeof options.grid === "number" ? [options.grid, options.grid] : options.grid : null;
+    invariant(el instanceof HTMLElement, `draggable() needs an HTMLElement, got ${typeof el}`);
+    const grid = normaliseGrid(options.grid);
     let disabled = options.disabled ?? false;
     let origin = { left: 0, top: 0, width: 0, height: 0 };
     let limit = null;
     let startOffset = { x: 0, y: 0 };
     let gridOrigin = { x: 0, y: 0 };
+    let scale = { x: 1, y: 1 };
     function resolveGridOrigin(area) {
       if (options.gridOrigin === "viewport") return { x: 0, y: 0 };
       const source = options.gridOrigin && typeof options.gridOrigin !== "string" ? options.gridOrigin : options.bounds instanceof Element ? options.bounds : options.bounds === "parent" ? el.parentElement : el.offsetParent ?? el.parentElement;
@@ -1020,22 +1112,28 @@ var detent = (() => {
         if (disabled) return false;
         const state = stateOf(el);
         const visual = boxOf(el);
+        scale = scaleOf(el);
         startOffset = { x: state.x, y: state.y };
-        origin = {
-          left: visual.left - state.x,
-          top: visual.top - state.y,
-          width: visual.width,
-          height: visual.height
-        };
-        limit = resolveBounds(el, options.bounds ?? null);
+        origin = unscaleBox(
+          {
+            left: visual.left - state.x * scale.x,
+            top: visual.top - state.y * scale.y,
+            width: visual.width,
+            height: visual.height
+          },
+          scale
+        );
+        const area = resolveBounds(el, options.bounds ?? null);
+        limit = area ? unscaleBox(area, scale) : null;
         gridOrigin = grid ? resolveGridOrigin(limit) : { x: 0, y: 0 };
-        el.classList.add(DRAGGING_CLASS);
+        el.classList.add(CLASS.dragging);
         return options.onStart?.(payload(session));
       },
       onMove(session) {
         const state = stateOf(el);
-        let x = options.axis === "y" ? startOffset.x : startOffset.x + session.delta.x;
-        let y = options.axis === "x" ? startOffset.y : startOffset.y + session.delta.y;
+        const delta = unscale(session.delta, scale);
+        let x = options.axis === "y" ? startOffset.x : startOffset.x + delta.x;
+        let y = options.axis === "x" ? startOffset.y : startOffset.y + delta.y;
         if (grid) {
           x = snap(origin.left + x, grid[0], gridOrigin.x) - origin.left;
           y = snap(origin.top + y, grid[1], gridOrigin.y) - origin.top;
@@ -1054,7 +1152,7 @@ var detent = (() => {
           state.y = startOffset.y;
           paint(el);
         }
-        el.classList.remove(DRAGGING_CLASS);
+        el.classList.remove(CLASS.dragging);
         options.onEnd?.(payload(session), cancelled);
       }
     });
@@ -1076,15 +1174,15 @@ var detent = (() => {
       },
       destroy() {
         pointer.destroy();
-        el.classList.remove(DRAGGING_CLASS);
+        el.classList.remove(CLASS.dragging);
       }
     };
   }
 
   // src/core/autoscroll.ts
   function createAutoScroll(target, options = {}) {
-    const threshold = options.threshold ?? 60;
-    const speed = options.speed ?? 14;
+    const threshold = options.threshold ?? DEFAULTS.scrollThreshold;
+    const speed = options.speed ?? DEFAULTS.scrollSpeed;
     let pointer = null;
     let frame2 = 0;
     function ramp(gap) {
@@ -1105,8 +1203,7 @@ var detent = (() => {
       if (dx || dy) {
         const beforeTop = scroller.scrollTop;
         const beforeLeft = scroller.scrollLeft;
-        scroller.scrollTop += dy;
-        scroller.scrollLeft += dx;
+        scroller.scrollBy({ top: dy, left: dx, behavior: "instant" });
         if (scroller.scrollTop !== beforeTop || scroller.scrollLeft !== beforeLeft) {
           options.onScroll?.();
         }
@@ -1135,9 +1232,9 @@ var detent = (() => {
     for (const el of elements) map.set(el, boxOf(el));
     return map;
   }
-  function play(before, duration = 180) {
+  function play(before, duration = DEFAULTS.animation) {
     if (!canAnimate() || reducedMotion() || duration <= 0) return;
-    for (const [el, from] of before) {
+    for (const el of before.keys()) {
       running.get(el)?.cancel();
       running.delete(el);
     }
@@ -1156,29 +1253,72 @@ var detent = (() => {
     }
   }
 
-  // src/sortable.ts
-  var registry = /* @__PURE__ */ new Set();
-  var SORTING_CLASS = "dk-sorting";
+  // src/core/scroll.ts
+  var SCROLLS = /auto|scroll|overlay/;
+  function scrolls(el) {
+    const style = getComputedStyle(el);
+    return SCROLLS.test(style.overflowY) || SCROLLS.test(style.overflowX);
+  }
+  function walk(el, stopAtFirst) {
+    const out = [];
+    let node = el.parentElement;
+    while (node && node !== document.body && node !== document.documentElement) {
+      if (scrolls(node)) {
+        out.push(node);
+        if (stopAtFirst) return out;
+      }
+      node = node.parentElement;
+    }
+    return out;
+  }
+  function scrollAncestorsOf(el) {
+    return walk(el, false);
+  }
+  function scrollParentOf(el) {
+    return walk(el, true)[0] ?? null;
+  }
+  function totalScroll(ancestors) {
+    let x = typeof window === "undefined" ? 0 : window.scrollX;
+    let y = typeof window === "undefined" ? 0 : window.scrollY;
+    for (const node of ancestors) {
+      x += node.scrollLeft;
+      y += node.scrollTop;
+    }
+    return { x, y };
+  }
+
+  // src/sortable/live-region.ts
+  var HIDDEN = "position:fixed;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap";
+  var region = null;
+  var holders = 0;
+  function acquireLiveRegion() {
+    if (holders++ > 0) return;
+    region = document.createElement("div");
+    region.setAttribute(ATTR.liveRegion, "");
+    region.setAttribute("aria-live", "assertive");
+    region.setAttribute("aria-atomic", "true");
+    region.style.cssText = HIDDEN;
+    document.body.appendChild(region);
+  }
+  function releaseLiveRegion() {
+    if (holders === 0) return;
+    if (--holders > 0) return;
+    region?.remove();
+    region = null;
+  }
+  function announce(message) {
+    if (region) region.textContent = message;
+  }
+
+  // src/sortable/place.ts
   function childrenOf(instance) {
     const { container, options } = instance;
     const nodes = options.items ? container.querySelectorAll(options.items) : container.children;
     const out = [];
     for (const node of Array.from(nodes)) {
-      if (node instanceof HTMLElement && !node.hasAttribute("data-dk-ignore")) out.push(node);
+      if (node instanceof HTMLElement && !node.hasAttribute(ATTR.ignore)) out.push(node);
     }
     return out;
-  }
-  function announce(message) {
-    let region = document.getElementById("dk-live-region");
-    if (!region) {
-      region = document.createElement("div");
-      region.id = "dk-live-region";
-      region.setAttribute("aria-live", "assertive");
-      region.setAttribute("aria-atomic", "true");
-      region.style.cssText = "position:fixed;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap";
-      document.body.appendChild(region);
-    }
-    region.textContent = message;
   }
   function placeAt(container, item, siblings, index) {
     const before = siblings[index] ?? null;
@@ -1187,13 +1327,104 @@ var detent = (() => {
     container.insertBefore(item, before);
     return true;
   }
+
+  // src/sortable/keyboard.ts
+  function bindKeyboard(instance, deps) {
+    const { container } = instance;
+    let lifted = null;
+    let liftedFrom = 0;
+    function onKeyDown(event) {
+      if (deps.isDisabled()) return;
+      const target = event.target;
+      if (!target) return;
+      const list = instance.items();
+      const current = lifted ?? list.find((node) => node === target || node.contains(target)) ?? null;
+      if (!current) return;
+      const index = list.indexOf(current);
+      if (event.key === " " || event.key === "Enter") {
+        event.preventDefault();
+        if (lifted) {
+          const to = list.indexOf(lifted);
+          lifted.classList.remove(CLASS.sorting);
+          announce(`Dropped at position ${to + 1} of ${list.length}.`);
+          if (to !== liftedFrom) {
+            deps.onSort?.({
+              item: lifted,
+              from: { container, index: liftedFrom },
+              to: { container, index: to }
+            });
+          }
+          lifted = null;
+        } else {
+          lifted = current;
+          liftedFrom = index;
+          current.classList.add(CLASS.sorting);
+          announce(
+            `Lifted from position ${index + 1} of ${list.length}. Use the arrow keys to move.`
+          );
+        }
+        return;
+      }
+      if (event.key === "Escape" && lifted) {
+        event.preventDefault();
+        const siblings2 = list.filter((node) => node !== lifted);
+        const snapshot2 = record(list);
+        placeAt(container, lifted, siblings2, liftedFrom);
+        play(snapshot2, deps.animation);
+        lifted.classList.remove(CLASS.sorting);
+        announce("Move cancelled.");
+        lifted = null;
+        return;
+      }
+      if (!lifted) return;
+      const step = event.key === "ArrowDown" || event.key === "ArrowRight" ? 1 : event.key === "ArrowUp" || event.key === "ArrowLeft" ? -1 : 0;
+      if (!step) return;
+      event.preventDefault();
+      const next = Math.max(0, Math.min(list.length - 1, index + step));
+      if (next === index) return;
+      const siblings = list.filter((node) => node !== lifted);
+      const snapshot = record(list);
+      placeAt(container, lifted, siblings, next);
+      play(snapshot, deps.animation);
+      lifted.focus?.();
+      announce(`Position ${next + 1} of ${list.length}.`);
+    }
+    container.addEventListener("keydown", onKeyDown);
+    return {
+      destroy() {
+        container.removeEventListener("keydown", onKeyDown);
+        lifted?.classList.remove(CLASS.sorting);
+        lifted = null;
+      }
+    };
+  }
+
+  // src/sortable/registry.ts
+  var REGISTRY_KEY = /* @__PURE__ */ Symbol.for("detent.sortable.registry");
+  function store() {
+    const g = globalThis;
+    return g[REGISTRY_KEY] ?? (g[REGISTRY_KEY] = /* @__PURE__ */ new Set());
+  }
+  function registerList(instance) {
+    store().add(instance);
+  }
+  function unregisterList(instance) {
+    store().delete(instance);
+  }
+  function eachList() {
+    return store();
+  }
+
+  // src/sortable/index.ts
   function sortable(container, options = {}) {
-    const animation = options.animation ?? 180;
+    invariant(container instanceof HTMLElement, "sortable() needs an HTMLElement container");
+    const animation = options.animation ?? DEFAULTS.animation;
     const useKeyboard = options.keyboard !== false;
     let disabled = options.disabled ?? false;
     const instance = { container, options, items: () => childrenOf(instance) };
-    registry.add(instance);
-    container.classList.add("dk-sortable");
+    registerList(instance);
+    container.classList.add(CLASS.sortable);
+    if (useKeyboard) acquireLiveRegion();
     let item = null;
     let fromContainer = container;
     let fromIndex = 0;
@@ -1208,34 +1439,50 @@ var detent = (() => {
     let lastDelta = { x: 0, y: 0 };
     let restorePosition = "";
     let restoreZIndex = "";
+    let scale = { x: 1, y: 1 };
+    let rtl = false;
     let cachedSiblings = [];
     let cachedRects = [];
     let cacheHost = null;
+    let candidates = [];
     function refreshCache(target) {
       cacheHost = target;
+      measureCandidates();
       cachedSiblings = target.items().filter((node) => node !== item);
       cachedRects = cachedSiblings.map(boxOf);
       measuredScroll = totalScroll(scrollAncestors);
     }
-    function hostFor(point) {
-      if (contains(boxOf(host.container), point)) return host;
-      for (const candidate of registry) {
-        if (candidate === host) continue;
+    function measureCandidates() {
+      candidates = [];
+      for (const candidate of eachList()) {
         const sameGroup = candidate.options.group != null && candidate.options.group === instance.options.group;
-        const sameList = candidate === instance;
-        if (!sameGroup && !sameList) continue;
+        if (candidate !== instance && !sameGroup) continue;
         if (!candidate.container.isConnected) continue;
-        if (contains(boxOf(candidate.container), point)) return candidate;
+        candidates.push({ instance: candidate, box: boxOf(candidate.container) });
+      }
+    }
+    function hostFor(point) {
+      for (const candidate of candidates) {
+        if (candidate.instance === host && contains(candidate.box, point)) return host;
+      }
+      for (const candidate of candidates) {
+        if (contains(candidate.box, point)) return candidate.instance;
       }
       return host;
+    }
+    function boxOfHost(target) {
+      for (const candidate of candidates) {
+        if (candidate.instance === target) return candidate.box;
+      }
+      return boxOf(target.container);
     }
     function reanchor(visual, delta) {
       if (!item) return;
       const state = stateOf(item);
       item.style.transform = "";
       const base = boxOf(item);
-      state.x = visual.left - base.left;
-      state.y = visual.top - base.top;
+      state.x = (visual.left - base.left) / scale.x;
+      state.y = (visual.top - base.top) / scale.y;
       paintNow(item);
       anchorOffset = { x: state.x, y: state.y };
       anchorDelta = { ...delta };
@@ -1245,18 +1492,23 @@ var detent = (() => {
       if (!item) return;
       const state = stateOf(item);
       const scroll = totalScroll(scrollAncestors);
-      state.x = anchorOffset.x + (lastDelta.x - anchorDelta.x) + (scroll.x - anchorScroll.x);
-      state.y = anchorOffset.y + (lastDelta.y - anchorDelta.y) + (scroll.y - anchorScroll.y);
+      const travel = unscale(
+        { x: lastDelta.x - anchorDelta.x, y: lastDelta.y - anchorDelta.y },
+        scale
+      );
+      state.x = anchorOffset.x + travel.x + (scroll.x - anchorScroll.x);
+      state.y = anchorOffset.y + travel.y + (scroll.y - anchorScroll.y);
       paintNow(item);
       const target = hostFor(lastPoint);
       const scrolledSinceMeasure = scroll.x !== measuredScroll.x || scroll.y !== measuredScroll.y;
       if (target !== cacheHost || scrolledSinceMeasure) {
         host = target;
+        rtl = isRtl(target.container);
         refreshCache(target);
       }
-      if (!cachedRects.length && !contains(boxOf(target.container), lastPoint)) return;
+      if (!cachedRects.length && !contains(boxOfHost(target), lastPoint)) return;
       const axis = !target.options.direction || target.options.direction === "auto" ? detectAxis(cachedRects) : target.options.direction;
-      const index = resolveInsertIndex(cachedRects, lastPoint, axis);
+      const index = resolveInsertIndex(cachedRects, lastPoint, axis, rtl);
       const before = cachedSiblings[index] ?? null;
       const alreadyThere = before ? item.nextElementSibling === before && item.parentElement === target.container : item.parentElement === target.container && item.nextElementSibling === null;
       if (alreadyThere) return;
@@ -1268,44 +1520,67 @@ var detent = (() => {
       refreshCache(target);
       options.onMove?.(item, { container: target.container, index });
     }
+    function beginDrag(found, from, point, delta) {
+      item = found;
+      host = instance;
+      fromContainer = from.container;
+      fromIndex = from.index;
+      const state = stateOf(found);
+      anchorOffset = { x: state.x, y: state.y };
+      anchorDelta = { x: 0, y: 0 };
+      scale = scaleOf(found);
+      rtl = isRtl(container);
+      scrollAncestors = scrollAncestorsOf(found);
+      anchorScroll = totalScroll(scrollAncestors);
+      lastPoint = point;
+      lastDelta = delta;
+      window.addEventListener("scroll", applyMove, { capture: true, passive: true });
+      restorePosition = found.style.position;
+      restoreZIndex = found.style.zIndex;
+      if (getComputedStyle(found).position === "static") found.style.position = "relative";
+      found.style.zIndex = String(options.zIndex ?? DEFAULTS.zIndex);
+      found.classList.add(CLASS.sorting);
+      refreshCache(instance);
+      if (options.autoScroll !== false) {
+        scroller = createAutoScroll(scrollParentOf(found), {
+          ...typeof options.autoScroll === "object" ? options.autoScroll : {},
+          onScroll: applyMove
+        });
+      }
+    }
+    function endDrag() {
+      window.removeEventListener("scroll", applyMove, { capture: true });
+      scroller?.stop();
+      scroller = null;
+      if (item) {
+        item.style.position = restorePosition;
+        item.style.zIndex = restoreZIndex;
+        item.classList.remove(CLASS.sorting);
+      }
+      item = null;
+      cachedSiblings = [];
+      cachedRects = [];
+      cacheHost = null;
+      candidates = [];
+    }
+    const containerStyle = getComputedStyle(container);
     const scrollsItself = /auto|scroll|overlay/.test(
-      getComputedStyle(container).overflowY + getComputedStyle(container).overflowX
+      containerStyle.overflowY + containerStyle.overflowX
     );
     const pointer = bindPointer(container, {
       ...options,
       touchAction: options.touchAction ?? (scrollsItself ? "auto" : "none"),
       onStart(session) {
         if (disabled) return false;
-        const candidates = instance.items();
+        const siblings = instance.items();
         const found = session.path.find(
-          (node) => node instanceof HTMLElement && candidates.includes(node)
+          (node) => node instanceof HTMLElement && siblings.includes(node)
         );
         if (!found) return false;
-        item = found;
-        host = instance;
-        fromContainer = container;
-        fromIndex = candidates.indexOf(item);
-        const state = stateOf(item);
-        anchorOffset = { x: state.x, y: state.y };
-        anchorDelta = { x: 0, y: 0 };
-        scrollAncestors = scrollAncestorsOf(item);
-        anchorScroll = totalScroll(scrollAncestors);
-        lastPoint = session.point;
-        lastDelta = session.delta;
-        window.addEventListener("scroll", applyMove, { capture: true, passive: true });
-        restorePosition = item.style.position;
-        restoreZIndex = item.style.zIndex;
-        if (getComputedStyle(item).position === "static") item.style.position = "relative";
-        item.style.zIndex = String(options.zIndex ?? 20);
-        item.classList.add(SORTING_CLASS);
-        refreshCache(instance);
-        if (options.autoScroll !== false) {
-          scroller = createAutoScroll(scrollParentOf(item), {
-            ...typeof options.autoScroll === "object" ? options.autoScroll : {},
-            onScroll: applyMove
-          });
-        }
-        return options.onStart?.(item, { container: fromContainer, index: fromIndex });
+        const from = { container, index: siblings.indexOf(found) };
+        if (options.onStart?.(found, from) === false) return false;
+        beginDrag(found, from, session.point, session.delta);
+        return true;
       },
       onMove(session) {
         lastPoint = session.point;
@@ -1317,9 +1592,6 @@ var detent = (() => {
         if (!item) return;
         const dragged = item;
         const state = stateOf(dragged);
-        window.removeEventListener("scroll", applyMove, { capture: true });
-        scroller?.stop();
-        scroller = null;
         if (cancelled) {
           const siblings = childrenOf({ ...instance, container: fromContainer }).filter(
             (node) => node !== dragged
@@ -1331,16 +1603,10 @@ var detent = (() => {
         state.y = 0;
         paintNow(dragged);
         play(landing, animation);
-        dragged.style.position = restorePosition;
-        dragged.style.zIndex = restoreZIndex;
-        dragged.classList.remove(SORTING_CLASS);
         const toContainer = dragged.parentElement;
         const toIndex = childrenOf({ ...instance, container: toContainer }).indexOf(dragged);
         const moved = !cancelled && (toContainer !== fromContainer || toIndex !== fromIndex);
-        item = null;
-        cachedSiblings = [];
-        cachedRects = [];
-        cacheHost = null;
+        endDrag();
         if (moved) {
           options.onSort?.({
             item: dragged,
@@ -1351,69 +1617,18 @@ var detent = (() => {
         options.onEnd?.(dragged, cancelled);
       }
     });
-    let lifted = null;
-    let liftedFrom = 0;
-    function onKeyDown(event) {
-      if (!useKeyboard || disabled) return;
-      const target = event.target;
-      if (!target) return;
-      const list = instance.items();
-      const current = lifted ?? list.find((node) => node === target || node.contains(target)) ?? null;
-      if (!current) return;
-      const index = list.indexOf(current);
-      if (event.key === " " || event.key === "Enter") {
-        event.preventDefault();
-        if (lifted) {
-          const to = list.indexOf(lifted);
-          lifted.classList.remove(SORTING_CLASS);
-          announce(`Dropped at position ${to + 1} of ${list.length}.`);
-          if (to !== liftedFrom) {
-            options.onSort?.({
-              item: lifted,
-              from: { container, index: liftedFrom },
-              to: { container, index: to }
-            });
-          }
-          lifted = null;
-        } else {
-          lifted = current;
-          liftedFrom = index;
-          current.classList.add(SORTING_CLASS);
-          announce(`Lifted from position ${index + 1} of ${list.length}. Use the arrow keys to move.`);
-        }
-        return;
-      }
-      if (event.key === "Escape" && lifted) {
-        event.preventDefault();
-        const siblings2 = list.filter((node) => node !== lifted);
-        const snapshot2 = record(list);
-        placeAt(container, lifted, siblings2, liftedFrom);
-        play(snapshot2, animation);
-        lifted.classList.remove(SORTING_CLASS);
-        announce("Move cancelled.");
-        lifted = null;
-        return;
-      }
-      if (!lifted) return;
-      const step = event.key === "ArrowDown" || event.key === "ArrowRight" ? 1 : event.key === "ArrowUp" || event.key === "ArrowLeft" ? -1 : 0;
-      if (!step) return;
-      event.preventDefault();
-      const next = Math.max(0, Math.min(list.length - 1, index + step));
-      if (next === index) return;
-      const siblings = list.filter((node) => node !== lifted);
-      const snapshot = record(list);
-      placeAt(container, lifted, siblings, next);
-      play(snapshot, animation);
-      lifted.focus?.();
-      announce(`Position ${next + 1} of ${list.length}.`);
-    }
-    container.addEventListener("keydown", onKeyDown);
+    const keyboard = useKeyboard ? bindKeyboard(instance, {
+      animation,
+      isDisabled: () => disabled,
+      onSort: options.onSort
+    }) : null;
     return {
       destroy() {
         pointer.destroy();
-        container.removeEventListener("keydown", onKeyDown);
-        container.classList.remove("dk-sortable");
-        registry.delete(instance);
+        keyboard?.destroy();
+        if (useKeyboard) releaseLiveRegion();
+        container.classList.remove(CLASS.sortable);
+        unregisterList(instance);
       }
     };
   }
@@ -1422,6 +1637,18 @@ var detent = (() => {
   }
 
   // src/core/resize-math.ts
+  function reconcileAspect(width, height, aspect, limits) {
+    const fromWidth = { width, height: width / aspect };
+    const fromHeight = { width: height * aspect, height };
+    const widthLegal = fromWidth.height >= limits.minHeight && fromWidth.height <= limits.maxHeight;
+    const heightLegal = fromHeight.width >= limits.minWidth && fromHeight.width <= limits.maxWidth;
+    if (widthLegal && heightLegal) {
+      return fromWidth.width * fromWidth.height <= fromHeight.width * fromHeight.height ? fromWidth : fromHeight;
+    }
+    if (widthLegal) return fromWidth;
+    if (heightLegal) return fromHeight;
+    return { width, height };
+  }
   function computeResize(input) {
     const { startWidth, startHeight, dirX, dirY, delta, limits, aspect, grid } = input;
     let width = dirX === 0 ? startWidth : startWidth + delta.x * dirX;
@@ -1444,21 +1671,7 @@ var detent = (() => {
     width = clamp(width, limits.minWidth, limits.maxWidth);
     height = clamp(height, limits.minHeight, limits.maxHeight);
     if (aspect && aspect > 0) {
-      const fromWidth = { width, height: width / aspect };
-      const fromHeight = { width: height * aspect, height };
-      const widthLegal = fromWidth.height >= limits.minHeight && fromWidth.height <= limits.maxHeight;
-      const heightLegal = fromHeight.width >= limits.minWidth && fromHeight.width <= limits.maxWidth;
-      if (widthLegal && heightLegal) {
-        const pick = fromWidth.width * fromWidth.height <= fromHeight.width * fromHeight.height ? fromWidth : fromHeight;
-        width = pick.width;
-        height = pick.height;
-      } else if (widthLegal) {
-        width = fromWidth.width;
-        height = fromWidth.height;
-      } else if (heightLegal) {
-        width = fromHeight.width;
-        height = fromHeight.height;
-      }
+      ({ width, height } = reconcileAspect(width, height, aspect, limits));
     }
     return {
       width,
@@ -1482,38 +1695,62 @@ var detent = (() => {
   }
   var ALL_HANDLES = ["n", "e", "s", "w", "ne", "nw", "se", "sw"];
 
-  // src/resizable.ts
-  var RESIZING_CLASS = "dk-resizing";
-  function resizable(el, options = {}) {
-    const supplied = Array.isArray(options.handles) || !options.handles ? null : options.handles;
-    const names = supplied ? Object.keys(supplied) : options.handles ?? ALL_HANDLES;
-    const grid = options.grid ? typeof options.grid === "number" ? [options.grid, options.grid] : options.grid : null;
-    let disabled = options.disabled ?? false;
-    const restorePosition = el.style.position;
-    if (!supplied && getComputedStyle(el).position === "static") el.style.position = "relative";
-    el.classList.add("dk-resizable");
-    const bindings = [];
-    const created = [];
+  // src/resizable/handles.ts
+  function anchor(node) {
+    node.style.position = "absolute";
+    node.style.touchAction = "none";
+  }
+  function resolveHandles(el, spec) {
+    const supplied = Array.isArray(spec) || !spec ? null : spec;
+    const names = supplied ? Object.keys(supplied) : spec ?? ALL_HANDLES;
+    const out = [];
     for (const name of names) {
       const direction = directionOf(name);
+      invariant(direction, `resizable() got an unknown handle name: ${String(name)}`);
       if (!direction) continue;
-      let node;
       if (supplied) {
         const target = supplied[name];
-        node = typeof target === "string" ? el.querySelector(target) : target ?? null;
+        const node = typeof target === "string" ? el.querySelector(target) : target ?? null;
+        invariant(node, `resizable() could not find the handle element for "${name}"`);
         if (!node) continue;
-        node.setAttribute("data-dk-handle", name);
+        node.setAttribute(ATTR.handle, name);
+        anchor(node);
+        out.push({ name, node, direction, created: false });
       } else {
-        node = document.createElement("span");
-        node.className = `dk-handle dk-handle-${name}`;
-        node.setAttribute("data-dk-handle", name);
+        const node = document.createElement("span");
+        node.className = `${CLASS.handle} ${handleClass(name)}`;
+        node.setAttribute(ATTR.handle, name);
         node.setAttribute("aria-hidden", "true");
+        anchor(node);
         el.appendChild(node);
-        created.push(node);
+        out.push({ name, node, direction, created: true });
       }
-      bindings.push(bindHandle(node, name, direction));
     }
-    function bindHandle(node, name, [dirX, dirY]) {
+    return out;
+  }
+
+  // src/resizable/index.ts
+  function resizable(el, options = {}) {
+    invariant(el instanceof HTMLElement, `resizable() needs an HTMLElement, got ${typeof el}`);
+    invariant(
+      (options.maxWidth ?? Infinity) >= (options.minWidth ?? DEFAULTS.minSize),
+      "resizable() maxWidth is below minWidth"
+    );
+    invariant(
+      (options.maxHeight ?? Infinity) >= (options.minHeight ?? DEFAULTS.minSize),
+      "resizable() maxHeight is below minHeight"
+    );
+    const grid = normaliseGrid(options.grid);
+    let disabled = options.disabled ?? false;
+    const handles = resolveHandles(el, options.handles);
+    const createdAny = handles.some((handle) => handle.created);
+    let restorePosition = null;
+    if (createdAny && getComputedStyle(el).position === "static") {
+      restorePosition = el.style.position;
+      el.style.position = "relative";
+    }
+    el.classList.add(CLASS.resizable);
+    function bindHandle({ node, name, direction: [dirX, dirY] }) {
       let startWidth = 0;
       let startHeight = 0;
       let startX = 0;
@@ -1527,6 +1764,7 @@ var detent = (() => {
         maxHeight: Infinity
       };
       let aspect = null;
+      let scale = { x: 1, y: 1 };
       function payload(event, cancel) {
         const state = stateOf(el);
         return {
@@ -1547,20 +1785,22 @@ var detent = (() => {
           if (disabled) return false;
           const state = stateOf(el);
           const visual = boxOf(el);
-          startWidth = visual.width;
-          startHeight = visual.height;
+          scale = scaleOf(el);
+          startWidth = visual.width / scale.x;
+          startHeight = visual.height / scale.y;
           startX = state.x;
           startY = state.y;
-          originLeft = visual.left - state.x;
-          originTop = visual.top - state.y;
+          originLeft = visual.left / scale.x - state.x;
+          originTop = visual.top / scale.y - state.y;
           aspect = options.aspectRatio === true ? startWidth / startHeight : typeof options.aspectRatio === "number" ? options.aspectRatio : null;
           limits = {
-            minWidth: options.minWidth ?? 16,
-            minHeight: options.minHeight ?? 16,
+            minWidth: options.minWidth ?? DEFAULTS.minSize,
+            minHeight: options.minHeight ?? DEFAULTS.minSize,
             maxWidth: options.maxWidth ?? Infinity,
             maxHeight: options.maxHeight ?? Infinity
           };
-          const area = resolveBounds(el, options.bounds ?? null);
+          const rendered = resolveBounds(el, options.bounds ?? null);
+          const area = rendered ? unscaleBox(rendered, scale) : null;
           if (area) {
             const left = originLeft + startX;
             const top = originTop + startY;
@@ -1569,7 +1809,7 @@ var detent = (() => {
             if (dirY > 0) limits.maxHeight = Math.min(limits.maxHeight, area.top + area.height - top);
             if (dirY < 0) limits.maxHeight = Math.min(limits.maxHeight, top + startHeight - area.top);
           }
-          el.classList.add(RESIZING_CLASS);
+          el.classList.add(CLASS.resizing);
           return options.onStart?.(payload(session.event, session.cancel));
         },
         onMove(session) {
@@ -1578,7 +1818,7 @@ var detent = (() => {
             startHeight,
             dirX,
             dirY,
-            delta: session.delta,
+            delta: unscale(session.delta, scale),
             limits,
             aspect,
             grid
@@ -1600,23 +1840,29 @@ var detent = (() => {
             state.y = startY;
             paint(el);
           }
-          el.classList.remove(RESIZING_CLASS);
+          el.classList.remove(CLASS.resizing);
           options.onEnd?.(payload(session.event, session.cancel), cancelled);
         }
       });
     }
+    const bindings = handles.map(bindHandle);
     return {
       setDisabled(next) {
         disabled = next;
       },
       destroy() {
         for (const binding of bindings) binding.destroy();
-        for (const node of created) node.remove();
-        if (supplied) {
-          for (const name of names) el.querySelector(`[data-dk-handle="${name}"]`)?.removeAttribute("data-dk-handle");
+        for (const handle of handles) {
+          if (handle.created) {
+            handle.node.remove();
+          } else {
+            handle.node.removeAttribute(ATTR.handle);
+            handle.node.style.position = "";
+            handle.node.style.touchAction = "";
+          }
         }
-        el.style.position = restorePosition;
-        el.classList.remove("dk-resizable", RESIZING_CLASS);
+        if (restorePosition !== null) el.style.position = restorePosition;
+        el.classList.remove(CLASS.resizable, CLASS.resizing);
       }
     };
   }
@@ -1662,7 +1908,7 @@ function heroPaint() {
 
 draggable(heroCard, {
   bounds: 'parent',
-  cancel: '.dk-handle',
+  cancel: '.detent-handle',
   onStart: () => log('drag:start', 'hero card'),
   onMove: heroPaint,
   onEnd: (e, cancelled) => log('drag:end', cancelled ? 'cancelled' : `${round(e.offset.x)}, ${round(e.offset.y)}`),
@@ -1883,7 +2129,7 @@ canvasPaint();
 window.addEventListener('resize', canvasPaint);
 
 // ---------- size table ----------
-document.getElementById('sizes').innerHTML = "<span>everything <b>5.83 KB</b> gzipped</span><span>draggable <b>1.96 KB</b> gzipped</span><span>sortable <b>3.91 KB</b> gzipped</span><span>resizable <b>2.61 KB</b> gzipped</span>";
+document.getElementById('sizes').innerHTML = "<span>everything <b>6.73 KB</b> gzipped</span><span>draggable <b>2.35 KB</b> gzipped</span><span>sortable <b>4.62 KB</b> gzipped</span><span>resizable <b>3.11 KB</b> gzipped</span>";
 })();
 </script>
 </body>

@@ -1,62 +1,75 @@
-/* Everything here is overridable. Nothing sets a colour except the handles,
-   which use currentColor so they inherit from whatever they sit inside. */
+/*
+ * Everything here is overridable on purpose.
+ *
+ * The whole sheet sits in a cascade layer, and unlayered author CSS beats
+ * layered author CSS at any specificity — so a plain `.detent-handle { ... }`
+ * in your own stylesheet wins with no specificity war and no !important.
+ * The library uses !important nowhere.
+ *
+ * The three declarations the library cannot work without — a handle's
+ * `position` and `touch-action`, and a static target's `position` — are not
+ * here. They are written inline at element creation time, where no host
+ * stylesheet can reach them. This sheet governs appearance only, and the
+ * library stays functional if you never load it.
+ */
 
-.dk-resizable {
-  box-sizing: border-box;
-}
+@layer detent {
+  .detent-resizable {
+    box-sizing: border-box;
+  }
 
-.dk-handle {
-  position: absolute;
-  touch-action: none;
-  --dk-handle-size: 12px;
-  --dk-handle-inset: calc(var(--dk-handle-size) / -2);
-}
+  .detent-handle {
+    --detent-handle-size: 12px;
+    --detent-handle-inset: calc(var(--detent-handle-size) / -2);
+  }
 
-.dk-handle-n,
-.dk-handle-s {
-  left: var(--dk-handle-size);
-  right: var(--dk-handle-size);
-  height: var(--dk-handle-size);
-  cursor: ns-resize;
-}
-.dk-handle-e,
-.dk-handle-w {
-  top: var(--dk-handle-size);
-  bottom: var(--dk-handle-size);
-  width: var(--dk-handle-size);
-  cursor: ew-resize;
-}
+  .detent-handle-n,
+  .detent-handle-s {
+    left: var(--detent-handle-size);
+    right: var(--detent-handle-size);
+    height: var(--detent-handle-size);
+    cursor: ns-resize;
+  }
 
-.dk-handle-n { top: var(--dk-handle-inset); }
-.dk-handle-s { bottom: var(--dk-handle-inset); }
-.dk-handle-e { right: var(--dk-handle-inset); }
-.dk-handle-w { left: var(--dk-handle-inset); }
+  .detent-handle-e,
+  .detent-handle-w {
+    top: var(--detent-handle-size);
+    bottom: var(--detent-handle-size);
+    width: var(--detent-handle-size);
+    cursor: ew-resize;
+  }
 
-.dk-handle-ne,
-.dk-handle-nw,
-.dk-handle-se,
-.dk-handle-sw {
-  width: var(--dk-handle-size);
-  height: var(--dk-handle-size);
-}
+  .detent-handle-n { top: var(--detent-handle-inset); }
+  .detent-handle-s { bottom: var(--detent-handle-inset); }
+  .detent-handle-e { right: var(--detent-handle-inset); }
+  .detent-handle-w { left: var(--detent-handle-inset); }
 
-.dk-handle-ne { top: var(--dk-handle-inset); right: var(--dk-handle-inset); cursor: nesw-resize; }
-.dk-handle-nw { top: var(--dk-handle-inset); left: var(--dk-handle-inset); cursor: nwse-resize; }
-.dk-handle-se { bottom: var(--dk-handle-inset); right: var(--dk-handle-inset); cursor: nwse-resize; }
-.dk-handle-sw { bottom: var(--dk-handle-inset); left: var(--dk-handle-inset); cursor: nesw-resize; }
+  .detent-handle-ne,
+  .detent-handle-nw,
+  .detent-handle-se,
+  .detent-handle-sw {
+    width: var(--detent-handle-size);
+    height: var(--detent-handle-size);
+  }
 
-.dk-dragging,
-.dk-sorting {
-  will-change: transform;
-}
+  .detent-handle-ne { top: var(--detent-handle-inset); right: var(--detent-handle-inset); cursor: nesw-resize; }
+  .detent-handle-nw { top: var(--detent-handle-inset); left: var(--detent-handle-inset); cursor: nwse-resize; }
+  .detent-handle-se { bottom: var(--detent-handle-inset); right: var(--detent-handle-inset); cursor: nwse-resize; }
+  .detent-handle-sw { bottom: var(--detent-handle-inset); left: var(--detent-handle-inset); cursor: nesw-resize; }
 
-[data-dragging] {
-  cursor: grabbing;
-}
+  .detent-dragging,
+  .detent-sorting {
+    will-change: transform;
+  }
 
-@media (prefers-reduced-motion: reduce) {
-  .dk-dragging,
-  .dk-sorting {
-    will-change: auto;
+  [data-detent-dragging] {
+    cursor: grabbing;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .detent-dragging,
+    .detent-sorting {
+      will-change: auto;
+    }
   }
 }

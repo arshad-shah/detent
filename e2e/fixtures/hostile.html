@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- The fixtures import library source directly, so the dev flag the bundler
+     would normally define has to be declared here. -->
+<script>window.__DEV__ = true;</script>
+<title>detent — hostile host page</title>
+<link rel="stylesheet" href="/src/styles.css">
+<style>
+  /* Every one of these is something a real site does. */
+  * { box-sizing: border-box; position: static; touch-action: auto; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; font: 14px system-ui; }
+  header { position: sticky; top: 0; z-index: 9999; background: #eee; padding: 8px; }
+
+  ul { margin: 0; padding: 0; list-style: none; }
+  li { height: 48px; border: 1px solid #ccc; background: #fff; }
+
+  #scaled { transform: scale(0.75); transform-origin: 0 0; width: 400px; }
+  #rtl { direction: rtl; display: flex; width: 300px; }
+  #rtl li { width: 100px; height: 60px; flex: 0 0 auto; }
+  #tall { overflow: auto; height: 200px; width: 260px; }
+
+  /* A host page restyling the library's handles. Must win: no !important. */
+  .detent-handle { background: rgb(255, 0, 0); }
+
+  #box { width: 200px; height: 150px; border: 2px solid #333; }
+</style>
+</head>
+<body>
+  <header id="chrome">sticky site chrome</header>
+
+  <h2>plain list</h2>
+  <ul id="plain"><li data-id="a">a</li><li data-id="b">b</li><li data-id="c">c</li></ul>
+
+  <h2>inside a scaled stage</h2>
+  <div id="scaled"><ul id="scaled-list"><li data-id="a">a</li><li data-id="b">b</li><li data-id="c">c</li></ul></div>
+
+  <h2>rtl row</h2>
+  <ul id="rtl"><li data-id="a">a</li><li data-id="b">b</li><li data-id="c">c</li></ul>
+
+  <h2>scrolling list</h2>
+  <div id="tall"><ul id="tall-list"></ul></div>
+
+  <h2>shadow host</h2>
+  <div id="shadow-host"></div>
+
+  <h2>resizable</h2>
+  <div id="box"></div>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>
