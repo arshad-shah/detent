@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { bindPointer } from '../src/core/pointer';
+import { bindPointer } from '../../src/core/pointer';
 import { press } from './helpers';
 
 let el: HTMLElement;

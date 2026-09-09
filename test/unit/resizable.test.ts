@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { resizable } from '../src/resizable';
-import { resetState } from '../src/core/box';
+import { resizable } from '../../src/resizable';
+import { resetState } from '../../src/core/box';
 import { layout, offsetOf, press } from './helpers';
 
 let el: HTMLElement;

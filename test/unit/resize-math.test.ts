@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ALL_HANDLES, computeResize, directionOf } from '../src/core/resize-math';
+import { ALL_HANDLES, computeResize, directionOf } from '../../src/core/resize-math';
 
 const free = { minWidth: 0, minHeight: 0, maxWidth: Infinity, maxHeight: Infinity };
 
