@@ -1,0 +1,6 @@
+{
+  "comment": "Gzipped ceilings in bytes. Raise deliberately, and say why in the changeset.",
+  "budgets": {
+    "dist/index.js": 700
+  }
+}

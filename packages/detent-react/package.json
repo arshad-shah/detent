@@ -1,0 +1,68 @@
+{
+  "name": "detent-react",
+  "version": "0.0.0",
+  "description": "React bindings for detent — drag, reorder and resize.",
+  "type": "module",
+  "sideEffects": false,
+  "license": "MIT",
+  "author": "Arshad Shah",
+  "homepage": "https://detent.arshadshah.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arshad-shah/detent.git",
+    "directory": "packages/detent-react"
+  },
+  "bugs": "https://github.com/arshad-shah/detent/issues",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "node build.mjs",
+    "size": "node scripts/size-check.mjs",
+    "test": "pnpm test:browser",
+    "test:browser": "vitest run --project browser",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.test.json"
+  },
+  "dependencies": {
+    "detent": "workspace:^"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.2.0",
+    "@vitest/browser": "^5.0.0",
+    "@vitest/browser-playwright": "^5.0.0",
+    "esbuild": "^0.28.2",
+    "playwright": "^1.63.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "typescript": "^7.0.2",
+    "vite": "^7.3.6",
+    "vitest": "^5.0.0"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "keywords": [
+    "react",
+    "drag",
+    "sortable",
+    "resize",
+    "hooks",
+    "detent"
+  ]
+}
