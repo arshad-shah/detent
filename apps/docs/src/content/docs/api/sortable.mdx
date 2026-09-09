@@ -9,7 +9,7 @@ Reorder a list. `direction: 'auto'` reads the layout from where the items sit,
 so a row, a column and a wrapping grid all work without configuration.
 
 ```js
-import { sortable } from 'detent';
+import { sortable } from '@arshad-shah/detent';
 
 sortable(list, {
   animation: 180,
@@ -101,7 +101,7 @@ sortable(list, {
 ## Reading the order
 
 ```js
-import { orderOf } from 'detent';
+import { orderOf } from '@arshad-shah/detent';
 
 orderOf(list);           // HTMLElement[] in current DOM order
 orderOf(list, '.card');  // only children matching a selector

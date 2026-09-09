@@ -6,7 +6,7 @@ import {
   type Handle,
   type ResizableOptions,
   type SortableOptions,
-} from 'detent';
+} from '@arshad-shah/detent';
 
 /** The contract Svelte expects back from an action. */
 export interface Action<Options> {

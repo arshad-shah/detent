@@ -1,16 +1,16 @@
 # detent-svelte
 
-Svelte actions for [detent](https://www.npmjs.com/package/detent) — drag,
+Svelte actions for [detent](https://www.npmjs.com/package/@arshad-shah/detent) — drag,
 reorder and resize with no dependencies.
 
 ```bash
-npm install detent detent-svelte
+npm install @arshad-shah/detent @arshad-shah/detent-svelte
 ```
 
 ```svelte
 <script>
-  import { sortable } from 'detent-svelte';
-  import 'detent/styles.css';
+  import { sortable } from '@arshad-shah/detent-svelte';
+  import '@arshad-shah/detent/styles.css';
 
   let items = $state([
     { id: 1, label: 'first' },

@@ -4,12 +4,12 @@ description: Custom elements that work in any framework, or none.
 ---
 
 ```bash
-npm install detent detent-elements
+npm install @arshad-shah/detent @arshad-shah/detent-elements
 ```
 
 ```html
 <script type="module">
-  import { defineDetentElements } from 'detent-elements';
+  import { defineDetentElements } from '@arshad-shah/detent-elements';
   defineDetentElements();
 </script>
 <link rel="stylesheet" href="/node_modules/detent/dist/styles.css">

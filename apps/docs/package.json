@@ -12,7 +12,7 @@
   },
   "typescriptComment": "Pinned to 6.x: astro check needs TypeScript's programmatic API, which the native 7.x compiler does not expose yet. The published packages still build with 7. See https://github.com/withastro/roadmap/discussions/1321",
   "dependencies": {
-    "detent": "workspace:^"
+    "@arshad-shah/detent": "workspace:^"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",

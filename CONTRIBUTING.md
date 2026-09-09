@@ -4,7 +4,7 @@
 
 ```bash
 pnpm install
-pnpm -F detent exec playwright install chromium firefox webkit
+pnpm -F @arshad-shah/detent exec playwright install chromium firefox webkit
 ```
 
 Node 24 and pnpm 11. The library lives in `packages/detent`; the repository
@@ -82,7 +82,7 @@ is a chicken-and-egg step:
 
 ```bash
 npm login
-pnpm -F detent build
+pnpm -F @arshad-shah/detent build
 cd packages/detent && npm publish --access public --provenance
 ```
 

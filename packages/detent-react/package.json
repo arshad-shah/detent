@@ -1,7 +1,7 @@
 {
-  "name": "detent-react",
+  "name": "@arshad-shah/detent-react",
   "version": "0.2.0",
-  "description": "React bindings for detent — drag, reorder and resize.",
+  "description": "React bindings for detent \u2014 drag, reorder and resize.",
   "type": "module",
   "sideEffects": false,
   "license": "MIT",
@@ -37,7 +37,7 @@
     "typecheck": "tsc --noEmit && tsc -p tsconfig.test.json"
   },
   "dependencies": {
-    "detent": "workspace:^"
+    "@arshad-shah/detent": "workspace:^"
   },
   "devDependencies": {
     "@types/node": "^24.13.3",
@@ -63,6 +63,9 @@
     "sortable",
     "resize",
     "hooks",
-    "detent"
-  ]
+    "@arshad-shah/detent"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
 }

@@ -1,5 +1,5 @@
 ---
-'detent': patch
+'@arshad-shah/detent': patch
 ---
 
 Six defects found by an adversarial review and reproduced as failing tests.

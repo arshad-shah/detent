@@ -1,4 +1,4 @@
-import { resizable, sortable } from 'detent';
+import { resizable, sortable } from '@arshad-shah/detent';
 
 /** All three ideas in one stage: a sortable list beside a resizable panel. */
 export default function mount(stage: HTMLElement): () => void {

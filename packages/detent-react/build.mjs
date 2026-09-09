@@ -12,7 +12,7 @@ const shared = {
   minify: true,
   target: 'es2020',
   define: { __DEV__: 'false' },
-  external: ['detent', 'react', 'react/jsx-runtime', 'svelte'],
+  external: ['@arshad-shah/detent', 'react', 'react/jsx-runtime', 'svelte'],
 };
 
 await build({ ...shared, format: 'esm', outfile: 'dist/index.js' });

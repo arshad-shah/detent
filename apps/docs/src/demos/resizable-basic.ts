@@ -1,4 +1,4 @@
-import { resizable } from 'detent';
+import { resizable } from '@arshad-shah/detent';
 
 export default function mount(stage: HTMLElement): () => void {
   const panel = stage.querySelector<HTMLElement>('.demo-panel');

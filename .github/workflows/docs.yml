@@ -30,7 +30,7 @@ jobs:
 
       # The site imports the library, whose types come from its emitted
       # declarations, so the core has to be built first.
-      - run: pnpm -F detent build
+      - run: pnpm -F @arshad-shah/detent build
 
       - run: pnpm -F docs build
 

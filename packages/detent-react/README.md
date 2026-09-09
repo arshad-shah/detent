@@ -1,14 +1,14 @@
 # detent-react
 
-React bindings for [detent](https://www.npmjs.com/package/detent) — drag,
+React bindings for [detent](https://www.npmjs.com/package/@arshad-shah/detent) — drag,
 reorder and resize with no dependencies.
 
 ```bash
-npm install detent detent-react
+npm install @arshad-shah/detent @arshad-shah/detent-react
 ```
 
 ```jsx
-import { useSortable } from 'detent-react';
+import { useSortable } from '@arshad-shah/detent-react';
 
 function List({ items, onReorder }) {
   const ref = useSortable({
@@ -55,7 +55,7 @@ interrupt it and callbacks are always the newest ones. You do not need
 ## Styles
 
 ```js
-import 'detent/styles.css';
+import '@arshad-shah/detent/styles.css';
 ```
 
 Required for resize handles, optional otherwise.

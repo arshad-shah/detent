@@ -1,4 +1,4 @@
-import { draggable } from 'detent';
+import { draggable } from '@arshad-shah/detent';
 
 /**
  * Mount the demo into `stage` and return a teardown function.

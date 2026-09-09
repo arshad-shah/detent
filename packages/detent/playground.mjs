@@ -8,7 +8,7 @@ const bundle = await build({
   entryPoints: ['src/index.ts'],
   bundle: true,
   format: 'iife',
-  globalName: 'detent',
+  globalName: '@arshad-shah/detent',
   target: 'es2020',
   // Same as the shipped build: invariant() and its messages are stripped.
   define: { __DEV__: 'false' },

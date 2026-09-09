@@ -1,4 +1,4 @@
-import { draggable } from 'detent';
+import { draggable } from '@arshad-shah/detent';
 
 export default function mount(stage: HTMLElement): () => void {
   const box = stage.querySelector<HTMLElement>('.demo-box');

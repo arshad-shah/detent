@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/arshad-shah/detent/main/brand/logo/detent-lockup.svg" alt="detent" height="48">
+<img src="https://raw.githubusercontent.com/arshad-shah/detent/main/brand/logo/detent-lockup.svg" alt="@arshad-shah/detent" height="48">
 
 Drag, reorder and resize for the web. No dependencies, no framework, one input
 path for mouse, touch and pen.
@@ -15,12 +15,12 @@ you feel when a dial lands on a setting. Brand assets live in
 | all three | 6.73 KB |
 
 ```bash
-npm install detent
+npm install @arshad-shah/detent
 ```
 
 ```js
-import { draggable, sortable, resizable } from 'detent';
-import 'detent/styles.css'; // required for resize handles; optional otherwise
+import { draggable, sortable, resizable } from '@arshad-shah/detent';
+import '@arshad-shah/detent/styles.css'; // required for resize handles; optional otherwise
 ```
 
 ## draggable
@@ -137,9 +137,9 @@ Full documentation, with demos you can drag, lives at
 
 | Package | What it gives you |
 | --- | --- |
-| [`detent-react`](https://www.npmjs.com/package/detent-react) | Hooks returning a callback ref. Re-rendering never re-binds. |
-| [`detent-svelte`](https://www.npmjs.com/package/detent-svelte) | `use:` actions with reactive options. |
-| [`detent-elements`](https://www.npmjs.com/package/detent-elements) | Custom elements. No peers — Angular, Vue, Astro, plain HTML. |
+| [`@arshad-shah/detent-react`](https://www.npmjs.com/package/@arshad-shah/detent-react) | Hooks returning a callback ref. Re-rendering never re-binds. |
+| [`@arshad-shah/detent-svelte`](https://www.npmjs.com/package/@arshad-shah/detent-svelte) | `use:` actions with reactive options. |
+| [`@arshad-shah/detent-elements`](https://www.npmjs.com/package/@arshad-shah/detent-elements) | Custom elements. No peers — Angular, Vue, Astro, plain HTML. |
 
 ## Styling in one paragraph
 

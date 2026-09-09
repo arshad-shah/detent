@@ -1,5 +1,5 @@
 import { useCallback, useRef } from 'react';
-import { draggable, type DraggableHandle, type DraggableOptions } from 'detent';
+import { draggable, type DraggableHandle, type DraggableOptions } from '@arshad-shah/detent';
 import { useLatest } from './latest';
 
 /**

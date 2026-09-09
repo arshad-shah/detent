@@ -8,4 +8,4 @@ export type {
   SortEvent,
   SortLocation,
   ResizeEvent,
-} from 'detent';
+} from '@arshad-shah/detent';

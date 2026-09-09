@@ -3,15 +3,15 @@
 Drag, reorder and resize for the web. No dependencies, no framework, one input
 path for mouse, touch and pen.
 
-[![npm](https://img.shields.io/npm/v/detent?color=A82A57&label=detent)](https://www.npmjs.com/package/detent)
+[![npm](https://img.shields.io/npm/v/@arshad-shah/detent?color=A82A57&label=detent)](https://www.npmjs.com/package/@arshad-shah/detent)
 [![pr](https://github.com/arshad-shah/detent/actions/workflows/pr.yml/badge.svg)](https://github.com/arshad-shah/detent/actions/workflows/pr.yml)
-[![license](https://img.shields.io/npm/l/detent?color=A82A57)](LICENSE)
+[![license](https://img.shields.io/npm/l/@arshad-shah/detent?color=A82A57)](LICENSE)
 
 **[detent.arshadshah.com](https://detent.arshadshah.com)** — documentation with
 demos you can actually drag.
 
 ```bash
-npm install detent
+npm install @arshad-shah/detent
 ```
 
 ```js
@@ -31,10 +31,10 @@ Each returns a handle with `destroy()`.
 
 | Package | Size | What it gives you |
 | --- | --- | --- |
-| [`detent`](packages/detent) | 6.9 KB | The library. Zero dependencies. |
-| [`detent-react`](packages/detent-react) | 0.6 KB | Hooks returning a callback ref. Re-rendering never re-binds. |
-| [`detent-svelte`](packages/detent-svelte) | 0.3 KB | `use:` actions with reactive options. |
-| [`detent-elements`](packages/detent-elements) | 1.0 KB | Custom elements. No peers — Angular, Vue, Astro, plain HTML. |
+| [`@arshad-shah/detent`](packages/detent) | 6.9 KB | The library. Zero dependencies. |
+| [`@arshad-shah/detent-react`](packages/detent-react) | 0.6 KB | Hooks returning a callback ref. Re-rendering never re-binds. |
+| [`@arshad-shah/detent-svelte`](packages/detent-svelte) | 0.3 KB | `use:` actions with reactive options. |
+| [`@arshad-shah/detent-elements`](packages/detent-elements) | 1.0 KB | Custom elements. No peers — Angular, Vue, Astro, plain HTML. |
 
 Gzipped. `draggable` alone is 2.4 KB, `sortable` 4.8 KB, `resizable` 3.2 KB —
 they tree-shake independently.

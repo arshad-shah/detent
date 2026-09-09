@@ -1,5 +1,5 @@
 import { useCallback, useRef } from 'react';
-import { resizable, type ResizableHandle, type ResizableOptions } from 'detent';
+import { resizable, type ResizableHandle, type ResizableOptions } from '@arshad-shah/detent';
 import { useLatest } from './latest';
 
 /**

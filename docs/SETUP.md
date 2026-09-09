@@ -21,25 +21,37 @@ npm login                      # opens a browser
 pnpm install
 pnpm build
 cd packages/detent
-npm publish --access public --provenance
+npm publish --access public
 ```
 
-`--provenance` requires npm 11.5 or newer. Check with `npm --version`; upgrade
-with `npm install -g npm@latest`.
+**No `--provenance` here.** Provenance is generated from a CI provider's OIDC
+token, so it only works from GitHub Actions — locally npm fails with
+`Automatic provenance generation not supported for provider: null`. Every
+release after this one goes through CI and *is* attested; this first one is
+the exception.
 
-Expected output ends with `+ detent@0.2.1`.
+`--access public` is belt and braces: `publishConfig.access` in each manifest
+already says public, which scoped packages need since they default to
+restricted.
 
-If it fails with **`402 Payment Required`**, you passed `--access public` to a
-scoped name — not applicable here, but that is what the error means.
-If it fails with **`403 Forbidden`**, the name is taken; it was free when this
-was written, so check <https://www.npmjs.com/package/detent>.
+Expected output ends with `+ @arshad-shah/detent@0.2.1`.
 
-Repeat for each wrapper **after** `detent` is live:
+If it fails with **`402 Payment Required`**, the scope is being treated as
+private — check `publishConfig.access` is `public` in that package's
+`package.json`.
+If it fails with **`404 Not Found`** on a scoped name, the `arshad-shah` scope
+does not exist yet on npm; it is created automatically the first time you
+publish under it, provided your npm username is `arshad-shah`. If your npm
+username differs, the scope must match an org you own — create one at
+<https://www.npmjs.com/org/create>.
+
+Repeat for each wrapper **after** the core is live — they depend on it, and
+pnpm rewrites `workspace:^` to a real range at publish time:
 
 ```bash
-cd ../detent-react   && npm publish --access public --provenance
-cd ../detent-svelte  && npm publish --access public --provenance
-cd ../detent-elements && npm publish --access public --provenance
+cd ../detent-react    && npm publish --access public
+cd ../detent-svelte   && npm publish --access public
+cd ../detent-elements && npm publish --access public
 ```
 
 ---
@@ -63,10 +75,10 @@ The workflow filename is just the file name, **not** a path — `main.yml`, not
 
 The four package pages:
 
-- <https://www.npmjs.com/package/detent/access>
-- <https://www.npmjs.com/package/detent-react/access>
-- <https://www.npmjs.com/package/detent-svelte/access>
-- <https://www.npmjs.com/package/detent-elements/access>
+- <https://www.npmjs.com/package/@arshad-shah/detent/access>
+- <https://www.npmjs.com/package/@arshad-shah/detent-react/access>
+- <https://www.npmjs.com/package/@arshad-shah/detent-svelte/access>
+- <https://www.npmjs.com/package/@arshad-shah/detent-elements/access>
 
 Once this is done, **do not create an `NPM_TOKEN` secret.** The release
 workflow authenticates over OIDC; a stored token would be a long-lived

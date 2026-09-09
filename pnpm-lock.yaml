@@ -20,7 +20,7 @@ importers:
 
   apps/docs:
     dependencies:
-      detent:
+      '@arshad-shah/detent':
         specifier: workspace:^
         version: link:../../packages/detent
     devDependencies:
@@ -78,7 +78,7 @@ importers:
 
   packages/detent-elements:
     dependencies:
-      detent:
+      '@arshad-shah/detent':
         specifier: workspace:^
         version: link:../detent
     devDependencies:
@@ -109,7 +109,7 @@ importers:
 
   packages/detent-react:
     dependencies:
-      detent:
+      '@arshad-shah/detent':
         specifier: workspace:^
         version: link:../detent
     devDependencies:
@@ -155,7 +155,7 @@ importers:
 
   packages/detent-svelte:
     dependencies:
-      detent:
+      '@arshad-shah/detent':
         specifier: workspace:^
         version: link:../detent
     devDependencies:
