@@ -1,0 +1,12 @@
+:root {
+  --detent-ink: #2B2D24;
+  --detent-paper: #E7E5DC;
+  --detent-panel: #FAF9F5;
+  --detent-signal: #A82A57;
+  --detent-signal-soft: #F4DEE6;
+  --detent-muted: #6E7264;
+  --detent-line: #C9C6B8;
+
+  --detent-font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --detent-font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}

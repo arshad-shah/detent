@@ -1,0 +1,931 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>detent — playground</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27%3E%3Crect width=%2748%27 height=%2748%27 rx=%2711%27 fill=%27%232B2D24%27/%3E%3Cpath d=%27M10 23 H15 A9 9 0 0 0 33 23 H38%27 stroke=%27%23E7E5DC%27 stroke-width=%274%27 stroke-linecap=%27round%27 fill=%27none%27/%3E%3Ccircle cx=%2724%27 cy=%2721%27 r=%276%27 fill=%27%23A82A57%27/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #e7e5dc;
+  --panel: #faf9f5;
+  --ink: #2b2d24;
+  --muted: #6e7264;
+  --line: #c9c6b8;
+  --hot: #a82a57;
+  --hot-soft: #f4dee6;
+  --rail: 232px;
+  --sans: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--hot); }
+
+:focus-visible {
+  outline: 2px solid var(--hot);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ---------- shell ---------- */
+
+.shell {
+  display: grid;
+  grid-template-columns: var(--rail) minmax(0, 1fr);
+  gap: 48px;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 24px 160px;
+}
+
+.rail {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  padding: 40px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.wordmark {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin: 0 0 0 -4px;
+}
+
+.wordmark svg { flex: none; }
+
+.tagline {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+  max-width: 20ch;
+}
+
+.rail nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+  min-height: 0;
+  flex: 0 1 auto;
+}
+
+.rail nav a {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 5px 0;
+  font-size: 14px;
+  color: var(--muted);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.rail nav a:hover { color: var(--ink); border-bottom-color: var(--line); }
+
+.rail nav a b {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--line);
+}
+
+.sizes {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+  display: grid;
+  gap: 2px;
+}
+.sizes b { color: var(--ink); font-weight: 600; }
+
+/* ---------- benches ---------- */
+
+main { padding-top: 40px; }
+
+.bench { padding: 44px 0; border-bottom: 1px solid var(--line); }
+.bench:first-child { padding-top: 0; }
+
+.bench > h2 {
+  margin: 0 0 6px;
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.bench > p {
+  margin: 0 0 22px;
+  max-width: 62ch;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.hero { padding-top: 8px; }
+
+.hero h1 {
+  margin: 0 0 10px;
+  font-size: clamp(38px, 7vw, 60px);
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+  font-weight: 700;
+  max-width: 14ch;
+}
+
+.hero > p { font-size: 17px; max-width: 56ch; }
+
+/* ---------- fields ---------- */
+
+.field {
+  position: relative;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  overflow: hidden;
+  background-image:
+    linear-gradient(to right, rgba(43, 45, 36, 0.055) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(43, 45, 36, 0.055) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.field-tall { height: 320px; }
+.field-short { height: 190px; }
+
+.card {
+  position: absolute;
+  background: var(--panel);
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  box-shadow: 3px 3px 0 rgba(43, 45, 36, 0.14);
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--muted);
+  user-select: none;
+}
+
+.card.dk-dragging,
+.card.dk-resizing {
+  cursor: grabbing;
+  border-color: var(--hot);
+  box-shadow: 4px 4px 0 var(--hot-soft);
+}
+
+/* Handles are invisible by default; the demo cards get a visible corner. */
+.card .dk-handle-se::after,
+.card .dk-handle-nw::after {
+  content: "";
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border: 2px solid var(--ink);
+}
+.card .dk-handle-se::after { right: 3px; bottom: 3px; border-top: 0; border-left: 0; }
+.card .dk-handle-nw::after { left: 3px; top: 3px; border-bottom: 0; border-right: 0; }
+.card:hover .dk-handle-se::after,
+.card:hover .dk-handle-nw::after { border-color: var(--hot); }
+
+.grip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  cursor: grab;
+  color: var(--muted);
+  flex: none;
+}
+.grip:hover { color: var(--hot); }
+.grip svg { display: block; }
+
+/* ---------- readouts ---------- */
+
+.readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  margin-top: 10px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+.readout b { color: var(--ink); font-weight: 600; }
+
+.split {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.split h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.split h3 + p {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--muted);
+  min-height: 2.6em;
+}
+
+/* ---------- lists ---------- */
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.list li,
+.tile,
+.chip {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  user-select: none;
+  cursor: grab;
+}
+
+.list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px 10px 4px;
+  font-size: 14px;
+}
+
+.list li .num {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  margin-left: auto;
+}
+
+.list li.dk-sorting,
+.tile.dk-sorting,
+.chip.dk-sorting {
+  border-color: var(--hot);
+  background: var(--hot-soft);
+  box-shadow: 3px 3px 0 rgba(168, 42, 87, 0.18);
+  cursor: grabbing;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.chip { padding: 7px 13px; font-size: 14px; }
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  gap: 8px;
+}
+.tile {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 20px;
+}
+
+.scroller {
+  max-height: 250px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 6px;
+  background: var(--panel);
+}
+.scroller.list { gap: 5px; }
+
+/* ---------- board ---------- */
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+.column {
+  background: rgba(43, 45, 36, 0.035);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 10px;
+}
+
+.column > h3 {
+  margin: 0 0 9px;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+}
+.column > h3 em {
+  font-family: var(--mono);
+  font-style: normal;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.column .list { min-height: 54px; }
+
+/* ---------- dashboard ---------- */
+
+.canvas {
+  position: relative;
+  height: 440px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  overflow: hidden;
+  background-image:
+    linear-gradient(to right, rgba(43, 45, 36, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(43, 45, 36, 0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.widget {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  box-shadow: 3px 3px 0 rgba(43, 45, 36, 0.14);
+  overflow: hidden;
+}
+
+.widget.dk-dragging,
+.widget.dk-resizing {
+  border-color: var(--hot);
+  box-shadow: 4px 4px 0 var(--hot-soft);
+  z-index: 5;
+}
+
+.widget-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(43, 45, 36, 0.04);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: grab;
+  user-select: none;
+  flex: none;
+}
+.widget-bar svg { color: var(--muted); flex: none; }
+
+.widget-body {
+  padding: 10px;
+  overflow: auto;
+  flex: 1;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.widget .dk-handle-se::after {
+  content: "";
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  width: 9px;
+  height: 9px;
+  border: 2px solid var(--muted);
+  border-top: 0;
+  border-left: 0;
+}
+.widget:hover .dk-handle-se::after { border-color: var(--hot); }
+
+/* ---------- log ---------- */
+
+.log-panel {
+  margin-top: auto;
+  background: var(--ink);
+  color: #e7e5dc;
+  border-radius: 4px;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.log-panel > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 10px;
+  border-bottom: 1px solid rgba(231, 229, 220, 0.16);
+}
+.log-panel button {
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  opacity: 0.6;
+  padding: 0;
+}
+.log-panel button:hover { opacity: 1; }
+
+#log {
+  margin: 0;
+  padding: 8px 10px;
+  height: 118px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+}
+#log div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#log i { font-style: normal; color: #e79ab6; }
+#log.hidden { display: none; }
+
+.hint {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 12px 0 0;
+}
+kbd {
+  font-family: var(--mono);
+  font-size: 11px;
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 3px;
+  padding: 1px 5px;
+  background: var(--panel);
+}
+
+@media (max-width: 860px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 0; padding: 0 18px 200px; }
+  .rail { position: static; height: auto; padding: 32px 0 0; }
+  .rail nav { flex-direction: row; flex-wrap: wrap; gap: 4px 14px; }
+  .rail nav a b { display: none; }
+  .sizes { display: none; }
+  main { padding-top: 24px; }
+  .log-panel {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    width: calc(100vw - 32px);
+    z-index: 100;
+    box-shadow: 0 6px 22px rgba(43, 45, 36, 0.3);
+  }
+  #log { height: 84px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="rail">
+    <div>
+      <h1 class="wordmark">
+        <svg viewBox="0 0 48 48" width="34" height="34" fill="none" aria-hidden="true">
+          <path d="M9 22 H14 A10 10 0 0 0 34 22 H39" stroke="var(--ink)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="24" cy="20" r="6.5" fill="var(--hot)"/>
+        </svg>
+        <span>detent</span>
+      </h1>
+      <p class="tagline">Drag, reorder and resize. No dependencies, no framework.</p>
+    </div>
+    <nav>
+      <a href="#free">Free movement<b>01</b></a>
+      <a href="#constraints">Constraints<b>02</b></a>
+      <a href="#grips">Grips and dead zones<b>03</b></a>
+      <a href="#reorder">Reorder a list<b>04</b></a>
+      <a href="#chips">A row of chips<b>05</b></a>
+      <a href="#tiles">A wrapping grid<b>06</b></a>
+      <a href="#board">Across three lists<b>07</b></a>
+      <a href="#long">A list that scrolls<b>08</b></a>
+      <a href="#keys">Without a mouse<b>09</b></a>
+      <a href="#canvas">All of it at once<b>10</b></a>
+    </nav>
+    <div class="sizes" id="sizes"></div>
+    <div class="log-panel">
+      <header>
+        <span>events</span>
+        <button type="button" id="log-toggle">hide</button>
+      </header>
+      <div id="log"></div>
+    </div>
+  </aside>
+
+  <main>
+
+    <!-- 01 -->
+    <section class="bench hero" id="free">
+      <h1>Pick this up and move it.</h1>
+      <p>Drag the card anywhere on the field. Pull the corner marks to resize it. The numbers below update as you go — they are the same values your callbacks receive.</p>
+      <div class="field field-tall" id="hero-field">
+        <div class="card" id="hero-card" style="left: 40px; top: 60px; width: 190px; height: 110px;">drag me</div>
+      </div>
+      <div class="readout" id="hero-readout"></div>
+      <p class="hint">Press <kbd>Esc</kbd> mid-drag to put it back.</p>
+    </section>
+
+    <!-- 02 -->
+    <section class="bench" id="constraints">
+      <h2>Constraints</h2>
+      <p>Three ways to limit where something can go. Each is one option on the same call.</p>
+      <div class="split">
+        <div>
+          <h3>Locked to one axis</h3>
+          <p>Moves horizontally only. Vertical travel is ignored rather than resisted.</p>
+          <div class="field field-short" id="axis-field">
+            <div class="card" id="axis-card" style="left: 20px; top: 62px; width: 120px; height: 62px;">x only</div>
+          </div>
+        </div>
+        <div>
+          <h3>Snapped to a grid</h3>
+          <p>Rounds to the nearest 20px, counted from the field's edge so it lands on the lines you can see.</p>
+          <div class="field field-short" id="grid-field">
+            <div class="card" id="grid-card" style="left: 20px; top: 60px; width: 120px; height: 60px;">20px</div>
+          </div>
+        </div>
+        <div>
+          <h3>Caged in its parent</h3>
+          <p>Stops at every edge, and stays stopped however far the pointer goes.</p>
+          <div class="field field-short" id="bounds-field">
+            <div class="card" id="bounds-card" style="left: 20px; top: 62px; width: 120px; height: 62px;">bounded</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 -->
+    <section class="bench" id="grips">
+      <h2>Grips and dead zones</h2>
+      <p>This card only moves by its grip, and the button inside it still takes clicks. A drag that ends over a button never fires that button's click.</p>
+      <div class="field field-short" id="grip-field">
+        <div class="card" id="grip-card" style="left: 24px; top: 40px; width: 250px; height: 76px; justify-content: flex-start; gap: 4px;">
+          <span class="grip" id="grip-handle" aria-hidden="true">
+            <svg width="12" height="16" viewBox="0 0 12 16" fill="currentColor"><circle cx="3" cy="3" r="1.5"/><circle cx="9" cy="3" r="1.5"/><circle cx="3" cy="8" r="1.5"/><circle cx="9" cy="8" r="1.5"/><circle cx="3" cy="13" r="1.5"/><circle cx="9" cy="13" r="1.5"/></svg>
+          </span>
+          <span>grip to move</span>
+          <button type="button" id="grip-button" style="margin-left:auto;margin-right:10px;font:inherit;font-size:12px;padding:4px 10px;border:1px solid var(--line);border-radius:2px;background:var(--panel);cursor:pointer;">click me</button>
+        </div>
+      </div>
+      <div class="readout" id="grip-readout"><span>button clicks <b>0</b></span></div>
+    </section>
+
+    <!-- 04 -->
+    <section class="bench" id="reorder">
+      <h2>Reorder a list</h2>
+      <p>Items slide out of the way as you pass them. Nothing is animated through layout — the browser measures once and the rest is a transform.</p>
+      <ul class="list" id="list-basic"></ul>
+      <div class="readout" id="list-readout"></div>
+    </section>
+
+    <!-- 05 -->
+    <section class="bench" id="chips">
+      <h2>A row of chips</h2>
+      <p>The same call. The direction is worked out from where the items actually sit, so nothing needs configuring.</p>
+      <ul class="chips" id="chip-row"></ul>
+    </section>
+
+    <!-- 06 -->
+    <section class="bench" id="tiles">
+      <h2>A wrapping grid</h2>
+      <p>Once items wrap onto more than one line, the nearest tile decides the drop rather than a single midpoint. Resize your window and it keeps up.</p>
+      <div class="tiles" id="tile-grid"></div>
+    </section>
+
+    <!-- 07 -->
+    <section class="bench" id="board">
+      <h2>Across three lists</h2>
+      <p>Lists that share a group name pass items to each other. Drop into an empty column and it takes the card.</p>
+      <div class="board" id="board-root"></div>
+    </section>
+
+    <!-- 08 -->
+    <section class="bench" id="long">
+      <h2>A list that scrolls</h2>
+      <p>Drag a card towards the top or bottom edge and the list scrolls to meet you, faster the closer you get. On touch this list still swipes normally — press and hold to lift instead.</p>
+      <ul class="list scroller" id="long-list"></ul>
+    </section>
+
+    <!-- 09 -->
+    <section class="bench" id="keys">
+      <h2>Without a mouse</h2>
+      <p>Tab to an item, then press space to lift it, arrow keys to move it and space again to drop. Escape puts it back. Each step is announced to screen readers.</p>
+      <ul class="list" id="key-list"></ul>
+      <p class="hint"><kbd>Tab</kbd> to focus · <kbd>Space</kbd> lift or drop · <kbd>↑</kbd> <kbd>↓</kbd> move · <kbd>Esc</kbd> cancel</p>
+    </section>
+
+    <!-- 10 -->
+    <section class="bench" id="canvas">
+      <h2>All of it at once</h2>
+      <p>Four panels on a canvas. Each one moves by its title bar and resizes from its bottom-right corner, both caged inside the canvas. Two of them hold sortable lists that pass cards between each other while the panels themselves are being moved.</p>
+      <div class="canvas" id="canvas-root"></div>
+      <div class="readout" id="canvas-readout"></div>
+    </section>
+
+  </main>
+</div>
+
+<script>/*__DRAGKIT__*/</script>
+<script>
+(() => {
+const { draggable, sortable, resizable } = detent;
+
+// ---------- event log ----------
+const logEl = document.getElementById('log');
+let logCount = 0;
+function log(name, detail) {
+  const row = document.createElement('div');
+  row.innerHTML = `<i>${name}</i> ${detail ?? ''}`;
+  logEl.prepend(row);
+  while (logEl.children.length > 60) logEl.lastChild.remove();
+  logCount++;
+}
+log('ready', 'drag something');
+document.getElementById('log-toggle').addEventListener('click', (e) => {
+  logEl.classList.toggle('hidden');
+  e.target.textContent = logEl.classList.contains('hidden') ? 'show' : 'hide';
+});
+
+const round = (n) => Math.round(n);
+
+// ---------- 01 free movement ----------
+const heroCard = document.getElementById('hero-card');
+const heroReadout = document.getElementById('hero-readout');
+
+function heroPaint() {
+  const field = document.getElementById('hero-field').getBoundingClientRect();
+  const box = heroCard.getBoundingClientRect();
+  heroReadout.innerHTML =
+    `<span>x <b>${round(box.left - field.left)}</b></span>` +
+    `<span>y <b>${round(box.top - field.top)}</b></span>` +
+    `<span>w <b>${round(box.width)}</b></span>` +
+    `<span>h <b>${round(box.height)}</b></span>`;
+}
+
+draggable(heroCard, {
+  bounds: 'parent',
+  cancel: '.dk-handle',
+  onStart: () => log('drag:start', 'hero card'),
+  onMove: heroPaint,
+  onEnd: (e, cancelled) => log('drag:end', cancelled ? 'cancelled' : `${round(e.offset.x)}, ${round(e.offset.y)}`),
+});
+
+resizable(heroCard, {
+  handles: ['se', 'nw'],
+  minWidth: 90,
+  minHeight: 60,
+  bounds: 'parent',
+  onResize: heroPaint,
+  onEnd: (e) => log('resize:end', `${round(e.width)} × ${round(e.height)}`),
+});
+
+heroPaint();
+window.addEventListener('resize', heroPaint);
+
+// ---------- 02 constraints ----------
+draggable(document.getElementById('axis-card'), { axis: 'x', bounds: 'parent' });
+draggable(document.getElementById('grid-card'), { grid: 20, bounds: 'parent' });
+draggable(document.getElementById('bounds-card'), { bounds: 'parent' });
+
+// ---------- 03 grips ----------
+draggable(document.getElementById('grip-card'), {
+  handle: '.grip',
+  bounds: 'parent',
+  onStart: () => log('drag:start', 'by grip'),
+});
+
+let clicks = 0;
+document.getElementById('grip-button').addEventListener('click', () => {
+  clicks++;
+  document.getElementById('grip-readout').innerHTML = `<span>button clicks <b>${clicks}</b></span>`;
+  log('click', 'button inside card');
+});
+
+// ---------- helpers for lists ----------
+function makeItem(label, index) {
+  const li = document.createElement('li');
+  li.innerHTML =
+    `<span class="grip" aria-hidden="true"><svg width="12" height="16" viewBox="0 0 12 16" fill="currentColor">` +
+    `<circle cx="3" cy="3" r="1.5"/><circle cx="9" cy="3" r="1.5"/><circle cx="3" cy="8" r="1.5"/>` +
+    `<circle cx="9" cy="8" r="1.5"/><circle cx="3" cy="13" r="1.5"/><circle cx="9" cy="13" r="1.5"/></svg></span>` +
+    `<span>${label}</span><span class="num">${String(index).padStart(2, '0')}</span>`;
+  li.dataset.label = label;
+  return li;
+}
+
+function fill(container, labels, make = makeItem) {
+  labels.forEach((label, i) => container.appendChild(make(label, i + 1)));
+}
+
+function orderText(container) {
+  return Array.from(container.children).map((c) => c.dataset.label).join(' → ');
+}
+
+// ---------- 04 basic list ----------
+const basic = document.getElementById('list-basic');
+fill(basic, ['Measure once', 'Write once a frame', 'Never during a move', 'Cache the neighbours', 'Animate with transforms']);
+const basicReadout = document.getElementById('list-readout');
+function renumber(container) {
+  Array.from(container.children).forEach((child, i) => {
+    const num = child.querySelector('.num');
+    if (num) num.textContent = String(i + 1).padStart(2, '0');
+  });
+}
+function showOrder() {
+  renumber(basic);
+  basicReadout.innerHTML = `<span>${orderText(basic)}</span>`;
+}
+showOrder();
+
+sortable(basic, {
+  onStart: (item) => log('sort:start', item.dataset.label),
+  onSort: (e) => { showOrder(); log('sort', `${e.from.index} → ${e.to.index}`); },
+});
+
+// ---------- 05 chips ----------
+const chipRow = document.getElementById('chip-row');
+fill(chipRow, ['pointer', 'scheduler', 'geometry', 'flip', 'autoscroll', 'box'], (label) => {
+  const li = document.createElement('li');
+  li.className = 'chip';
+  li.textContent = label;
+  li.dataset.label = label;
+  return li;
+});
+sortable(chipRow, { onSort: (e) => log('sort', `chip ${e.from.index} → ${e.to.index}`) });
+
+// ---------- 06 tiles ----------
+const tileGrid = document.getElementById('tile-grid');
+fill(tileGrid, Array.from({ length: 12 }, (_, i) => String(i + 1)), (label) => {
+  const el = document.createElement('div');
+  el.className = 'tile';
+  el.textContent = label;
+  el.dataset.label = label;
+  return el;
+});
+sortable(tileGrid, { onSort: (e) => log('sort', `tile ${e.from.index} → ${e.to.index}`) });
+
+// ---------- 07 board ----------
+const boardRoot = document.getElementById('board-root');
+const columns = [
+  ['Backlog', ['Touch delay tuning', 'Nested scroll containers', 'Shadow DOM notes']],
+  ['In progress', ['Cross-list transfer', 'Auto-scroll ramp']],
+  ['Done', []],
+];
+
+for (const [title, cards] of columns) {
+  const column = document.createElement('div');
+  column.className = 'column';
+  const heading = document.createElement('h3');
+  const count = document.createElement('em');
+  heading.textContent = title;
+  heading.appendChild(count);
+  const list = document.createElement('ul');
+  list.className = 'list';
+  fill(list, cards);
+  column.append(heading, list);
+  boardRoot.appendChild(column);
+
+  const refresh = () => {
+    for (const ul of boardRoot.querySelectorAll('.list')) {
+      ul.previousElementSibling.querySelector("em").textContent = String(ul.children.length);
+    }
+  };
+  refresh();
+
+  sortable(list, {
+    group: 'board',
+    onSort: (e) => {
+      refresh();
+      renumber(e.to.container);
+      renumber(e.from.container);
+      const moved = e.from.container !== e.to.container;
+      log('sort', moved ? `${e.item.dataset.label} → ${e.to.container.previousElementSibling.firstChild.textContent}` : `${e.from.index} → ${e.to.index}`);
+    },
+  });
+}
+
+// ---------- 08 long list ----------
+const longList = document.getElementById('long-list');
+fill(longList, Array.from({ length: 24 }, (_, i) => `Row ${i + 1}`));
+sortable(longList, {
+  autoScroll: { threshold: 70, speed: 12 },
+  onSort: (e) => { renumber(longList); log('sort', `row ${e.from.index} → ${e.to.index}`); },
+});
+
+// ---------- 09 keyboard ----------
+const keyList = document.getElementById('key-list');
+fill(keyList, ['Lift with space', 'Move with arrows', 'Drop with space', 'Cancel with escape']);
+for (const li of keyList.children) li.tabIndex = 0;
+sortable(keyList, {
+  onSort: (e) => { renumber(keyList); log('sort', `keyboard ${e.from.index} → ${e.to.index}`); },
+});
+
+// ---------- 10 canvas ----------
+const canvasRoot = document.getElementById('canvas-root');
+const canvasReadout = document.getElementById('canvas-readout');
+
+function makeWidget(title, left, top, width, height) {
+  const el = document.createElement('div');
+  el.className = 'widget';
+  el.style.cssText = `left:${left}px;top:${top}px;width:${width}px;height:${height}px;`;
+  el.innerHTML =
+    `<div class="widget-bar">` +
+    `<svg width="12" height="16" viewBox="0 0 12 16" fill="currentColor" aria-hidden="true">` +
+    `<circle cx="3" cy="3" r="1.5"/><circle cx="9" cy="3" r="1.5"/><circle cx="3" cy="8" r="1.5"/>` +
+    `<circle cx="9" cy="8" r="1.5"/><circle cx="3" cy="13" r="1.5"/><circle cx="9" cy="13" r="1.5"/></svg>` +
+    `<span>${title}</span></div><div class="widget-body"></div>`;
+  canvasRoot.appendChild(el);
+
+  draggable(el, { handle: '.widget-bar', bounds: 'parent', onMove: canvasPaint });
+  resizable(el, {
+    handles: ['se', 'e', 's'],
+    minWidth: 150,
+    minHeight: 110,
+    bounds: 'parent',
+    onResize: canvasPaint,
+  });
+  return el.querySelector('.widget-body');
+}
+
+function canvasPaint() {
+  const area = canvasRoot.getBoundingClientRect();
+  const parts = Array.from(canvasRoot.querySelectorAll('.widget')).map((w, i) => {
+    const b = w.getBoundingClientRect();
+    return `<span>panel ${i + 1} <b>${round(b.left - area.left)},${round(b.top - area.top)}</b> <b>${round(b.width)}×${round(b.height)}</b></span>`;
+  });
+  canvasReadout.innerHTML = parts.join('');
+}
+
+const inboxBody = makeWidget('Inbox', 20, 20, 236, 200);
+const queueBody = makeWidget('Queue', 276, 20, 236, 200);
+const notesBody = makeWidget('Notes', 20, 244, 236, 160);
+const readmeBody = makeWidget('Readme', 276, 244, 236, 160);
+
+const inboxList = document.createElement('ul');
+inboxList.className = 'list';
+fill(inboxList, ['Ticket 214', 'Ticket 215', 'Ticket 219']);
+inboxBody.appendChild(inboxList);
+
+const queueList = document.createElement('ul');
+queueList.className = 'list';
+fill(queueList, ['Ticket 208']);
+queueBody.appendChild(queueList);
+
+for (const list of [inboxList, queueList]) {
+  sortable(list, {
+    group: 'canvas',
+    onSort: (e) => { renumber(e.to.container); renumber(e.from.container); log('sort', `${e.item.dataset.label} → panel`); },
+  });
+}
+
+notesBody.textContent = 'Move this panel by its bar. The lists above keep working while the panels are being dragged and resized — they are separate bindings on separate elements.';
+readmeBody.textContent = 'Every panel is caged in the canvas. Resize one until it hits an edge and it stops growing rather than escaping.';
+
+canvasPaint();
+window.addEventListener('resize', canvasPaint);
+
+// ---------- size table ----------
+document.getElementById('sizes').innerHTML = /*__SIZES__*/'';
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+node_modules/
+dist/
+shots/
+playground/index.html
+
+# macOS
+.DS_Store
+
+# build
+dist/
+.astro/
+.wrangler/
+
+# test
+coverage/
+test-results/
+playwright-report/
