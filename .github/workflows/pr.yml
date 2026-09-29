@@ -68,12 +68,6 @@ jobs:
           retention-days: 7
 
   changeset:
-    # Every branch except the one Changesets opens itself. That pull request
-    # *consumes* the changesets while bumping the packages, so `changeset
-    # status` correctly reports "packages changed but no changesets found" and
-    # exits 1 — a gate the release pull request can never satisfy, and it is a
-    # required check, so it would block every release.
-    if: github.head_ref != 'changeset-release/main'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -100,7 +94,18 @@ jobs:
       # Compare against this PR's own base, not always main. On a stacked
       # branch, --since=origin/main is satisfied by an ancestor's changeset
       # and the PR's own changes go unchecked.
+      # Skipped on the branch Changesets opens itself: that pull request
+      # *consumes* the changesets while bumping the packages, so `changeset
+      # status` correctly reports "packages changed but no changesets found"
+      # and exits 1 — a gate the release pull request can never satisfy.
+      #
+      # The condition sits on the step rather than the job on purpose. A job
+      # skipped by its own `if` reports `conclusion: skipped`, and a required
+      # status check is not satisfied by a skip — the release pull request stays
+      # blocked forever. Skipping the step instead lets the job finish
+      # `success`, which is what branch protection is waiting for.
       - name: Every change to a package needs a changeset
+        if: github.head_ref != 'changeset-release/main'
         run: pnpm changeset status --since=origin/${{ github.base_ref }}
 
   # A lockfile diff is not something a human reliably reads. This fails the pull
