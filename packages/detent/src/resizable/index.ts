@@ -180,6 +180,22 @@ export function resizable(el: HTMLElement, options: ResizableOptions = {}): Resi
           if (dirX < 0) limits.maxWidth = Math.min(limits.maxWidth, left + startWidth - area.left);
           if (dirY > 0) limits.maxHeight = Math.min(limits.maxHeight, area.top + area.height - top);
           if (dirY < 0) limits.maxHeight = Math.min(limits.maxHeight, top + startHeight - area.top);
+
+          // An axis the ratio derives needs a ceiling too. Only the axis the
+          // handle drives used to get one, so an `n` handle holding a ratio grew
+          // the width with nothing to stop it and walked straight out of the
+          // container. A derived axis grows about its centre, so it runs into
+          // both edges at once and the nearer one decides.
+          if (aspect) {
+            if (dirX === 0) {
+              const room = Math.min(left - area.left, area.left + area.width - (left + startWidth));
+              limits.maxWidth = Math.min(limits.maxWidth, startWidth + 2 * Math.max(0, room));
+            }
+            if (dirY === 0) {
+              const room = Math.min(top - area.top, area.top + area.height - (top + startHeight));
+              limits.maxHeight = Math.min(limits.maxHeight, startHeight + 2 * Math.max(0, room));
+            }
+          }
         }
 
         // Ask before marking, as draggable and sortable do. A refusal used to

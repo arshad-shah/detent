@@ -231,3 +231,83 @@ describe('anchoring across host layouts', () => {
     expect(el.style.height).toBe('');
   });
 });
+
+/**
+ * The documented contract: "Bounds become a size ceiling. With `bounds` set, the
+ * element runs out of room rather than escaping its container."
+ *
+ * With `aspectRatio` on an edge handle, only the axis the handle drives ever got
+ * a bounds-derived ceiling. The axis the ratio derives got none, so the element
+ * grew straight out of its container.
+ */
+describe('aspect ratio inside bounds', () => {
+  /** Place the element at a known spot in the 600x600 parent from beforeEach. */
+  function at(left: number, top: number, width = 200, height = 100) {
+    document.body.innerHTML = '';
+    resetLayout();
+    parent = document.createElement('div');
+    el = document.createElement('div');
+    parent.appendChild(el);
+    document.body.appendChild(parent);
+    resetState(el);
+    layout(parent, { left: 0, top: 0, width: 600, height: 600 });
+    layout(el, { left, top, width, height });
+    return edgesOf(el);
+  }
+
+  it('does not escape sideways when the top edge drives the width', () => {
+    const before = at(380, 200);
+    resizable(el, { distance: 0, aspectRatio: true, bounds: 'parent' });
+    press(grip('n'), before.left + 100, before.top).move(before.left + 100, before.top - 400).up();
+
+    const after = edgesOf(el);
+    expect(after.right).toBeLessThanOrEqual(600);
+    expect(after.left).toBeGreaterThanOrEqual(0);
+    expect(after.top).toBeGreaterThanOrEqual(0);
+  });
+
+  it('does not escape downwards when the left edge drives the height', () => {
+    const before = at(300, 440);
+    resizable(el, { distance: 0, aspectRatio: true, bounds: 'parent' });
+    press(grip('w'), before.left, before.top + 50).move(before.left - 400, before.top + 50).up();
+
+    const after = edgesOf(el);
+    expect(after.bottom).toBeLessThanOrEqual(600);
+    expect(after.top).toBeGreaterThanOrEqual(0);
+    expect(after.left).toBeGreaterThanOrEqual(0);
+  });
+
+  it('holds the ratio while it runs out of room', () => {
+    const before = at(380, 200);
+    resizable(el, { distance: 0, aspectRatio: 2, bounds: 'parent' });
+    press(grip('n'), before.left + 100, before.top).move(before.left + 100, before.top - 400).up();
+
+    const after = edgesOf(el);
+    const ratio = (after.right - after.left) / (after.bottom - after.top);
+    expect(ratio).toBeCloseTo(2, 1);
+    expect(after.right).toBeLessThanOrEqual(600);
+  });
+
+  it('grows the derived axis about the centre, not off to one side', () => {
+    const before = at(200, 300);
+    resizable(el, { distance: 0, aspectRatio: true });
+    press(grip('n'), before.left + 100, before.top).move(before.left + 100, before.top - 50).up();
+
+    const after = edgesOf(el);
+    // The bottom edge is the one that was not grabbed, so it holds.
+    expect(after.bottom).toBe(before.bottom);
+    // The width grew, and it grew equally on both sides.
+    expect(after.right - after.left).toBeGreaterThan(before.right - before.left);
+    expect(before.left - after.left).toBe(after.right - before.right);
+  });
+
+  it('still lets a corner handle anchor the opposite corner', () => {
+    const before = at(200, 300);
+    resizable(el, { distance: 0, aspectRatio: true });
+    press(grip('se'), before.right, before.bottom).move(before.right + 80, before.bottom + 40).up();
+
+    const after = edgesOf(el);
+    expect(after.left).toBe(before.left);
+    expect(after.top).toBe(before.top);
+  });
+});

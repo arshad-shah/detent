@@ -79,16 +79,19 @@ export function reconcileAspect(
  * Where the element has to sit so the edge the pointer did not grab stays put.
  *
  * Two terms. `edge` is the displacement the grabbed handle asks for: nothing for
- * a handle on the start side, the whole size change for one on the end side.
- * `anchor` undoes the movement the host layout applies on its own when the size
- * changes — for a centred element, half the size change in the opposite
- * direction.
+ * a handle on the start side, the whole size change for one on the end side, and
+ * half of it either way for an axis no handle drives — an axis `aspectRatio`
+ * derives has no edge the user grabbed, so it grows about its own centre rather
+ * than sprawling off to one side. `anchor` undoes the movement the host layout
+ * applies on its own when the size changes.
  *
  * Both are derived from the final clamped size, so hitting a limit cannot make
  * the element drift.
  */
 function offsetFor(dir: -1 | 0 | 1, size: number, startSize: number, anchor: number): number {
-  const edge = dir < 0 ? startSize - size : 0;
+  // Subtract in this order rather than negating `change`, so an unmoved axis
+  // yields +0 instead of -0.
+  const edge = dir < 0 ? startSize - size : dir > 0 ? 0 : (startSize - size) / 2;
   return edge - anchor * (size - startSize);
 }
 
