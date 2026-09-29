@@ -146,6 +146,80 @@ describe('computeResize', () => {
     }
   });
 
+  // `anchor` is how far the host layout moves the element per pixel of size
+  // change: 0 when it is pinned by left/top, -0.5 when centred, -1 when
+  // end-anchored. The offset has to undo that, or resizing from one corner
+  // drags the whole element sideways.
+  describe('anchor correction', () => {
+    it('is a no-op for a start-anchored element', () => {
+      const without = computeResize({ ...base, dirX: 1, dirY: 1, delta: { x: 60, y: 40 } });
+      const zero = computeResize({
+        ...base,
+        dirX: 1,
+        dirY: 1,
+        delta: { x: 60, y: 40 },
+        anchor: { x: 0, y: 0 },
+      });
+      expect(zero).toEqual(without);
+      expect(zero.offsetX).toBe(0);
+      expect(zero.offsetY).toBe(0);
+    });
+
+    it('gives back half the growth for a centred element', () => {
+      const r = computeResize({
+        ...base,
+        dirX: 1,
+        dirY: 1,
+        delta: { x: 60, y: 40 },
+        anchor: { x: -0.5, y: -0.5 },
+      });
+      // Layout will pull the element 30 left and 20 up; this puts it back.
+      expect(r.offsetX).toBe(30);
+      expect(r.offsetY).toBe(20);
+    });
+
+    it('gives back all the growth for an end-anchored element', () => {
+      const r = computeResize({
+        ...base,
+        dirX: 1,
+        dirY: 1,
+        delta: { x: 60, y: 40 },
+        anchor: { x: -1, y: -1 },
+      });
+      expect(r.offsetX).toBe(60);
+      expect(r.offsetY).toBe(40);
+    });
+
+    it('composes with the edge term on a top-left handle', () => {
+      // Dragging nw inwards by 50 shrinks the element and moves it 50 right.
+      // A centred host would also move it 25 right on its own, so the offset is
+      // the difference rather than the sum.
+      const r = computeResize({
+        ...base,
+        dirX: -1,
+        dirY: 0,
+        delta: { x: 50, y: 0 },
+        anchor: { x: -0.5, y: 0 },
+      });
+      expect(r.width).toBe(150);
+      expect(r.offsetX).toBe(25);
+    });
+
+    it('derives the correction from the clamped size, so a minimum cannot drift', () => {
+      const r = computeResize({
+        ...base,
+        dirX: 1,
+        dirY: 1,
+        delta: { x: 5000, y: 5000 },
+        limits: { ...free, maxWidth: 260, maxHeight: 140 },
+        anchor: { x: -0.5, y: -0.5 },
+      });
+      expect(r.width).toBe(260);
+      expect(r.offsetX).toBe(30);
+      expect(r.offsetY).toBe(20);
+    });
+  });
+
   it('holds the ratio from an edge handle', () => {
     const r = computeResize({ ...base, dirX: 1, dirY: 0, delta: { x: 100, y: 0 }, aspect: 2 });
     expect(r.width).toBe(300);

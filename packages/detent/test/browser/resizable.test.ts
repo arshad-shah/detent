@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { resizable } from '../../src/resizable/index';
 import { ATTR, CLASS } from '../../src/core/constants';
 import { resetState } from '../../src/core/box';
-import { layout, offsetOf, press } from './helpers';
+import { edgesOf, host, layout, offsetOf, press, resetLayout, type HostAnchor } from './helpers';
 
 let el: HTMLElement;
 let parent: HTMLElement;
@@ -147,5 +147,87 @@ describe('resizing', () => {
     handle.setDisabled(true);
     press(grip('se'), 300, 200).move(400, 300);
     expect(el.style.width).toBe('');
+  });
+});
+
+/**
+ * The documented contract: "the edge you grabbed follows the pointer, so the
+ * opposite edge stays put."
+ *
+ * That held only for an element anchored to its top-left corner, which is the
+ * one layout the tests above use. In every other host layout, changing the
+ * width re-runs layout and moves the element — so resizing from a single corner
+ * slid the whole element sideways.
+ */
+describe('anchoring across host layouts', () => {
+  const anchors: HostAnchor[] = [
+    'absolute',
+    'absolute-end',
+    'margin-auto',
+    'flex-center',
+    'flex-end',
+    'flex-rtl',
+  ];
+
+  /** Rebuild the fixture without the default absolute layout from beforeEach. */
+  function place(anchor: HostAnchor) {
+    document.body.innerHTML = '';
+    resetLayout();
+    parent = document.createElement('div');
+    el = document.createElement('div');
+    parent.appendChild(el);
+    document.body.appendChild(parent);
+    resetState(el);
+    host(parent, el, anchor);
+    return edgesOf(el);
+  }
+
+  for (const anchor of anchors) {
+    it(`keeps the left and top still when growing from se — ${anchor}`, () => {
+      const before = place(anchor);
+      resizable(el, { distance: 0 });
+      const g = grip('se');
+      press(g, before.right, before.bottom).move(before.right + 60, before.bottom + 40).up();
+
+      const after = edgesOf(el);
+      expect(after.left).toBe(before.left);
+      expect(after.top).toBe(before.top);
+      expect(after.right).toBe(before.right + 60);
+      expect(after.bottom).toBe(before.bottom + 40);
+    });
+
+    it(`keeps the right and bottom still when shrinking from nw — ${anchor}`, () => {
+      const before = place(anchor);
+      resizable(el, { distance: 0 });
+      const g = grip('nw');
+      press(g, before.left, before.top).move(before.left + 50, before.top + 30).up();
+
+      const after = edgesOf(el);
+      expect(after.right).toBe(before.right);
+      expect(after.bottom).toBe(before.bottom);
+      expect(after.left).toBe(before.left + 50);
+      expect(after.top).toBe(before.top + 30);
+    });
+  }
+
+  it('leaves the element inline width and height as it found them', () => {
+    place('flex-center');
+    el.style.width = '200px';
+    el.style.height = '100px';
+    const handle = resizable(el, { distance: 0 });
+    handle.destroy();
+    // The probe writes and restores a width; a botched restore shows up here.
+    expect(el.style.width).toBe('200px');
+    expect(el.style.height).toBe('100px');
+  });
+
+  it('writes no inline width or height when the host set none', () => {
+    place('flex-center');
+    const handle = resizable(el, { distance: 0 });
+    expect(el.style.width).toBe('');
+    expect(el.style.height).toBe('');
+    handle.destroy();
+    expect(el.style.width).toBe('');
+    expect(el.style.height).toBe('');
   });
 });

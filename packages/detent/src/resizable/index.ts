@@ -10,6 +10,66 @@ import type { Box, Handle, Point } from '../core/types';
 import { resolveHandles, type ResolvedHandle } from './handles';
 import type { ResizableHandle, ResizableOptions, ResizeEvent } from './types';
 
+/** How much to shrink the element by when measuring how its host anchors it. */
+const ANCHOR_PROBE = 32;
+
+/**
+ * Turn a measured movement into a layout-response coefficient.
+ *
+ * Only `[-1, 0]` is physically meaningful: shrinking an element can leave its
+ * start edge where it is (`0`), move it by half the change (`-0.5`, centred), or
+ * by the whole change (`-1`, end-anchored). A number outside that band means the
+ * element did not simply shift in response to its own size — a wrapping row can
+ * pull an item up onto the previous line when it shrinks — and a wild
+ * coefficient would be worse than none, so those fall back to no correction.
+ *
+ * The deadzone matters as much as the clamp. Sub-pixel layout would otherwise
+ * hand back a coefficient like `-0.004` for an absolutely positioned element and
+ * introduce a drift where today there is none.
+ */
+function coefficient(moved: number, probe: number): number {
+  const k = moved / probe;
+  if (k > -0.02 || k < -1.05) return 0;
+  return k < -1 ? -1 : k;
+}
+
+/**
+ * Measure how the host layout moves the element when its size changes.
+ *
+ * One synchronous write-read-restore, so the browser cannot paint the probed
+ * size and there is nothing to see. Twice per gesture, never per frame: the
+ * result is a pair of numbers the move handler then uses as pure arithmetic.
+ *
+ * It shrinks rather than grows on purpose. Growing an element by 32px can push a
+ * flex or inline row past its wrap threshold and measure a wrap instead of an
+ * anchor. Shrinking can only ever relieve that pressure, and the band check in
+ * `coefficient` catches the case where it relieves it enough to un-wrap.
+ */
+function measureAnchor(
+  el: HTMLElement,
+  visual: Box,
+  scale: Point,
+  startWidth: number,
+  startHeight: number,
+): Point {
+  const width = el.style.width;
+  const height = el.style.height;
+  // Never probe below 1px, or a min-width would swallow the whole measurement.
+  const px = Math.min(ANCHOR_PROBE, Math.max(1, startWidth - 1));
+  const py = Math.min(ANCHOR_PROBE, Math.max(1, startHeight - 1));
+
+  el.style.width = `${startWidth - px}px`;
+  el.style.height = `${startHeight - py}px`;
+  const probed = boxOf(el);
+  el.style.width = width;
+  el.style.height = height;
+
+  return {
+    x: coefficient((visual.left - probed.left) / scale.x, px),
+    y: coefficient((visual.top - probed.top) / scale.y, py),
+  };
+}
+
 export function resizable(el: HTMLElement, options: ResizableOptions = {}): ResizableHandle {
   invariant(el instanceof HTMLElement, `resizable() needs an HTMLElement, got ${typeof el}`);
   invariant(
@@ -54,6 +114,8 @@ export function resizable(el: HTMLElement, options: ResizableOptions = {}): Resi
     let aspect: number | null = null;
     // Rendered pixels per layout pixel, from any transformed ancestor.
     let scale: Point = { x: 1, y: 1 };
+    // How the host layout repositions the element when its size changes.
+    let anchor: Point = { x: 0, y: 0 };
 
     function payload(event: PointerEvent, cancel: () => void): ResizeEvent {
       const state = stateOf(el);
@@ -88,6 +150,10 @@ export function resizable(el: HTMLElement, options: ResizableOptions = {}): Resi
         startY = state.y;
         originLeft = visual.left / scale.x - state.x;
         originTop = visual.top / scale.y - state.y;
+
+        // Before anything else writes to the element, so the probe measures the
+        // host's own layout rather than our own in-progress one.
+        anchor = measureAnchor(el, visual, scale, startWidth, startHeight);
 
         aspect =
           options.aspectRatio === true
@@ -133,6 +199,7 @@ export function resizable(el: HTMLElement, options: ResizableOptions = {}): Resi
           limits,
           aspect,
           grid,
+          anchor,
         });
 
         const state = stateOf(el);

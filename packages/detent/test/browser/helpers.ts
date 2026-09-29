@@ -66,6 +66,83 @@ export function row(elements: HTMLElement[], width = 50, gap = 0, left = 0, top 
   }
 }
 
+/**
+ * How the host page anchors an element, which decides where the element ends up
+ * when the library changes its width.
+ *
+ * Only `absolute` keeps the element's top-left still under a size change, and
+ * it is the only one the suite used to cover — which is why resizing slid the
+ * element sideways in every other layout without a test noticing.
+ */
+export type HostAnchor =
+  | 'absolute'
+  | 'absolute-end'
+  | 'margin-auto'
+  | 'flex-center'
+  | 'flex-end'
+  | 'flex-rtl';
+
+/**
+ * Put `el` inside `parent` under a named host layout, at a known size.
+ *
+ * The parent is always 600x600 at the viewport origin, so a test can reason
+ * about absolute coordinates without measuring it.
+ */
+export function host(
+  parent: HTMLElement,
+  el: HTMLElement,
+  anchor: HostAnchor,
+  width = 200,
+  height = 100,
+): void {
+  const box = `box-sizing:border-box;margin:0;width:${width}px;height:${height}px`;
+  const frame = (extra: string) =>
+    parent.classList.add(rule(`position:absolute;left:0;top:0;width:600px;height:600px;${extra}`));
+
+  switch (anchor) {
+    case 'absolute':
+      frame('');
+      el.classList.add(rule(`position:absolute;left:100px;top:100px;${box}`));
+      return;
+    case 'absolute-end':
+      frame('');
+      el.classList.add(rule(`position:absolute;right:100px;bottom:100px;${box}`));
+      return;
+    case 'margin-auto':
+      frame('');
+      el.classList.add(rule(`${box};margin-left:auto;margin-right:auto`));
+      return;
+    case 'flex-center':
+      frame('display:flex;align-items:center;justify-content:center');
+      el.classList.add(rule(`${box};flex:0 0 auto`));
+      return;
+    case 'flex-end':
+      frame('display:flex;align-items:flex-end;justify-content:flex-end');
+      el.classList.add(rule(`${box};flex:0 0 auto`));
+      return;
+    case 'flex-rtl':
+      frame('display:flex;direction:rtl');
+      el.classList.add(rule(`${box};flex:0 0 auto`));
+      return;
+  }
+}
+
+/** The four edges of an element's rendered box, rounded to whole pixels. */
+export function edgesOf(el: HTMLElement): {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+} {
+  const b = el.getBoundingClientRect();
+  return {
+    left: Math.round(b.left),
+    top: Math.round(b.top),
+    right: Math.round(b.right),
+    bottom: Math.round(b.bottom),
+  };
+}
+
 /** Drop every layout rule between tests. */
 export function resetLayout(): void {
   document.head.querySelectorAll('style[data-test-layout]').forEach((s) => s.remove());
