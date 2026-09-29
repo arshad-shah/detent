@@ -22,12 +22,23 @@ const ROOT = resolve(process.cwd(), '../..');
 
 const SEARCH = ['README.md', 'SECURITY.md', 'CONTRIBUTING.md', 'packages', 'apps/docs/src/content'];
 
-// Dated records of what was planned before the packages were scoped. Rewriting
-// them would falsify the history they exist to preserve.
-const SKIP = /node_modules|[/\\]dist[/\\]|[/\\]\.astro[/\\]|docs[/\\]superpowers/;
+/**
+ * Records of the past, which have to be free to quote it.
+ *
+ * `docs/superpowers` holds dated plans written before the packages were scoped.
+ * A CHANGELOG entry describing this very fix has to be able to show the broken
+ * import it replaced — and Changesets copies the changeset text into one
+ * CHANGELOG per package, so the guard would otherwise fail on its own release.
+ *
+ * Two patterns rather than one alternation: `CHANGELOG.md$` is anchored and the
+ * directory parts are not, and mixing them reads as though the anchor applies to
+ * all of them.
+ */
+const SKIP_PATH = /node_modules|[/\\]dist[/\\]|[/\\]\.astro[/\\]|docs[/\\]superpowers/;
+const SKIP_FILE = /CHANGELOG\.md$/;
 
 function walk(path: string, out: string[] = []): string[] {
-  if (SKIP.test(path)) return out;
+  if (SKIP_PATH.test(path) || SKIP_FILE.test(path)) return out;
   const stats = statSync(path, { throwIfNoEntry: false });
   if (!stats) return out;
   if (stats.isDirectory()) {
