@@ -68,6 +68,12 @@ jobs:
           retention-days: 7
 
   changeset:
+    # Every branch except the one Changesets opens itself. That pull request
+    # *consumes* the changesets while bumping the packages, so `changeset
+    # status` correctly reports "packages changed but no changesets found" and
+    # exits 1 — a gate the release pull request can never satisfy, and it is a
+    # required check, so it would block every release.
+    if: github.head_ref != 'changeset-release/main'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
