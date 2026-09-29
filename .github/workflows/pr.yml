@@ -18,6 +18,11 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
+        with:
+          # The token is not written into .git/config, where any later step —
+          # including a postinstall from any transitive dependency — could read
+          # it. Nothing in this job pushes with the git CLI.
+          persist-credentials: false
 
       - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86  # v6
 
@@ -69,8 +74,13 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
         with:
           # changeset status compares against the base branch, so it needs
-          # more than the default single commit.
+          # more than the default single commit. Fetching does not need a
+          # stored credential on a public repository, and nothing here pushes.
           fetch-depth: 0
+          # The token is not written into .git/config, where any later step —
+          # including a postinstall from any transitive dependency — could read
+          # it. Nothing in this job pushes with the git CLI.
+          persist-credentials: false
 
       - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86  # v6
 
@@ -86,3 +96,23 @@ jobs:
       # and the PR's own changes go unchecked.
       - name: Every change to a package needs a changeset
         run: pnpm changeset status --since=origin/${{ github.base_ref }}
+
+  # A lockfile diff is not something a human reliably reads. This fails the pull
+  # request outright when it introduces a dependency carrying a known advisory or
+  # a licence the project cannot take — which matters more now that lockfile
+  # changes arrive from contributors without write access.
+  dependencies:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294  # v5.0.0
+        with:
+          fail-on-severity: moderate
+          # The library itself ships zero dependencies; everything here is a dev
+          # tool. Copyleft in a build tool is fine, so this only names licences
+          # that would be a genuine problem to depend on.
+          deny-licenses: AGPL-3.0, AGPL-3.0-only, AGPL-3.0-or-later
