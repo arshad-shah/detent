@@ -8,7 +8,11 @@ const bundle = await build({
   entryPoints: ['src/index.ts'],
   bundle: true,
   format: 'iife',
-  globalName: '@arshad-shah/detent',
+  // A bare identifier, not the package name. esbuild emits this verbatim as
+  // `var <globalName> = (() => { ... })()`, so `@arshad-shah/detent` is a syntax
+  // error rather than a namespaced global — which is how scoping the packages
+  // broke this script without anything noticing.
+  globalName: 'detent',
   target: 'es2020',
   // Same as the shipped build: invariant() and its messages are stripped.
   define: { __DEV__: 'false' },

@@ -45,6 +45,13 @@ jobs:
       - name: Bundle size budget
         run: pnpm size
 
+      # Nothing else builds the playground, so a broken one goes unnoticed —
+      # which is exactly what happened when the packages were scoped and its
+      # esbuild globalName became an invalid identifier. It reads dist/, so it
+      # has to come after the build.
+      - name: The playground still builds
+        run: pnpm -F @arshad-shah/detent playground
+
       - run: pnpm test:e2e
 
       - name: Upload Playwright report on failure
