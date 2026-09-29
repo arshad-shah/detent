@@ -50,7 +50,8 @@ column and a wrapping grid all work unconfigured. Auto-scroll, and full
 keyboard reordering with screen-reader announcements.
 
 **`resizable`** — eight handles, or elements you supply yourself. Aspect ratio,
-grid, bounds as a size ceiling.
+grid, bounds as a size ceiling. The edge you grab is the only one that moves,
+whether the element is absolutely positioned, centred, right-aligned or RTL.
 
 ## Why it stays smooth
 

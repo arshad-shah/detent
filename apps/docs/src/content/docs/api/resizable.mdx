@@ -25,11 +25,23 @@ Pulling the top or left edge moves the element as well as sizing it — the edge
 you grabbed follows the pointer, so the opposite edge stays put. The offset is
 derived from the final clamped size, so hitting a minimum never causes drift.
 
+That holds whatever the host layout does. Changing an element's width re-runs
+layout, and a centred, right-aligned or RTL element moves on its own when its
+size changes — which would drag the whole box sideways as you pulled one corner.
+detent measures how the layout responds once, when the gesture starts, and
+cancels it out. Nothing is measured per frame.
+
 ## Holding a ratio
 
 `aspectRatio` keeps width and height in proportion. `true` holds the element's
 starting ratio; a number sets one explicitly. On a corner handle, whichever
 axis you push harder leads.
+
+On an **edge** handle one axis is derived rather than dragged, and it has no edge
+you grabbed — so it grows about its own centre. Pulling the top edge of a
+ratio-locked box scales it about its bottom-centre rather than shoving it
+sideways. With `bounds` set, a derived axis has to fit on both sides, so a box
+already flush against both edges of its container will not grow.
 
 <Demo id="resizable-aspect" title="aspectRatio: 16 / 9, bottom-right handle only" height={200}>
   <div class="demo-panel"></div>
@@ -43,7 +55,7 @@ axis you push harder leads.
 | `minWidth`, `minHeight` | `number` | `16` | Smallest size a resize will produce. |
 | `maxWidth`, `maxHeight` | `number` | `Infinity` | Largest size a resize will produce. |
 | `aspectRatio` | `boolean \| number` | — | `true` keeps the starting ratio; a number sets one. |
-| `grid` | `number \| [number, number]` | — | Snap the size to a grid, in pixels. |
+| `grid` | `number \| [number, number]` | — | Snap the size to a grid, in pixels, counted from the size the element started at. |
 | `bounds` | `'parent' \| 'window' \| Element \| Box \| null` | `null` | Keep the element inside this area. |
 | `disabled` | `boolean` | `false` | Keep the binding but stop responding. |
 
@@ -110,3 +122,13 @@ the limits are honoured — the less surprising of the two failures.
 **Resizing from the top or left moves the element as well as sizing it**, and
 the offset is derived from the final clamped size, so hitting a minimum never
 causes drift.
+
+**The grid counts from the start size, not from zero.** A 190px-wide element with
+`grid: 20` reaches 190, 210, 230 — not 180, 200, 220. Snapping the absolute size
+would jump the edge you grabbed by up to a whole step the moment you moved,
+sometimes against the pointer.
+
+**An element sized by its container cannot be resized.** Setting `width` on an
+element with `flex: 1`, or a grid item stretched by `justify-self`, does nothing
+— the container's sizing wins, and the resize is a silent no-op. Give the element
+`flex: none` or a definite width first. See [Limitations](/guides/limitations/).
