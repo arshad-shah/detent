@@ -76,8 +76,14 @@ export function computeResize(input: ResizeInput): ResizeResult {
   let height = dirY === 0 ? startHeight : startHeight + delta.y * dirY;
 
   if (grid) {
-    if (dirX !== 0 && grid[0] > 1) width = snap(width, grid[0]);
-    if (dirY !== 0 && grid[1] > 1) height = snap(height, grid[1]);
+    // Counted from the size the element started at, not from zero. Snapping the
+    // absolute size means the reachable sizes are multiples of the step, so an
+    // element that did not begin on one jumps up to a whole step the moment the
+    // drag threshold is crossed — and can jump against the pointer. Anchoring
+    // to the start size makes a zero delta a no-op and every step a whole step,
+    // which is the same thing draggable does with position.
+    if (dirX !== 0 && grid[0] > 1) width = snap(width, grid[0], startWidth);
+    if (dirY !== 0 && grid[1] > 1) height = snap(height, grid[1], startHeight);
   }
 
   if (aspect && aspect > 0) {

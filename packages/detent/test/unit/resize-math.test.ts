@@ -103,6 +103,49 @@ describe('computeResize', () => {
     expect(r.height).toBe(110);
   });
 
+  // The grid counts from the size the element started at, not from zero. An
+  // element whose size is not already a multiple of the step would otherwise
+  // jump up to a full step on the first movement — see the tests below, which
+  // all use a start size deliberately off the grid.
+  const offGrid = { ...base, startWidth: 190, startHeight: 110 } as const;
+
+  it('leaves an off-grid size untouched when nothing has moved', () => {
+    const r = computeResize({ ...offGrid, dirX: -1, dirY: -1, delta: { x: 0, y: 0 }, grid: [20, 20] });
+    expect(r.width).toBe(190);
+    expect(r.height).toBe(110);
+    expect(r.offsetX).toBe(0);
+    expect(r.offsetY).toBe(0);
+  });
+
+  it('moves the grabbed edge by whole steps from an off-grid start', () => {
+    const grid: [number, number] = [20, 20];
+    // Half a step in: still rounds back to where it began.
+    expect(computeResize({ ...offGrid, dirX: 1, dirY: 0, delta: { x: 9, y: 0 }, grid }).width).toBe(190);
+    // Past half a step: exactly one step, never a fraction of the start size.
+    expect(computeResize({ ...offGrid, dirX: 1, dirY: 0, delta: { x: 11, y: 0 }, grid }).width).toBe(210);
+    expect(computeResize({ ...offGrid, dirX: 1, dirY: 0, delta: { x: 31, y: 0 }, grid }).width).toBe(230);
+  });
+
+  it('holds still until the pointer has travelled half a step', () => {
+    const grid: [number, number] = [20, 20];
+    // Under half a step in either direction, from either edge, nothing moves.
+    for (const dirX of [1, -1] as const) {
+      for (const dx of [-9, -5, -1, 1, 5, 9]) {
+        const r = computeResize({ ...offGrid, dirX, dirY: 0, delta: { x: dx, y: 0 }, grid });
+        expect(r.width).toBe(190);
+        expect(r.offsetX).toBe(0);
+      }
+    }
+  });
+
+  it('changes the size by whole steps once it does move', () => {
+    const grid: [number, number] = [20, 20];
+    for (const dx of [11, 19, 21, 39, 41]) {
+      const r = computeResize({ ...offGrid, dirX: 1, dirY: 0, delta: { x: dx, y: 0 }, grid });
+      expect((r.width - 190) % 20).toBe(0);
+    }
+  });
+
   it('holds the ratio from an edge handle', () => {
     const r = computeResize({ ...base, dirX: 1, dirY: 0, delta: { x: 100, y: 0 }, aspect: 2 });
     expect(r.width).toBe(300);
