@@ -7,3 +7,12 @@ allowBuilds:
   esbuild: true
   sharp: true
   workerd: true
+
+# `wrangler` pins an older `sharp` through `miniflare`, which pulled a second
+# copy into the tree alongside the patched one `astro` already asks for — and
+# the older copy carries GHSA-g89c-p67h-r497 and GHSA-2jg2-4ch7-h545 in libheif.
+# Nothing published depends on sharp: it reaches the tree only through the
+# private docs app. This collapses both copies onto the patched version, and can
+# go once wrangler's own constraint catches up.
+overrides:
+  sharp: ^0.35.4
