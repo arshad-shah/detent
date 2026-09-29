@@ -492,6 +492,438 @@ kbd {
   background: var(--panel);
 }
 
+/* ---------- regression benches ---------- */
+
+.cells {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(178px, 1fr));
+  gap: 14px;
+}
+
+.cell > h4 {
+  margin: 0 0 2px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.cell > code {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--muted);
+  margin-bottom: 7px;
+  min-height: 2.4em;
+}
+
+/* A host box whose layout rules are the thing under test. */
+.host {
+  position: relative;
+  height: 150px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--panel);
+  overflow: hidden;
+  /* Room for the grip. It sits half outside the element, and the end-anchored
+     layouts pack the card flush to the edge, so without this the only thing you
+     can grab is clipped away. */
+  padding: 14px;
+}
+.host-abs { }
+.host-auto { display: block; }
+.host-auto > .pad { margin: 0 auto; }
+.host-center { display: flex; align-items: center; justify-content: center; }
+.host-end { display: flex; align-items: flex-end; justify-content: flex-end; }
+.host-rtl { display: flex; direction: rtl; }
+.host-absend { }
+
+.pad {
+  box-sizing: border-box;
+  width: 108px;
+  height: 70px;
+  flex: 0 0 auto;
+  background: var(--hot-soft);
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+/* An absolutely positioned child's containing block is the padding box, so the
+   host's padding does not inset it — these two need the offset spelled out or
+   the grip lands under `overflow: hidden`. */
+.host-abs > .pad { position: absolute; left: 14px; top: 14px; }
+.host-absend > .pad { position: absolute; right: 14px; bottom: 14px; }
+
+/* Only the se corner is grabbable in the anchoring bench, and it shows. */
+.pad .detent-handle-se::after {
+  content: "";
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  width: 8px;
+  height: 8px;
+  border: 2px solid var(--ink);
+  border-top: 0;
+  border-left: 0;
+}
+.pad:hover .detent-handle-se::after { border-color: var(--hot); }
+
+/* Δ readouts. A zero is the pass condition, so zero is the quiet colour. */
+.deltas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px 10px;
+  margin-top: 7px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--muted);
+}
+.deltas b { font-weight: 600; color: var(--muted); }
+.deltas b.moved { color: var(--hot); }
+.deltas b.held { color: #3c7a3c; }
+
+/* The readouts share the held/moved vocabulary with the delta grids. */
+.readout b.moved { color: var(--hot); }
+.readout b.held { color: #3c7a3c; }
+.readout .verdict { margin-top: 0; }
+
+.verdict {
+  margin-top: 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+}
+.verdict.ok { color: #3c7a3c; }
+.verdict.bad { color: var(--hot); }
+
+/* ---------- a visible cage ---------- */
+
+.cage {
+  position: relative;
+  height: 230px;
+  /* An outline, not a border. `bounds` is the element's border box, and an
+     absolutely positioned child's containing block is its padding box — so with
+     a border the panel's legal limit sits *inside* the dashes and a correct
+     resize looks like a 2px escape. An outline is painted outside the border
+     box, so the dashes mark the limit exactly. */
+  outline: 2px dashed var(--hot);
+  border-radius: 3px;
+  background: var(--panel);
+  margin: 2px;
+}
+.caged {
+  position: absolute;
+  box-sizing: border-box;
+  background: var(--hot-soft);
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+/* ---------- every handle ---------- */
+
+.rig {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 208px;
+  gap: 18px;
+  align-items: start;
+}
+@media (max-width: 720px) { .rig { grid-template-columns: minmax(0, 1fr); } }
+
+.rig-stage {
+  position: relative;
+  height: 280px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--panel);
+  background-image:
+    linear-gradient(to right, rgba(43, 45, 36, 0.055) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(43, 45, 36, 0.055) 1px, transparent 1px);
+  background-size: 20px 20px;
+  overflow: hidden;
+}
+
+/* Every handle visible, so all eight can be exercised by hand. */
+.showall .detent-handle {
+  background: rgba(168, 42, 87, 0.16);
+  outline: 1px solid rgba(168, 42, 87, 0.5);
+  outline-offset: -1px;
+}
+.showall .detent-handle:hover { background: rgba(168, 42, 87, 0.42); }
+
+.controls {
+  display: grid;
+  gap: 8px;
+  font-size: 12px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 12px;
+  background: var(--panel);
+}
+.controls label {
+  display: grid;
+  grid-template-columns: 5.4em minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+}
+.controls input,
+.controls select {
+  font: inherit;
+  font-size: 12px;
+  padding: 3px 5px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: var(--paper);
+  color: inherit;
+  min-width: 0;
+}
+.controls .row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+.controls button {
+  font: inherit;
+  font-size: 12px;
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: var(--paper);
+  cursor: pointer;
+}
+.controls button:hover { border-color: var(--hot); color: var(--hot); }
+
+/* ---------- hostile host ---------- */
+
+.hostile {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(236px, 1fr));
+  gap: 16px;
+}
+
+.hcell {
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 10px;
+  background: var(--panel);
+  min-height: 176px;
+  /* Each cell is its own containing block, so no cell's CSS reaches another —
+     and clips its own scaled content instead of painting over its neighbour. */
+  contain: layout style;
+  overflow: hidden;
+}
+
+/* A scaled wrapper still occupies its *unscaled* height in flow, so each one
+   reserves its own scaled height — the inner box is 96px, so 0.75 needs 72 and
+   1.4 needs 135. Getting this wrong puts the verdict line on top of the box. */
+.scaled { margin-bottom: 6px; }
+.scaled-75 { height: 74px; }
+.scaled-140 { height: 136px; }
+.hcell > h4 {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--mono);
+  color: var(--hot);
+}
+
+.scaled-75 { transform: scale(0.75); transform-origin: top left; width: 133.33%; }
+.scaled-140 { transform: scale(1.4); transform-origin: top left; width: 71.43%; }
+
+.mini {
+  position: relative;
+  height: 96px;
+  border: 1px dashed var(--line);
+  border-radius: 2px;
+}
+.mini > .chip-card {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  box-sizing: border-box;
+  width: 74px;
+  height: 44px;
+  background: var(--hot-soft);
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  font-size: 10px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  user-select: none;
+}
+.mini > .chip-card .detent-handle-se::after {
+  content: "";
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  width: 7px;
+  height: 7px;
+  border: 2px solid var(--ink);
+  border-top: 0;
+  border-left: 0;
+}
+
+.mini-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+.mini-list li {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  padding: 5px 8px;
+  font-size: 12px;
+  cursor: grab;
+  user-select: none;
+}
+.mini-list li.detent-sorting { border-color: var(--hot); background: var(--hot-soft); }
+
+/* The reset cell: author CSS that tries to fight the library. */
+/* Scoped to the content, not the cell. A host page's reset stylesheet flattens
+   the things it renders; it does not un-position the panel the component was
+   handed. Reverting the cell itself only proved that a broken cell looks
+   broken. */
+.reset-cell .mini > *,
+.reset-cell .mini-list,
+.reset-cell .mini-list * {
+  all: revert;
+  box-sizing: border-box;
+}
+.reset-cell .mini { position: relative; }
+.reset-cell .mini-list { list-style: none; margin: 8px 0 0; padding: 0; }
+.reset-cell .mini > .chip-card {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  width: 74px;
+  height: 44px;
+  border: 1px solid #2b2d24;
+}
+
+.sticky-strip {
+  position: relative;
+  height: 140px;
+  overflow-y: auto;
+  border: 1px dashed var(--line);
+  border-radius: 2px;
+}
+.sticky-strip > header {
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 4px 8px;
+}
+.smooth { scroll-behavior: smooth; }
+
+/* ---------- composition ---------- */
+
+.combo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+/* Sortable items that are themselves resizable: both write to the same state. */
+.dual {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+}
+.dual li {
+  position: relative;
+  box-sizing: border-box;
+  width: 180px;
+  height: 44px;
+  background: var(--panel);
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 4px;
+  font-size: 13px;
+  cursor: grab;
+  user-select: none;
+}
+.dual li.detent-sorting { border-color: var(--hot); background: var(--hot-soft); }
+.dual li .detent-handle-se::after {
+  content: "";
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  width: 8px;
+  height: 8px;
+  border: 2px solid var(--muted);
+  border-top: 0;
+  border-left: 0;
+}
+.dual li:hover .detent-handle-se::after { border-color: var(--hot); }
+
+.outer-scroll {
+  height: 210px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 8px;
+  background: rgba(43, 45, 36, 0.03);
+}
+.inner-scroll {
+  height: 150px;
+  overflow-y: auto;
+  border: 1px dashed var(--line);
+  border-radius: 2px;
+  padding: 6px;
+  background: var(--panel);
+}
+
+.growable {
+  position: relative;
+  box-sizing: border-box;
+  width: 230px;
+  height: 130px;
+  overflow: auto;
+  background: var(--panel);
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  padding: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.growable .detent-handle-se::after {
+  content: "";
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  width: 8px;
+  height: 8px;
+  border: 2px solid var(--muted);
+  border-top: 0;
+  border-left: 0;
+}
+
 @media (max-width: 860px) {
   .shell { grid-template-columns: minmax(0, 1fr); gap: 0; padding: 0 18px 200px; }
   .rail { position: static; height: auto; padding: 32px 0 0; }
@@ -540,6 +972,12 @@ kbd {
       <a href="#long">A list that scrolls<b>08</b></a>
       <a href="#keys">Without a mouse<b>09</b></a>
       <a href="#canvas">All of it at once<b>10</b></a>
+      <a href="#anchoring">Anchoring<b>11</b></a>
+      <a href="#cage">A ratio in a cage<b>12</b></a>
+      <a href="#offgrid">Off-grid snapping<b>13</b></a>
+      <a href="#handles">All eight handles<b>14</b></a>
+      <a href="#hostile">A hostile host<b>15</b></a>
+      <a href="#compose">Two bindings, one element<b>16</b></a>
     </nav>
     <div class="sizes" id="sizes"></div>
     <div class="log-panel">
@@ -659,6 +1097,172 @@ kbd {
       <p>Four panels on a canvas. Each one moves by its title bar and resizes from its bottom-right corner, both caged inside the canvas. Two of them hold sortable lists that pass cards between each other while the panels themselves are being moved.</p>
       <div class="canvas" id="canvas-root"></div>
       <div class="readout" id="canvas-readout"></div>
+    </section>
+
+    <!-- 11 -->
+    <section class="bench" id="anchoring">
+      <h2>The edge you grabbed, and only that edge</h2>
+      <p>The same card in six host layouts, each with a bottom-right handle and nothing else. Pull the corner. <b>Δleft and Δtop must stay 0</b> in all six — those edges were not grabbed. Only the first column is anchored to its top-left corner the way an absolutely positioned element is; the rest move on their own when their size changes, and the library has to cancel that out.</p>
+      <div class="cells" id="anchor-cells"></div>
+      <p class="hint">Green is held, pink is moved. Any pink in the <code>Δleft</code> or <code>Δtop</code> row is the bug this bench exists for.</p>
+    </section>
+
+    <!-- 12 -->
+    <section class="bench" id="cage">
+      <h2>A ratio inside a cage</h2>
+      <p>Aspect ratio locked, bounds set to the dashed cage, and only the four edge handles. An edge handle drives one axis and the ratio derives the other — and a derived axis has no edge you grabbed, so it grows about its own centre and has to fit on both sides. Pull any edge as far as you can: the panel should run out of room, never cross the dashes.</p>
+      <div class="cage" id="cage-area">
+        <div class="caged" id="caged-panel" style="left: 62%; top: 24px; width: 150px; height: 84px;">n e s w</div>
+      </div>
+      <div class="readout" id="cage-readout"></div>
+      <p class="hint">Sitting it close to a corner is the interesting case — that is where the derived axis runs out of room first.</p>
+    </section>
+
+    <!-- 13 -->
+    <section class="bench" id="offgrid">
+      <h2>A grid that does not start on the grid</h2>
+      <p>This panel is 190×110 with <code>grid: 20</code>, so its size is deliberately not a multiple of the step. Drag the left edge slowly. The edge must not move until the pointer has travelled half a step, and it must never move <em>against</em> the pointer.</p>
+      <div class="field field-short" id="grid-area">
+        <div class="card" id="offgrid-card" style="left: 60px; top: 40px; width: 190px; height: 110px;">190 × 110</div>
+      </div>
+      <div class="readout" id="offgrid-readout"></div>
+      <p class="hint">A grid counted from zero would only ever reach 180, 200, 220 — so the first pixel of movement jumped 10px, sometimes the wrong way.</p>
+    </section>
+
+    <!-- 14 -->
+    <section class="bench" id="handles">
+      <h2>All eight handles</h2>
+      <p>Every handle, visible and grabbable, with the options live. Changing any of them destroys the binding and rebinds — so this also exercises <code>destroy()</code> far harder than the test suite does. Watch the handle count: a leak would show up as it climbing.</p>
+      <div class="rig">
+        <div class="rig-stage" id="rig-stage">
+          <div class="caged showall" id="rig-panel" style="left: 90px; top: 70px; width: 190px; height: 110px;">grab any edge</div>
+        </div>
+        <div class="controls" id="rig-controls">
+          <label>min w <input type="number" id="c-minw" value="60" min="16" step="10"></label>
+          <label>min h <input type="number" id="c-minh" value="40" min="16" step="10"></label>
+          <label>max w <input type="number" id="c-maxw" value="" placeholder="none" step="10"></label>
+          <label>max h <input type="number" id="c-maxh" value="" placeholder="none" step="10"></label>
+          <label>ratio
+            <select id="c-aspect">
+              <option value="">off</option>
+              <option value="true">true</option>
+              <option value="1">1 / 1</option>
+              <option value="1.7777777777777777">16 / 9</option>
+            </select>
+          </label>
+          <label>grid
+            <select id="c-grid">
+              <option value="">off</option>
+              <option value="10">10</option>
+              <option value="20">20</option>
+            </select>
+          </label>
+          <label>bounds
+            <select id="c-bounds">
+              <option value="">none</option>
+              <option value="parent">parent</option>
+            </select>
+          </label>
+          <div class="row"><label style="grid-template-columns:auto auto;justify-self:start"><input type="checkbox" id="c-disabled" style="width:auto"> disabled</label></div>
+          <div class="row" id="rig-state"></div>
+          <button type="button" id="rig-reset">reset size</button>
+        </div>
+      </div>
+      <div class="readout" id="rig-readout"></div>
+    </section>
+
+    <!-- 15 -->
+    <section class="bench" id="hostile">
+      <h2>A hostile host</h2>
+      <p>The conditions the end-to-end fixture asserts against, on a page you can actually poke. Every cell should behave exactly like the benches above; where it cannot, the reason is documented rather than fixed.</p>
+      <div class="hostile" id="hostile-grid">
+
+        <div class="hcell">
+          <h4>transform: scale(0.75)</h4>
+          <div class="scaled scaled-75">
+            <div class="mini" id="h-scale-down"><div class="chip-card">drag + resize</div></div>
+          </div>
+          <div class="verdict" id="h-scale-down-v"></div>
+        </div>
+
+        <div class="hcell">
+          <h4>transform: scale(1.4)</h4>
+          <div class="scaled scaled-140">
+            <div class="mini" id="h-scale-up"><div class="chip-card">drag + resize</div></div>
+          </div>
+          <div class="verdict" id="h-scale-up-v"></div>
+        </div>
+
+        <div class="hcell" dir="rtl">
+          <h4 dir="ltr">dir="rtl"</h4>
+          <div class="mini" id="h-rtl"><div class="chip-card">resize</div></div>
+          <ul class="mini-list" id="h-rtl-list" style="margin-top:8px"></ul>
+        </div>
+
+        <div class="hcell">
+          <h4>shadow root</h4>
+          <div id="h-shadow"></div>
+        </div>
+
+        <div class="hcell">
+          <h4>sticky z-index: 9999</h4>
+          <div class="sticky-strip">
+            <header>this header is above everything</header>
+            <ul class="mini-list" id="h-sticky" style="padding:6px"></ul>
+          </div>
+          <div class="verdict" id="h-sticky-v">A lifted row passes under the header — the documented stacking-context limit.</div>
+        </div>
+
+        <div class="hcell">
+          <h4>scroll-behavior: smooth</h4>
+          <div class="sticky-strip smooth">
+            <ul class="mini-list" id="h-smooth" style="padding:6px"></ul>
+          </div>
+        </div>
+
+        <div class="hcell reset-cell">
+          <h4>all: revert</h4>
+          <div class="mini" id="h-reset"><div class="chip-card">resize</div></div>
+          <ul class="mini-list" id="h-reset-list" style="margin-top:8px"></ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 16 -->
+    <section class="bench" id="compose">
+      <h2>Two bindings, one element</h2>
+      <p>Where the state shared between <code>draggable</code>, <code>sortable</code> and <code>resizable</code> is most likely to go wrong. Every element here carries more than one binding, and they all write through the same box state.</p>
+      <div class="combo">
+
+        <div>
+          <h3>Sortable rows that resize</h3>
+          <p>Each row reorders by drag <em>and</em> resizes from its corner. Resize a row, reorder it, then resize it again — the size has to survive the reorder.</p>
+          <ul class="dual" id="dual-list"></ul>
+        </div>
+
+        <div>
+          <h3>A scroller inside a scroller</h3>
+          <p>Auto-scroll has to pick the nearest scrollable ancestor, not the outermost one. Drag a row to the inner edge.</p>
+          <div class="outer-scroll">
+            <p style="margin:0 0 8px;font-size:12px;color:var(--muted)">Outer scroller. The inner one has its own overflow.</p>
+            <div class="inner-scroll"><ul class="mini-list" id="nested-list"></ul></div>
+            <p style="margin:8px 0 0;font-size:12px;color:var(--muted)">More outer content, so the outer one really scrolls.<br><br><br><br><br><br>End of the outer scroller.</p>
+          </div>
+        </div>
+
+        <div>
+          <h3>A list inside a resizing panel</h3>
+          <p>Resize the panel while the list inside it is mid-reorder. The panel's own size is written by the library; the list's reorder measures boxes inside it.</p>
+          <div class="growable" id="grow-panel">
+            <ul class="mini-list" id="grow-list"></ul>
+          </div>
+          <div class="readout" id="grow-readout"></div>
+        </div>
+
+      </div>
+      <p class="hint">The body carries <code>data-detent-dragging</code> while any gesture is live, refcounted. It should always be gone once you let go — the readout below tracks it.</p>
+      <div class="readout" id="compose-readout"></div>
     </section>
 
   </main>
@@ -922,6 +1526,347 @@ readmeBody.textContent = 'Every panel is caged in the canvas. Resize one until i
 
 canvasPaint();
 window.addEventListener('resize', canvasPaint);
+
+/** A compact list of plain rows, for the benches where the list is not the point. */
+function fillMini(list, labels) {
+  for (const label of labels) {
+    const li = document.createElement('li');
+    li.textContent = label;
+    li.dataset.label = label;
+    list.appendChild(li);
+  }
+}
+
+// ---------- 11 anchoring ----------
+// Six host layouts, one `se` handle each. Only the edges the pointer grabbed may
+// move; every other delta has to read zero. `absolute` is the layout the test
+// suite used to cover on its own, which is why the other five went wrong.
+const ANCHORS = [
+  ['absolute', 'host-abs', 'position:absolute; left; top'],
+  ['margin auto', 'host-auto', 'margin: 0 auto'],
+  ['flex centre', 'host-center', 'justify-content: center'],
+  ['flex end', 'host-end', 'justify-content: flex-end'],
+  ['rtl', 'host-rtl', 'direction: rtl'],
+  ['absolute end', 'host-absend', 'position:absolute; right; bottom'],
+];
+
+const anchorCells = document.getElementById('anchor-cells');
+
+for (const [title, hostClass, note] of ANCHORS) {
+  const cell = document.createElement('div');
+  cell.className = 'cell';
+  cell.innerHTML =
+    `<h4>${title}</h4><code>${note}</code>` +
+    `<div class="host ${hostClass}"><div class="pad">se</div></div>` +
+    `<div class="deltas"></div>`;
+  anchorCells.appendChild(cell);
+
+  const pad = cell.querySelector('.pad');
+  const deltas = cell.querySelector('.deltas');
+  let start = null;
+
+  // Which edges this handle is allowed to move. Everything else must hold.
+  const allowed = { right: true, bottom: true, left: false, top: false };
+
+  function show() {
+    const box = pad.getBoundingClientRect();
+    const base = start ?? box;
+    deltas.innerHTML = ['left', 'top', 'right', 'bottom']
+      .map((edge) => {
+        const d = Math.round(box[edge] - base[edge]);
+        const state = d === 0 ? (allowed[edge] ? '' : 'held') : allowed[edge] ? '' : 'moved';
+        return `<span>Δ${edge} <b class="${state}">${d > 0 ? '+' : ''}${d}</b></span>`;
+      })
+      .join('');
+  }
+
+  resizable(pad, {
+    handles: ['se'],
+    minWidth: 48,
+    minHeight: 32,
+    onStart: () => {
+      start = pad.getBoundingClientRect();
+      show();
+    },
+    onResize: show,
+    onEnd: () => {
+      show();
+      const box = pad.getBoundingClientRect();
+      const slid = Math.round(box.left - start.left) !== 0 || Math.round(box.top - start.top) !== 0;
+      log('resize:end', `${title} — ${slid ? 'SLID' : 'anchored'}`);
+    },
+  });
+
+  show();
+}
+
+// ---------- 12 a ratio inside a cage ----------
+const cageArea = document.getElementById('cage-area');
+const cagedPanel = document.getElementById('caged-panel');
+const cageReadout = document.getElementById('cage-readout');
+
+function cagePaint() {
+  const cage = cageArea.getBoundingClientRect();
+  const box = cagedPanel.getBoundingClientRect();
+  // Measured against the same box the library uses as bounds: the cage's border
+  // box, which the outline marks exactly.
+  const out = Math.round(
+    Math.max(0, cage.left - box.left, box.right - cage.right,
+             cage.top - box.top, box.bottom - cage.bottom),
+  );
+  const ratio = (box.width / box.height).toFixed(3);
+  cageReadout.innerHTML =
+    `<span>size <b>${round(box.width)} × ${round(box.height)}</b></span>` +
+    `<span>ratio <b>${ratio}</b></span>` +
+    `<span class="${out ? 'verdict bad' : 'verdict ok'}">${out ? `escaped by ${out}px` : 'inside the cage'}</span>`;
+}
+
+resizable(cagedPanel, {
+  handles: ['n', 'e', 's', 'w'],
+  aspectRatio: true,
+  bounds: cageArea,
+  minWidth: 60,
+  minHeight: 34,
+  onResize: cagePaint,
+  onEnd: (e) => { cagePaint(); log('resize:end', `caged ${round(e.width)} × ${round(e.height)}`); },
+});
+cagePaint();
+window.addEventListener('resize', cagePaint);
+
+// ---------- 13 an off-grid grid ----------
+const offGridCard = document.getElementById('offgrid-card');
+const offGridReadout = document.getElementById('offgrid-readout');
+let gridStart = null;
+
+function offGridPaint(event) {
+  const box = offGridCard.getBoundingClientRect();
+  if (!gridStart) {
+    offGridReadout.innerHTML =
+      `<span>size <b>${round(box.width)} × ${round(box.height)}</b></span>` +
+      `<span>drag the left edge</span>`;
+    return;
+  }
+  const pointer = event ? Math.round(event.clientX - gridStart.pointerX) : 0;
+  const edge = Math.round(box.left - gridStart.left);
+  // Snapping means the edge lands on steps, so it can lead or lag the pointer by
+  // up to half a step. What it must never do is move the other way.
+  const wrongWay = pointer !== 0 && edge !== 0 && Math.sign(pointer) !== Math.sign(edge);
+  offGridReadout.innerHTML =
+    `<span>pointer <b>${pointer > 0 ? '+' : ''}${pointer}</b></span>` +
+    `<span>left edge <b class="${wrongWay ? 'moved' : ''}">${edge > 0 ? '+' : ''}${edge}</b></span>` +
+    `<span>width <b>${round(box.width)}</b></span>` +
+    `<span class="${wrongWay ? 'verdict bad' : 'verdict ok'}">${wrongWay ? 'moving against the pointer' : 'tracking the pointer'}</span>`;
+}
+
+resizable(offGridCard, {
+  handles: ['w', 'nw', 'e'],
+  grid: 20,
+  // No threshold: this bench compares pointer travel against edge travel, and a
+  // 4px dead zone before onStart would make the two disagree by 4px for reasons
+  // that have nothing to do with the grid.
+  distance: 0,
+  minWidth: 90,
+  minHeight: 50,
+  onStart: (e) => {
+    const box = offGridCard.getBoundingClientRect();
+    gridStart = { left: box.left, pointerX: e.event.clientX };
+  },
+  onResize: (e) => offGridPaint(e.event),
+  onEnd: (e) => { offGridPaint(e.event); log('resize:end', `grid ${round(e.width)} × ${round(e.height)}`); },
+});
+offGridPaint();
+
+// ---------- 14 all eight handles ----------
+let rigPanel = document.getElementById('rig-panel');
+const rigStage = document.getElementById('rig-stage');
+const rigReadout = document.getElementById('rig-readout');
+const rigState = document.getElementById('rig-state');
+let rigHandle = null;
+
+const control = (id) => document.getElementById(id);
+const numberOr = (id, fallback) => {
+  const raw = control(id).value.trim();
+  return raw === '' ? fallback : Number(raw);
+};
+
+function rigPaint(active) {
+  const box = rigPanel.getBoundingClientRect();
+  rigReadout.innerHTML =
+    `<span>handle <b>${active ?? '—'}</b></span>` +
+    `<span>size <b>${round(box.width)} × ${round(box.height)}</b></span>`;
+  rigState.textContent = `${rigPanel.querySelectorAll('[data-detent-handle]').length} handles bound`;
+}
+
+function rigBind() {
+  // Rebinding on every option change is the point: it runs destroy() hundreds of
+  // times in a session, which is where a leaked handle or listener would show.
+  if (rigHandle) rigHandle.destroy();
+  const aspectRaw = control('c-aspect').value;
+  const gridRaw = control('c-grid').value;
+  rigHandle = resizable(rigPanel, {
+    minWidth: numberOr('c-minw', 16),
+    minHeight: numberOr('c-minh', 16),
+    maxWidth: numberOr('c-maxw', Infinity),
+    maxHeight: numberOr('c-maxh', Infinity),
+    aspectRatio: aspectRaw === '' ? undefined : aspectRaw === 'true' ? true : Number(aspectRaw),
+    grid: gridRaw === '' ? undefined : Number(gridRaw),
+    bounds: control('c-bounds').value === 'parent' ? 'parent' : null,
+    disabled: control('c-disabled').checked,
+    onStart: (e) => { rigPaint(e.handle); return undefined; },
+    onResize: (e) => rigPaint(e.handle),
+    onEnd: (e) => { rigPaint(null); log('resize:end', `${e.handle} → ${round(e.width)} × ${round(e.height)}`); },
+  });
+  rigPaint(null);
+}
+
+for (const id of ['c-minw', 'c-minh', 'c-maxw', 'c-maxh', 'c-aspect', 'c-grid', 'c-bounds', 'c-disabled']) {
+  control(id).addEventListener('change', rigBind);
+}
+control('rig-reset').addEventListener('click', () => {
+  // A fresh element, not a restyled one. The library keeps its offset in a
+  // WeakMap keyed by the element, so clearing the inline transform alone leaves
+  // that offset behind and the next gesture snaps the panel back to it.
+  const fresh = document.createElement('div');
+  fresh.id = 'rig-panel';
+  fresh.className = 'caged showall';
+  fresh.style.cssText = 'left:90px;top:70px;width:190px;height:110px;';
+  fresh.textContent = 'grab any edge';
+  rigPanel.replaceWith(fresh);
+  rigPanel = fresh;
+  rigBind();
+});
+rigBind();
+
+// ---------- 15 a hostile host ----------
+function miniCard(mini, dragOptions = {}) {
+  const card = mini.querySelector('.chip-card');
+  draggable(card, { bounds: 'parent', cancel: '.detent-handle', ...dragOptions });
+  resizable(card, { handles: ['se'], minWidth: 40, minHeight: 28, bounds: 'parent' });
+  return card;
+}
+
+// A scaled ancestor means every measurement has to be converted out of rendered
+// pixels. The tell is drift: the card should stay under the cursor exactly.
+function scaledCell(id, verdictId, scale) {
+  const mini = document.getElementById(id);
+  const verdict = document.getElementById(verdictId);
+  let start = null;
+  const card = miniCard(mini, {
+    onStart: (e) => { start = { x: e.event.clientX, box: card.getBoundingClientRect() }; },
+    onMove: (e) => {
+      const box = card.getBoundingClientRect();
+      // Rendered movement should match pointer movement 1:1 whatever the scale.
+      const drift = Math.round(Math.abs(box.left - start.box.left - (e.event.clientX - start.x)));
+      verdict.textContent = drift <= 1 ? `tracking (drift ${drift}px)` : `DRIFTING by ${drift}px`;
+      verdict.className = `verdict ${drift <= 1 ? 'ok' : 'bad'}`;
+    },
+  });
+  verdict.textContent = `scale(${scale}) — drag to check for drift`;
+  verdict.className = 'verdict';
+}
+
+scaledCell('h-scale-down', 'h-scale-down-v', 0.75);
+scaledCell('h-scale-up', 'h-scale-up-v', 1.4);
+
+miniCard(document.getElementById('h-rtl'));
+fillMini(document.getElementById('h-rtl-list'), ['أول', 'ثاني', 'ثالث']);
+sortable(document.getElementById('h-rtl-list'), { onSort: (e) => log('sort', `rtl ${e.from.index} → ${e.to.index}`) });
+
+// A shadow root cannot see the document's stylesheet, so it adopts its own copy
+// of the real one — otherwise the handles would have no size and this cell would
+// pass by accident.
+const shadowHost = document.getElementById('h-shadow');
+const shadow = shadowHost.attachShadow({ mode: 'open' });
+const shadowStyle = document.createElement('style');
+shadowStyle.textContent =
+  /*__CSS__*/'' +
+  `.mini{position:relative;height:90px;border:1px dashed #c9c6b8;border-radius:2px}` +
+  `.chip-card{position:absolute;left:8px;top:8px;box-sizing:border-box;width:74px;height:44px;` +
+  `background:#f4dee6;border:1px solid #2b2d24;border-radius:2px;font:11px system-ui;color:#6e7264;` +
+  `display:flex;align-items:center;justify-content:center;cursor:grab;user-select:none}` +
+  `.chip-card .detent-handle-se::after{content:"";position:absolute;right:2px;bottom:2px;width:7px;height:7px;` +
+  `border:2px solid #2b2d24;border-top:0;border-left:0}` +
+  `ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:4px}` +
+  `li{background:#faf9f5;border:1px solid #c9c6b8;border-radius:2px;padding:5px 8px;font:12px system-ui;cursor:grab;user-select:none}`;
+shadow.append(shadowStyle);
+const shadowMini = document.createElement('div');
+shadowMini.className = 'mini';
+shadowMini.innerHTML = '<div class="chip-card">in a shadow</div>';
+const shadowList = document.createElement('ul');
+for (const label of ['alpha', 'beta', 'gamma']) {
+  const li = document.createElement('li');
+  li.textContent = label;
+  li.dataset.label = label;
+  shadowList.appendChild(li);
+}
+shadow.append(shadowMini, shadowList);
+miniCard(shadowMini);
+sortable(shadowList, { onSort: (e) => log('sort', `shadow ${e.from.index} → ${e.to.index}`) });
+
+fillMini(document.getElementById('h-sticky'), Array.from({ length: 9 }, (_, i) => `Row ${i + 1}`));
+sortable(document.getElementById('h-sticky'), { autoScroll: true, onSort: (e) => log('sort', `sticky ${e.from.index} → ${e.to.index}`) });
+
+fillMini(document.getElementById('h-smooth'), Array.from({ length: 9 }, (_, i) => `Smooth ${i + 1}`));
+sortable(document.getElementById('h-smooth'), { autoScroll: true, onSort: (e) => log('sort', `smooth ${e.from.index} → ${e.to.index}`) });
+
+miniCard(document.getElementById('h-reset'));
+fillMini(document.getElementById('h-reset-list'), ['reverted', 'still works', 'no styles']);
+sortable(document.getElementById('h-reset-list'), { onSort: (e) => log('sort', `reset ${e.from.index} → ${e.to.index}`) });
+
+// ---------- 16 two bindings, one element ----------
+const dualList = document.getElementById('dual-list');
+for (const label of ['Resize me, then reorder me', 'Then resize me again', 'And me']) {
+  const li = document.createElement('li');
+  li.dataset.label = label;
+  li.innerHTML =
+    `<span class="grip" aria-hidden="true"><svg width="12" height="16" viewBox="0 0 12 16" fill="currentColor">` +
+    `<circle cx="3" cy="3" r="1.5"/><circle cx="9" cy="3" r="1.5"/><circle cx="3" cy="8" r="1.5"/>` +
+    `<circle cx="9" cy="8" r="1.5"/><circle cx="3" cy="13" r="1.5"/><circle cx="9" cy="13" r="1.5"/></svg></span>` +
+    `<span>${label}</span>`;
+  dualList.appendChild(li);
+  // Both bindings on one element, writing through the same box state.
+  resizable(li, { handles: ['se'], minWidth: 120, minHeight: 32 });
+}
+sortable(dualList, {
+  handle: '.grip',
+  onSort: (e) => log('sort', `dual ${e.from.index} → ${e.to.index}`),
+});
+
+const nestedList = document.getElementById('nested-list');
+fillMini(nestedList, Array.from({ length: 12 }, (_, i) => `Nested ${i + 1}`));
+sortable(nestedList, {
+  autoScroll: { threshold: 40, speed: 8 },
+  onSort: (e) => log('sort', `nested ${e.from.index} → ${e.to.index}`),
+});
+
+const growPanel = document.getElementById('grow-panel');
+const growList = document.getElementById('grow-list');
+const growReadout = document.getElementById('grow-readout');
+fillMini(growList, Array.from({ length: 7 }, (_, i) => `Item ${i + 1}`));
+sortable(growList, { onSort: (e) => log('sort', `in-panel ${e.from.index} → ${e.to.index}`) });
+
+function growPaint() {
+  const box = growPanel.getBoundingClientRect();
+  growReadout.innerHTML = `<span>panel <b>${round(box.width)} × ${round(box.height)}</b></span>`;
+}
+resizable(growPanel, { handles: ['se', 'e', 's'], minWidth: 150, minHeight: 90, onResize: growPaint });
+growPaint();
+
+// The body attribute is refcounted across every simultaneous gesture. If it is
+// ever left behind, the cursor stays wrong for the rest of the session.
+const composeReadout = document.getElementById('compose-readout');
+let peakGestures = 0;
+function composePaint() {
+  const live = document.body.hasAttribute('data-detent-dragging');
+  if (live) peakGestures++;
+  composeReadout.innerHTML =
+    `<span>body flag <b class="${live ? 'moved' : ''}">${live ? 'set' : 'clear'}</b></span>` +
+    `<span>seen set <b>${peakGestures}</b> frames</span>`;
+}
+for (const type of ['pointerdown', 'pointerup', 'pointercancel', 'pointermove', 'keyup']) {
+  window.addEventListener(type, composePaint, true);
+}
+composePaint();
 
 // ---------- size table ----------
 document.getElementById('sizes').innerHTML = /*__SIZES__*/'';

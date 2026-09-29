@@ -46,6 +46,10 @@ const sizes = [
 const html = readFileSync('playground/template.html', 'utf8')
   .replace('/*__DRAGKIT__*/', bundle.outputFiles[0].text)
   .replace("/*__SIZES__*/''", JSON.stringify(sizes))
+  // The same sheet again, as a string. A shadow root cannot see a document
+  // stylesheet, so the shadow-DOM bench has to adopt its own copy — and it has
+  // to be the real one, or that bench proves nothing.
+  .replace("/*__CSS__*/''", JSON.stringify(css.outputFiles[0].text))
   .replace('</style>', css.outputFiles[0].text + '\n</style>');
 
 writeFileSync('playground/index.html', html);
