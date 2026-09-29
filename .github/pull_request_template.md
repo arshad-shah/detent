@@ -8,7 +8,14 @@ Setup, the three test tiers and the release process are in CONTRIBUTING.md.
 
 ## What this changes
 
-<!-- And why. If it fixes an issue, "Closes #123" here. -->
+<!--
+And why. If it closes issues, give each one its own keyword:
+
+    Closes #12, closes #13, closes #14
+
+GitHub only acts on the first reference in a comma-separated list, so
+"Closes #12, #13, #14" silently leaves #13 and #14 open.
+-->
 
 ## How it was verified
 
