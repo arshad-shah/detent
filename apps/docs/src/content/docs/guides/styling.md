@@ -22,7 +22,8 @@ drag, which is useful for cursor and `pointer-events` rules.
 
 ## Overriding needs no `!important`
 
-`detent/styles.css` ships inside `@layer detent`. Unlayered author CSS beats
+`@arshad-shah/detent/styles.css` ships inside `@layer detent`. Unlayered author
+CSS beats
 layered author CSS **at any specificity**, so a plain rule in your own
 stylesheet wins with no specificity war:
 
@@ -59,7 +60,8 @@ The consequence is a guarantee: **dragging, sorting and keyboard reordering all
 work with no stylesheet loaded at all.** The stylesheet governs appearance.
 
 The exception is resize handles. Their size and placement are cosmetic, so
-without `detent/styles.css` a library-created handle is correctly anchored but
+without `@arshad-shah/detent/styles.css` a library-created handle is correctly
+anchored but
 has no dimensions — there is nothing to grab. Either load the stylesheet, or
 supply your own handles and size them yourself.
 

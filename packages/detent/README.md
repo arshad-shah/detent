@@ -89,7 +89,8 @@ resizable(element, {
 ```
 
 By default, handles are `<span>` elements appended to the target and styled by
-`detent/styles.css`. They are invisible; give them whatever affordance suits
+`@arshad-shah/detent/styles.css`. They are invisible; give them whatever
+affordance suits
 your design.
 
 **Use your own handles instead** when appending children would break the
@@ -149,7 +150,7 @@ Full documentation, with demos you can drag, lives at
 
 ## Styling in one paragraph
 
-Classes are prefixed `detent-`, and `detent/styles.css` ships inside
+Classes are prefixed `detent-`, and `@arshad-shah/detent/styles.css` ships inside
 `@layer detent` — so an unlayered rule in your own stylesheet overrides it at
 any specificity, with no `!important` anywhere. The declarations the library
 cannot function without are written inline instead, beyond the reach of a host
