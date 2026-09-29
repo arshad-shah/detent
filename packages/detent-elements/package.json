@@ -1,6 +1,6 @@
 {
   "name": "@arshad-shah/detent-elements",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Custom elements for detent \u2014 drag, reorder and resize in any framework.",
   "type": "module",
   "sideEffects": false,

@@ -1,5 +1,12 @@
 # detent-svelte
 
+## 0.3.0
+
+### Patch Changes
+
+- Updated dependencies [[`024b500`](https://github.com/arshad-shah/detent/commit/024b50044ac3e0528493cc08a3503e8ffd875997)]:
+  - @arshad-shah/detent@0.3.0
+
 ## 0.2.0
 
 ### Minor Changes

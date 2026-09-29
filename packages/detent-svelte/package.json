@@ -1,6 +1,6 @@
 {
   "name": "@arshad-shah/detent-svelte",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Svelte actions for detent \u2014 drag, reorder and resize.",
   "type": "module",
   "sideEffects": false,
