@@ -17,6 +17,11 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
+        with:
+          # The token is not written into .git/config, where any later step —
+          # including a postinstall from any transitive dependency — could read
+          # it. Nothing in this job pushes with the git CLI.
+          persist-credentials: false
       - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86  # v6
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7
         with:
@@ -34,6 +39,10 @@ jobs:
       - run: pnpm test:browser
       - name: Bundle size budget
         run: pnpm size
+      # Nothing else builds the playground, so a broken one goes unnoticed.
+      # It reads dist/, so it has to come after the build.
+      - name: The playground still builds
+        run: pnpm -F @arshad-shah/detent playground
       - run: pnpm test:e2e
 
   release:
@@ -48,6 +57,13 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
         with:
           fetch-depth: 0
+          # Safe here too: changesets/action pushes the version commit and the
+          # tags through the GitHub API, not the git CLI — `push-with-git-cli`
+          # defaults to false — which is why every release commit in this
+          # repository carries GitHub's own signature. So the release job, the
+          # one job that holds contents:write and id-token:write, no longer
+          # leaves a usable token on disk while `pnpm install` runs.
+          persist-credentials: false
 
       - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86  # v6
 

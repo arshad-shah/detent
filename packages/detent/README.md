@@ -82,7 +82,7 @@ resizable(element, {
   minHeight: 80,
   maxWidth: 600,
   aspectRatio: 16 / 9, // or true to keep the current ratio
-  grid: 10,
+  grid: 10,            // counted from the size it started at
   bounds: 'parent',
   onResize(e) {},      // e.width, e.height, e.handle
 });
@@ -108,6 +108,12 @@ the library also leaves `position` alone.
 `draggable` and `resizable` compose on the same element — resizing from the top
 or left edge moves it as well as sizes it, and a following drag continues from
 there.
+
+The edge you grab is the only one that moves, whatever the host layout is doing.
+Changing an element's width re-runs layout, and a centred, right-aligned or RTL
+element shifts on its own when its size changes — detent measures how the layout
+responds once per gesture and cancels it out, so pulling one corner never drags
+the whole box sideways.
 
 ## How it stays smooth
 

@@ -22,6 +22,11 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
+        with:
+          # The token is not written into .git/config, where any later step —
+          # including a postinstall from any transitive dependency — could read
+          # it. Nothing in this job pushes with the git CLI.
+          persist-credentials: false
 
       - uses: github/codeql-action/init@cdf488f595d80d6e07e03d4674febd5ab45fa938  # v4
         with:

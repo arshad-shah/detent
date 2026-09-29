@@ -3,7 +3,7 @@ title: Limitations
 description: The things that will catch you out, why they happen, and what to do about them.
 ---
 
-Three things are documented rather than fixed, because fixing them inside the
+Four things are documented rather than fixed, because fixing them inside the
 library would cost more than it is worth. Each has a workaround.
 
 ## A dragged item cannot escape an ancestor's stacking context
@@ -105,6 +105,39 @@ nothing to grab.
 Either load the stylesheet, or pass your own `handles` and size them yourself.
 Everything else — dragging, sorting, keyboard reordering — works with no
 stylesheet at all. See [Styling](/guides/styling/).
+
+## An element sized by its container cannot be resized
+
+**The symptom.** You call `resizable` on a panel, drag a handle, and nothing
+happens. No error, no console warning, and `onResize` fires with the size never
+changing.
+
+**Why.** `resizable` works by writing `width` and `height`. Some layouts ignore
+those entirely:
+
+- `flex: 1`, or any `flex-grow` — the flex algorithm distributes the space and
+  `width` only sets the basis it starts from
+- a grid item stretched by the default `justify-self: stretch` or
+  `align-self: stretch`
+- `width: 100%` against a parent that is itself being sized by something else
+
+**How to confirm it.** Drag a handle and watch the element in devtools. The
+inline `width` detent writes is there and changing; the computed width is not.
+That gap is the whole diagnosis.
+
+**The fix.** Give the element a size of its own before making it resizable:
+
+```css
+.panel {
+  flex: none;      /* or justify-self: start, for a grid item */
+  width: 320px;
+}
+```
+
+**Why the library does not do this for you.** It would have to write `flex`,
+`justify-self` or `align-self` on your element and guess which one you meant,
+and undo the guess on `destroy()`. Which of those properties is in play is
+something your layout knows and the library does not.
 
 ## How large the pieces can be
 

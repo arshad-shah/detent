@@ -1,0 +1,62 @@
+name: Feature request
+description: Something detent should be able to do and cannot.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        detent is a zero-dependency library with a gzip ceiling per bundle,
+        enforced in CI. That constraint is the product, not an accident — so the
+        cost question below is a real one rather than a formality.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: >
+        What are you trying to build, and where does detent stop you? Describe
+        the situation rather than the API you have in mind — the best answer is
+        often a different one.
+    validations:
+      required: true
+
+  - type: textarea
+    id: workaround
+    attributes:
+      label: What you do today
+      description: >
+        The callbacks expose the underlying events and elements, so a surprising
+        amount is reachable from outside. What did you try, and how far did it
+        get?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you would add
+      description: The option, callback or export, and its shape if you have one in mind.
+
+  - type: dropdown
+    id: cost
+    attributes:
+      label: What should this cost
+      description: >
+        `packages/detent/size-budget.json` sets a gzip ceiling per bundle and CI
+        fails a pull request that exceeds it. A rough answer is fine; the point
+        is that the question gets asked.
+      options:
+        - Nothing — it is a change in behaviour, not new code
+        - A few hundred bytes
+        - A kilobyte or more, and I think it earns it
+        - It belongs outside the core, in userland or a wrapper
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope
+      options:
+        - label: This works for mouse, touch and pen, or I have said which it does not.
+        - label: I am willing to open a pull request for it.

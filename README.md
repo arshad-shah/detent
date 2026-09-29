@@ -50,7 +50,8 @@ column and a wrapping grid all work unconfigured. Auto-scroll, and full
 keyboard reordering with screen-reader announcements.
 
 **`resizable`** — eight handles, or elements you supply yourself. Aspect ratio,
-grid, bounds as a size ceiling.
+grid, bounds as a size ceiling. The edge you grab is the only one that moves,
+whether the element is absolutely positioned, centred, right-aligned or RTL.
 
 ## Why it stays smooth
 
@@ -102,10 +103,16 @@ pnpm test:e2e    # the hostile host-page fixture
 pnpm docs        # the documentation site
 ```
 
+`packages/detent/playground/index.html` is a single self-contained file, built
+by `pnpm -F @arshad-shah/detent playground`, that opens straight from disk — it
+is where behaviour gets checked by hand, including the host layouts and hostile
+pages that the test suite cannot show you.
+
 [CONTRIBUTING.md](CONTRIBUTING.md) covers the test tiers, changesets and the
 release flow. [docs/SETUP.md](docs/SETUP.md) has the one-time npm and
 Cloudflare steps. [SECURITY.md](SECURITY.md) covers reporting and how releases
-are secured.
+are secured. [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) applies to everyone taking
+part.
 
 Design documents and audits are in [`docs/superpowers/`](docs/superpowers/) —
 including the [adversarial reviews](docs/superpowers/audits/) and what each

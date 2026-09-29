@@ -103,6 +103,123 @@ describe('computeResize', () => {
     expect(r.height).toBe(110);
   });
 
+  // The grid counts from the size the element started at, not from zero. An
+  // element whose size is not already a multiple of the step would otherwise
+  // jump up to a full step on the first movement — see the tests below, which
+  // all use a start size deliberately off the grid.
+  const offGrid = { ...base, startWidth: 190, startHeight: 110 } as const;
+
+  it('leaves an off-grid size untouched when nothing has moved', () => {
+    const r = computeResize({ ...offGrid, dirX: -1, dirY: -1, delta: { x: 0, y: 0 }, grid: [20, 20] });
+    expect(r.width).toBe(190);
+    expect(r.height).toBe(110);
+    expect(r.offsetX).toBe(0);
+    expect(r.offsetY).toBe(0);
+  });
+
+  it('moves the grabbed edge by whole steps from an off-grid start', () => {
+    const grid: [number, number] = [20, 20];
+    // Half a step in: still rounds back to where it began.
+    expect(computeResize({ ...offGrid, dirX: 1, dirY: 0, delta: { x: 9, y: 0 }, grid }).width).toBe(190);
+    // Past half a step: exactly one step, never a fraction of the start size.
+    expect(computeResize({ ...offGrid, dirX: 1, dirY: 0, delta: { x: 11, y: 0 }, grid }).width).toBe(210);
+    expect(computeResize({ ...offGrid, dirX: 1, dirY: 0, delta: { x: 31, y: 0 }, grid }).width).toBe(230);
+  });
+
+  it('holds still until the pointer has travelled half a step', () => {
+    const grid: [number, number] = [20, 20];
+    // Under half a step in either direction, from either edge, nothing moves.
+    for (const dirX of [1, -1] as const) {
+      for (const dx of [-9, -5, -1, 1, 5, 9]) {
+        const r = computeResize({ ...offGrid, dirX, dirY: 0, delta: { x: dx, y: 0 }, grid });
+        expect(r.width).toBe(190);
+        expect(r.offsetX).toBe(0);
+      }
+    }
+  });
+
+  it('changes the size by whole steps once it does move', () => {
+    const grid: [number, number] = [20, 20];
+    for (const dx of [11, 19, 21, 39, 41]) {
+      const r = computeResize({ ...offGrid, dirX: 1, dirY: 0, delta: { x: dx, y: 0 }, grid });
+      expect((r.width - 190) % 20).toBe(0);
+    }
+  });
+
+  // `anchor` is how far the host layout moves the element per pixel of size
+  // change: 0 when it is pinned by left/top, -0.5 when centred, -1 when
+  // end-anchored. The offset has to undo that, or resizing from one corner
+  // drags the whole element sideways.
+  describe('anchor correction', () => {
+    it('is a no-op for a start-anchored element', () => {
+      const without = computeResize({ ...base, dirX: 1, dirY: 1, delta: { x: 60, y: 40 } });
+      const zero = computeResize({
+        ...base,
+        dirX: 1,
+        dirY: 1,
+        delta: { x: 60, y: 40 },
+        anchor: { x: 0, y: 0 },
+      });
+      expect(zero).toEqual(without);
+      expect(zero.offsetX).toBe(0);
+      expect(zero.offsetY).toBe(0);
+    });
+
+    it('gives back half the growth for a centred element', () => {
+      const r = computeResize({
+        ...base,
+        dirX: 1,
+        dirY: 1,
+        delta: { x: 60, y: 40 },
+        anchor: { x: -0.5, y: -0.5 },
+      });
+      // Layout will pull the element 30 left and 20 up; this puts it back.
+      expect(r.offsetX).toBe(30);
+      expect(r.offsetY).toBe(20);
+    });
+
+    it('gives back all the growth for an end-anchored element', () => {
+      const r = computeResize({
+        ...base,
+        dirX: 1,
+        dirY: 1,
+        delta: { x: 60, y: 40 },
+        anchor: { x: -1, y: -1 },
+      });
+      expect(r.offsetX).toBe(60);
+      expect(r.offsetY).toBe(40);
+    });
+
+    it('composes with the edge term on a top-left handle', () => {
+      // Dragging nw inwards by 50 shrinks the element and moves it 50 right.
+      // A centred host would also move it 25 right on its own, so the offset is
+      // the difference rather than the sum.
+      const r = computeResize({
+        ...base,
+        dirX: -1,
+        dirY: 0,
+        delta: { x: 50, y: 0 },
+        anchor: { x: -0.5, y: 0 },
+      });
+      expect(r.width).toBe(150);
+      expect(r.offsetX).toBe(25);
+    });
+
+    it('derives the correction from the clamped size, so a minimum cannot drift', () => {
+      const r = computeResize({
+        ...base,
+        dirX: 1,
+        dirY: 1,
+        delta: { x: 5000, y: 5000 },
+        limits: { ...free, maxWidth: 260, maxHeight: 140 },
+        anchor: { x: -0.5, y: -0.5 },
+      });
+      expect(r.width).toBe(260);
+      expect(r.offsetX).toBe(30);
+      expect(r.offsetY).toBe(20);
+    });
+  });
+
   it('holds the ratio from an edge handle', () => {
     const r = computeResize({ ...base, dirX: 1, dirY: 0, delta: { x: 100, y: 0 }, aspect: 2 });
     expect(r.width).toBe(300);

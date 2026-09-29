@@ -1,5 +1,8 @@
 # Contributing
 
+Everyone taking part here is expected to follow the
+[Code of Conduct](CODE_OF_CONDUCT.md).
+
 ## Getting set up
 
 ```bash
@@ -167,6 +170,27 @@ SHA with a tag when resolving a conflict.
 `main` is protected: pull requests only, required checks, no force pushes,
 enforced for admins. The settings live in
 [`.github/branch-protection.json`](.github/branch-protection.json) so they are
-reviewable in a diff rather than buried in a dashboard.
+reviewable in a diff rather than buried in a dashboard, and `pnpm protect-main`
+applies them.
+
+Five checks are required — `verify`, `changeset` and `dependencies` from
+`pr.yml`, `build` from `docs.yml`, and `analyze` from `codeql.yml`. Code-owner
+review is on, which is what makes [`CODEOWNERS`](.github/CODEOWNERS) a gate
+rather than a note: it guards the paths where a mistake reaches publishing
+credentials, branch protection, or the contents of a published tarball.
+
+**`required_approving_review_count` is deliberately `0`.** GitHub does not let
+you approve your own pull request, so requiring one approval on a
+single-maintainer repository would mean nothing could ever merge — including the
+automated Version Packages PR that cuts every release. Zero approvals, plus
+required checks, plus code-owner review, is the strongest configuration that
+still functions today, and it starts biting the moment a second person has write
+access with no further change needed. Raise it then, not before.
+
+Workflows check out with `persist-credentials: false`. The default writes the
+job's `GITHUB_TOKEN` into `.git/config`, where any `postinstall` in the
+dependency tree could read it during the `pnpm install` that follows. Nothing
+here pushes with the git CLI — `changesets/action` uses the GitHub API — so
+nothing needs it. Do not add it back when resolving a conflict.
 
 Reporting a vulnerability: [SECURITY.md](SECURITY.md).

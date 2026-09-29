@@ -20,6 +20,18 @@ export interface ResizeInput {
   /** width / height to hold, or null for free resizing. */
   aspect: number | null;
   grid: [number, number] | null;
+  /**
+   * How far the element's own layout position moves per pixel of size change,
+   * per axis — `0` for a start-anchored element, `-0.5` for a centred one, `-1`
+   * for an end-anchored one, and anything between when a sibling absorbs part
+   * of the change.
+   *
+   * Writing `width` re-runs layout, and for most host layouts that moves the
+   * element. Without this term the element slides sideways when resized from a
+   * single corner. Omitted means `0`, which is exactly the behaviour of an
+   * absolutely positioned element pinned by `left` and `top`.
+   */
+  anchor?: Point;
 }
 
 export interface ResizeResult {
@@ -64,20 +76,46 @@ export function reconcileAspect(
 }
 
 /**
+ * Where the element has to sit so the edge the pointer did not grab stays put.
+ *
+ * Two terms. `edge` is the displacement the grabbed handle asks for: nothing for
+ * a handle on the start side, the whole size change for one on the end side, and
+ * half of it either way for an axis no handle drives — an axis `aspectRatio`
+ * derives has no edge the user grabbed, so it grows about its own centre rather
+ * than sprawling off to one side. `anchor` undoes the movement the host layout
+ * applies on its own when the size changes.
+ *
+ * Both are derived from the final clamped size, so hitting a limit cannot make
+ * the element drift.
+ */
+function offsetFor(dir: -1 | 0 | 1, size: number, startSize: number, anchor: number): number {
+  // Subtract in this order rather than negating `change`, so an unmoved axis
+  // yields +0 instead of -0.
+  const edge = dir < 0 ? startSize - size : dir > 0 ? 0 : (startSize - size) / 2;
+  return edge - anchor * (size - startSize);
+}
+
+/**
  * All eight handles are the same sum, expressed as a direction per axis. The
  * only extra work for the top and left handles is that shrinking has to move
  * the element as well as resize it — and that offset is derived from the final
  * clamped size, so hitting a minimum never causes the element to drift.
  */
 export function computeResize(input: ResizeInput): ResizeResult {
-  const { startWidth, startHeight, dirX, dirY, delta, limits, aspect, grid } = input;
+  const { startWidth, startHeight, dirX, dirY, delta, limits, aspect, grid, anchor } = input;
 
   let width = dirX === 0 ? startWidth : startWidth + delta.x * dirX;
   let height = dirY === 0 ? startHeight : startHeight + delta.y * dirY;
 
   if (grid) {
-    if (dirX !== 0 && grid[0] > 1) width = snap(width, grid[0]);
-    if (dirY !== 0 && grid[1] > 1) height = snap(height, grid[1]);
+    // Counted from the size the element started at, not from zero. Snapping the
+    // absolute size means the reachable sizes are multiples of the step, so an
+    // element that did not begin on one jumps up to a whole step the moment the
+    // drag threshold is crossed — and can jump against the pointer. Anchoring
+    // to the start size makes a zero delta a no-op and every step a whole step,
+    // which is the same thing draggable does with position.
+    if (dirX !== 0 && grid[0] > 1) width = snap(width, grid[0], startWidth);
+    if (dirY !== 0 && grid[1] > 1) height = snap(height, grid[1], startHeight);
   }
 
   if (aspect && aspect > 0) {
@@ -103,8 +141,8 @@ export function computeResize(input: ResizeInput): ResizeResult {
   return {
     width,
     height,
-    offsetX: dirX < 0 ? startWidth - width : 0,
-    offsetY: dirY < 0 ? startHeight - height : 0,
+    offsetX: offsetFor(dirX, width, startWidth, anchor?.x ?? 0),
+    offsetY: offsetFor(dirY, height, startHeight, anchor?.y ?? 0),
   };
 }
 
