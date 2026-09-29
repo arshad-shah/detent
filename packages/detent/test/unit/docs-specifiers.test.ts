@@ -51,10 +51,20 @@ const BAD = [
   /\bimport\s+['"]detent(-react|-svelte|-elements)?(\/[^'"]*)?['"]/,
   /\b(?:npm|pnpm|yarn|bun)\s+(?:install|add|i|view|uninstall)\s+(?:[^\n]*\s)?detent(?:-react|-svelte|-elements)?\b/,
   /`detent(-react|-svelte|-elements)?\/[a-z][\w.-]*`/,
-  // Anchored to the scheme on purpose. Unanchored, this matches a registry URL
-  // sitting inside some other host's path, which CodeQL is right to flag.
-  /https?:\/\/(?:www\.)?npmjs\.com\/package\/detent(-react|-svelte|-elements)?\b/,
-  /(?:^|[\s"'(/])node_modules\/detent(-react|-svelte|-elements)?\//,
+];
+
+/**
+ * The URL and path cases, as plain substrings rather than patterns.
+ *
+ * A regex over a URL that is not anchored to the start of the string is a real
+ * defect when the result authorises anything — CodeQL flags it, correctly — and
+ * anchoring with `^` cannot work here, because these appear mid-sentence. There
+ * is no pattern to express anyway: the scoped form puts `@arshad-shah/` exactly
+ * where these stop matching, so a substring test is both safer and more precise.
+ */
+const BAD_SUBSTRINGS = [
+  'npmjs.com/package/detent',
+  'node_modules/detent',
 ];
 
 describe('documentation names the published packages', () => {
@@ -69,7 +79,10 @@ describe('documentation names the published packages', () => {
     for (const file of files) {
       const lines = readFileSync(file, 'utf8').split('\n');
       lines.forEach((line, i) => {
-        if (BAD.some((pattern) => pattern.test(line))) {
+        const hit =
+          BAD.some((pattern) => pattern.test(line)) ||
+          BAD_SUBSTRINGS.some((needle) => line.includes(needle));
+        if (hit) {
           offences.push(`${relative(ROOT, file)}:${i + 1}  ${line.trim()}`);
         }
       });
