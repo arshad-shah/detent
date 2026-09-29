@@ -98,7 +98,8 @@ three engines.
 
 ## Resize handles need the stylesheet
 
-Library-created handles get their size from `detent/styles.css`. Without it
+Library-created handles get their size from `@arshad-shah/detent/styles.css`.
+Without it
 they exist and are correctly anchored, but have no dimensions, so there is
 nothing to grab.
 

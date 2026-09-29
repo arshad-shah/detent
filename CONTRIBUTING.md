@@ -27,7 +27,8 @@ pnpm size          # gzip table and the budget check
 
 **Build before you typecheck.** The wrapper packages resolve `detent`'s types
 through its emitted declarations, so `pnpm typecheck` fails with
-`Cannot find module 'detent'` on a clean checkout until `pnpm build` has run.
+`Cannot find module '@arshad-shah/detent'` on a clean checkout until `pnpm build`
+has run.
 CI runs them in that order for the same reason.
 
 ## How tests are organised

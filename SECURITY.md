@@ -55,10 +55,10 @@ npm audit signatures
 For a specific version:
 
 ```bash
-npm view detent dist.integrity
+npm view @arshad-shah/detent dist.integrity
 ```
 
-The provenance badge on <https://www.npmjs.com/package/detent> links to the
+The provenance badge on <https://www.npmjs.com/package/@arshad-shah/detent> links to the
 workflow run that built it, and that run's logs are public.
 
 ## Supported versions

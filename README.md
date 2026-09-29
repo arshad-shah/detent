@@ -15,8 +15,8 @@ npm install @arshad-shah/detent
 ```
 
 ```js
-import { draggable, sortable, resizable } from 'detent';
-import 'detent/styles.css'; // required for resize handles, optional otherwise
+import { draggable, sortable, resizable } from '@arshad-shah/detent';
+import '@arshad-shah/detent/styles.css'; // required for resize handles, optional otherwise
 
 draggable(box, { bounds: 'parent' });
 sortable(list, { animation: 180, onSort: ({ from, to }) => reorder(from, to) });

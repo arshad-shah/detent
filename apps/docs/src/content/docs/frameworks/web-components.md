@@ -12,7 +12,7 @@ npm install @arshad-shah/detent @arshad-shah/detent-elements
   import { defineDetentElements } from '@arshad-shah/detent-elements';
   defineDetentElements();
 </script>
-<link rel="stylesheet" href="/node_modules/detent/dist/styles.css">
+<link rel="stylesheet" href="/node_modules/@arshad-shah/detent/dist/styles.css">
 
 <detent-sortable animation="180" style="display:block">
   <div>first</div>
