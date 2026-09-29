@@ -51,8 +51,10 @@ const BAD = [
   /\bimport\s+['"]detent(-react|-svelte|-elements)?(\/[^'"]*)?['"]/,
   /\b(?:npm|pnpm|yarn|bun)\s+(?:install|add|i|view|uninstall)\s+(?:[^\n]*\s)?detent(?:-react|-svelte|-elements)?\b/,
   /`detent(-react|-svelte|-elements)?\/[a-z][\w.-]*`/,
-  /npmjs\.com\/package\/detent(-react|-svelte|-elements)?\b/,
-  /node_modules\/detent(-react|-svelte|-elements)?\//,
+  // Anchored to the scheme on purpose. Unanchored, this matches a registry URL
+  // sitting inside some other host's path, which CodeQL is right to flag.
+  /https?:\/\/(?:www\.)?npmjs\.com\/package\/detent(-react|-svelte|-elements)?\b/,
+  /(?:^|[\s"'(/])node_modules\/detent(-react|-svelte|-elements)?\//,
 ];
 
 describe('documentation names the published packages', () => {
