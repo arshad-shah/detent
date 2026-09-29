@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/arshad-shah/detent/security/advisories/new
+    about: Report privately through GitHub's advisory flow. Never in a public issue.
+  - name: Question or idea
+    url: https://github.com/arshad-shah/detent/discussions
+    about: Anything that is not a defect or a concrete proposal.
+  - name: Documentation
+    url: https://detent.arshadshah.com
+    about: The API reference, guides and the limitations page, with demos you can drag.

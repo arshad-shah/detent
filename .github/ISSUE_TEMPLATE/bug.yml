@@ -1,0 +1,118 @@
+name: Bug report
+description: Something does not behave the way it is documented to.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time. The fields below are the ones that decide
+        whether a detent bug can be reproduced — especially the input device and
+        the layout around the element, which is where most of them turn out to
+        live.
+
+        **Found something exploitable?** Do not file it here. Use the
+        [private advisory flow](https://github.com/arshad-shah/detent/security/advisories/new).
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: The exact version, from `package.json` or `npm ls @arshad-shah/detent`.
+      placeholder: "@arshad-shah/detent 0.3.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: api
+    attributes:
+      label: Which part
+      multiple: true
+      options:
+        - draggable
+        - sortable
+        - resizable
+        - a framework wrapper (react / svelte / elements)
+        - the stylesheet
+    validations:
+      required: true
+
+  - type: dropdown
+    id: engine
+    attributes:
+      label: Browser engine
+      description: The engine, not the brand — Edge, Brave, Arc and Chrome are all Chromium.
+      multiple: true
+      options:
+        - Chromium (Chrome, Edge, Brave, Arc, Opera)
+        - Firefox (Gecko)
+        - Safari (WebKit)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: pointer
+    attributes:
+      label: Input device
+      description: >
+        detent has one input path for all three, so this is the single most
+        common source of "works for me". Please pick what you actually used.
+      multiple: true
+      options:
+        - Mouse or trackpad
+        - Touch
+        - Pen or stylus
+        - Keyboard
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: "macOS 15.2, Windows 11, iOS 18, Android 15"
+    validations:
+      required: true
+
+  - type: textarea
+    id: layout
+    attributes:
+      label: The layout around the element
+      description: >
+        How is the element positioned and sized by your page? Absolutely
+        positioned, a flex or grid child, centred, `dir="rtl"`, inside a
+        transformed or scrolling ancestor, inside a shadow root? Paste the
+        relevant CSS if you can. Several resize bugs have turned entirely on
+        this, so please do not skip it.
+      placeholder: |
+        .panel { position: absolute; left: 40px; top: 40px; width: 300px; }
+        Its parent has `transform: scale(0.8)`.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected, and what happened
+      description: Both, in that order. If there is an error, paste it in full.
+    validations:
+      required: true
+
+  - type: input
+    id: repro
+    attributes:
+      label: Reproduction
+      description: >
+        A CodeSandbox, StackBlitz or gist. The
+        [playground](https://github.com/arshad-shah/detent/tree/main/packages/detent/playground)
+        is a single self-contained file — editing it and attaching the result
+        works too.
+      placeholder: https://codesandbox.io/...
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before you file
+      options:
+        - label: I checked the [limitations guide](https://detent.arshadshah.com/guides/limitations/), which documents the things that are known and deliberate.
+          required: true
+        - label: I am loading `@arshad-shah/detent/styles.css`, or I supplied my own handles and sized them myself.
