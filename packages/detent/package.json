@@ -1,6 +1,6 @@
 {
   "name": "@arshad-shah/detent",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Tiny zero-dependency drag, reorder and resize for the web. Pointer-based, touch-ready, framework-free.",
   "type": "module",
   "sideEffects": false,

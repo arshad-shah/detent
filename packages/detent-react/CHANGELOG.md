@@ -1,5 +1,24 @@
 # detent-react
 
+## 0.3.1
+
+### Patch Changes
+
+- [#57](https://github.com/arshad-shah/detent/pull/57) [`0bf9c7f`](https://github.com/arshad-shah/detent/commit/0bf9c7f3a4399a8897b3b58dc075f5b223857bc3) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Release alongside `@arshad-shah/detent` so all four stay on one version line.
+  
+  `@arshad-shah/detent-elements` earns it on its own: its README told you to load
+  the stylesheet from `node_modules/detent/dist/styles.css`, a path that has not
+  existed since the packages were scoped, and that README ships inside the
+  published tarball.
+  
+  `detent-react` and `detent-svelte` had correct documentation already. They are
+  here because the four packages are `linked` in `.changeset/config.json` — they
+  are meant to share a version, and leaving two of them a patch behind makes
+  "which versions go together" a question a reader has to work out rather than
+  read.
+- Updated dependencies [[`d91c542`](https://github.com/arshad-shah/detent/commit/d91c542d064d2465efd3acddc1f4994d9c236581)]:
+  - @arshad-shah/detent@0.3.1
+
 ## 0.3.0
 
 ### Patch Changes
